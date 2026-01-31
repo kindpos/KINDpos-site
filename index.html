@@ -1,0 +1,340 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="description" content="KINDpos — local-first POS built to keep working when things go wrong." />
+  <title>KINDpos — Nice. Dependable. Yours.</title>
+
+  <style>
+    :root{
+      /* Ethereal green + stormy neutrals */
+      --bg: #07110e;
+      --panel: rgba(10, 26, 20, 0.62);
+      --panel-2: rgba(8, 18, 14, 0.55);
+      --text: #d9f4ea;
+      --muted: rgba(217, 244, 234, 0.72);
+      --line: rgba(140, 255, 210, 0.22);
+      --glow: rgba(140, 255, 210, 0.35);
+      --accent: #8cffd2;   /* ethereal green */
+      --accent2: #7cf3c7;
+      --warn: rgba(255, 220, 120, 0.9);
+      --shadow: rgba(0,0,0,0.55);
+    }
+
+    * { box-sizing: border-box; }
+    html, body { height: 100%; }
+
+    body{
+      margin: 0;
+      color: var(--text);
+      background: radial-gradient(1200px 700px at 25% 20%, rgba(140,255,210,0.08), transparent 55%),
+                  radial-gradient(900px 600px at 80% 75%, rgba(124,243,199,0.06), transparent 60%),
+                  linear-gradient(180deg, #050c0a, var(--bg));
+      font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, "Apple Color Emoji","Segoe UI Emoji";
+      letter-spacing: 0.2px;
+      overflow-x: hidden;
+    }
+
+    /* Optional: if you have your custom fonts locally, add @font-face here */
+
+    .wrap{
+      max-width: 1080px;
+      margin: 0 auto;
+      padding: 44px 20px 70px;
+      position: relative;
+    }
+
+    .topbar{
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 18px;
+      margin-bottom: 38px;
+    }
+
+    .brand{
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      text-decoration: none;
+      color: var(--text);
+    }
+
+    .mark{
+      width: 36px;
+      height: 36px;
+      border-radius: 10px;
+      border: 1px solid var(--line);
+      background: linear-gradient(180deg, rgba(140,255,210,0.16), rgba(140,255,210,0.03));
+      box-shadow: 0 0 22px rgba(140,255,210,0.12);
+      display: grid;
+      place-items: center;
+      font-weight: 700;
+      color: var(--accent);
+    }
+
+    .brand h1{
+      font-size: 15px;
+      margin: 0;
+      font-weight: 650;
+      letter-spacing: 1.8px;
+      text-transform: uppercase;
+      opacity: 0.95;
+    }
+
+    .tag{
+      font-size: 12px;
+      color: var(--muted);
+      opacity: 0.85;
+    }
+
+    .pill{
+      border: 1px solid var(--line);
+      background: rgba(10, 26, 20, 0.45);
+      padding: 8px 12px;
+      border-radius: 999px;
+      color: var(--muted);
+      font-size: 12px;
+      box-shadow: 0 10px 24px var(--shadow);
+      white-space: nowrap;
+    }
+
+    .hero{
+      display: grid;
+      grid-template-columns: 1.2fr 0.8fr;
+      gap: 22px;
+      align-items: start;
+    }
+
+    @media (max-width: 900px){
+      .hero{ grid-template-columns: 1fr; }
+    }
+
+    .card{
+      border: 1px solid var(--line);
+      background: linear-gradient(180deg, rgba(10, 26, 20, 0.72), rgba(8, 18, 14, 0.44));
+      border-radius: 18px;
+      padding: 22px;
+      box-shadow: 0 18px 50px rgba(0,0,0,0.45);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .card:before{
+      content:"";
+      position:absolute;
+      inset:-2px;
+      background: radial-gradient(600px 200px at 25% 0%, rgba(140,255,210,0.12), transparent 55%);
+      pointer-events:none;
+    }
+
+    .headline{
+      font-size: clamp(34px, 4.3vw, 54px);
+      line-height: 1.02;
+      margin: 8px 0 10px;
+      font-weight: 780;
+      letter-spacing: -0.6px;
+    }
+
+    .subhead{
+      font-size: 16px;
+      line-height: 1.55;
+      color: var(--muted);
+      margin: 0 0 16px;
+      max-width: 62ch;
+    }
+
+    .emph{
+      color: var(--text);
+      text-shadow: 0 0 22px rgba(140,255,210,0.12);
+    }
+
+    .points{
+      display: grid;
+      gap: 10px;
+      margin: 16px 0 18px;
+      padding: 0;
+      list-style: none;
+      color: var(--muted);
+      font-size: 14px;
+    }
+
+    .points li{
+      display: flex;
+      gap: 10px;
+      align-items: flex-start;
+    }
+
+    .dot{
+      width: 10px;
+      height: 10px;
+      margin-top: 5px;
+      border-radius: 999px;
+      background: var(--accent);
+      box-shadow: 0 0 16px var(--glow);
+      flex: 0 0 auto;
+    }
+
+    .ctaRow{
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin-top: 16px;
+      align-items: center;
+    }
+
+    .btn{
+      appearance: none;
+      border: 1px solid var(--line);
+      background: rgba(140,255,210,0.10);
+      color: var(--text);
+      padding: 11px 14px;
+      border-radius: 12px;
+      font-weight: 650;
+      cursor: pointer;
+      text-decoration: none;
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      transition: transform 160ms ease, box-shadow 160ms ease, background 160ms ease;
+      box-shadow: 0 12px 28px rgba(0,0,0,0.45);
+    }
+
+    .btn:hover{
+      transform: translateY(-1px);
+      background: rgba(140,255,210,0.14);
+      box-shadow: 0 18px 40px rgba(0,0,0,0.55);
+    }
+
+    .btn.primary{
+      border-color: rgba(140,255,210,0.42);
+      background: linear-gradient(180deg, rgba(140,255,210,0.20), rgba(140,255,210,0.08));
+    }
+
+    .btn small{
+      color: var(--muted);
+      font-weight: 500;
+    }
+
+    .side h2{
+      margin: 4px 0 10px;
+      font-size: 16px;
+      letter-spacing: 1.4px;
+      text-transform: uppercase;
+      color: var(--text);
+      opacity: 0.9;
+    }
+
+    .mini{
+      font-size: 14px;
+      line-height: 1.55;
+      color: var(--muted);
+      margin: 0 0 14px;
+    }
+
+    .callout{
+      border: 1px dashed rgba(140,255,210,0.30);
+      background: rgba(10, 26, 20, 0.35);
+      border-radius: 14px;
+      padding: 14px;
+      color: var(--muted);
+      font-size: 13px;
+      line-height: 1.5;
+    }
+
+    .callout b{ color: var(--text); }
+
+    .footer{
+      margin-top: 22px;
+      display:flex;
+      flex-wrap:wrap;
+      gap: 10px 16px;
+      color: rgba(217,244,234,0.55);
+      font-size: 12px;
+      align-items:center;
+      justify-content: space-between;
+    }
+
+    .links a{
+      color: rgba(140,255,210,0.85);
+      text-decoration: none;
+      border-bottom: 1px solid rgba(140,255,210,0.18);
+    }
+
+    .links a:hover{
+      border-bottom-color: rgba(140,255,210,0.45);
+    }
+  </style>
+</head>
+
+<body>
+  <div class="wrap">
+    <div class="topbar">
+      <a class="brand" href="#">
+        <div class="mark">K</div>
+        <div>
+          <h1>KINDpos</h1>
+          <div class="tag">Nice. Dependable. Yours.</div>
+        </div>
+      </a>
+      <div class="pill">Local-first POS • Built for busy nights</div>
+    </div>
+
+    <div class="hero">
+      <section class="card">
+        <div class="headline">Restaurants are chaotic.<br><span class="emph">Your POS shouldn’t be.</span></div>
+        <p class="subhead">
+          KINDpos is a <span class="emph">local-first</span>, reliability-driven point-of-sale system designed to keep
+          service moving through outages, printer failures, and peak-hour pressure — and to clearly explain what happened afterward.
+        </p>
+
+        <ul class="points">
+          <li><span class="dot"></span><span><b>Works without the internet</b> — orders and printing continue.</span></li>
+          <li><span class="dot"></span><span><b>Prevents “ghost” behavior</b> — no surprise reappearing orders or double charges.</span></li>
+          <li><span class="dot"></span><span><b>Built-in diagnostics</b> — the system can explain itself when things go wrong.</span></li>
+          <li><span class="dot"></span><span><b>Designed for human workflow</b> — calm UI, fewer taps, less hunting.</span></li>
+        </ul>
+
+        <div class="ctaRow">
+          <!-- Swap these links to your real destinations -->
+          <a class="btn primary" href="mailto:hello@kindpos.com?subject=KINDpos%20—%20Interested&body=Hi%20KIND%20Technologies%2C%0A%0AI%27m%20interested%20in%20KINDpos.%20Here%E2%80%99s%20my%20venue%20and%20what%20I%E2%80%99d%20love%20to%20see%3A%0A%0A-%20Venue%20name%3A%0A-%20City%2FState%3A%0A-%20Current%20POS%3A%0A-%20Biggest%20pain%20points%3A%0A%0AThanks!">
+            Contact <small>(hello@kindpos.com)</small>
+          </a>
+          <a class="btn" href="#" onclick="alert('Coming soon: early pilot interest form.'); return false;">
+            Join Early Pilot List
+          </a>
+          <a class="btn" href="#" onclick="alert('Coming soon: deck + white paper download.'); return false;">
+            View Overview
+          </a>
+        </div>
+      </section>
+
+      <aside class="card side">
+        <h2>What we’re building</h2>
+        <p class="mini">
+          A POS designed like a good coworker: steady, predictable, and helpful under pressure.
+        </p>
+
+        <div class="callout">
+          <b>Phase 1 (Q1):</b> Offline-capable core POS + printer reliability + tokenized payments + audit/diagnostics.
+          <br><br>
+          <b>Why?</b> Because “just restart everything” is not a strategy.
+        </div>
+
+        <div class="footer">
+          <div>© <span id="year"></span> KIND Technologies LLC</div>
+          <div class="links">
+            <a href="#" onclick="alert('Coming soon: LinkedIn page link'); return false;">LinkedIn</a> •
+            <a href="mailto:hello@kindpos.com">Email</a>
+          </div>
+        </div>
+      </aside>
+    </div>
+  </div>
+
+  <script>
+    document.getElementById('year').textContent = new Date().getFullYear();
+  </script>
+</body>
+</html>
