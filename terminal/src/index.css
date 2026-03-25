@@ -1,0 +1,63 @@
+/* KINDpos Terminal — Win98-inspired theme */
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+:root {
+  --gray: #c0c0c0;
+  --gray-dark: #808080;
+  --gray-light: #dfdfdf;
+  --navy: #000080;
+  --navy-light: #0000cd;
+  --white: #ffffff;
+  --black: #000000;
+  --mint: #c6ffbb;
+  --yellow: #fbde42;
+  --red-soft: #ff6b6b;
+  --red-btn: #c00020;
+  --gradient-navy: linear-gradient(180deg, #000080 0%, #0000cd 100%);
+  --font: 'MS Sans Serif', Tahoma, sans-serif;
+  --font-size: 11px;
+}
+
+html, body, #root {
+  height: 100%;
+  width: 100%;
+  overflow: hidden;
+}
+
+body {
+  font-family: var(--font);
+  font-size: var(--font-size);
+  background: var(--gray);
+  color: var(--black);
+  -webkit-font-smoothing: none;
+}
+
+button {
+  font-family: var(--font);
+  font-size: var(--font-size);
+  cursor: pointer;
+  border: none;
+  outline: none;
+}
+
+input, select, textarea {
+  font-family: var(--font);
+  font-size: var(--font-size);
+}
+
+::-webkit-scrollbar { width: 16px; }
+::-webkit-scrollbar-track {
+  background: var(--gray-light);
+  border: 1px solid var(--gray-dark);
+}
+::-webkit-scrollbar-thumb {
+  background: var(--gray);
+  border: 2px solid;
+  border-color: var(--white) var(--gray-dark) var(--gray-dark) var(--white);
+}
