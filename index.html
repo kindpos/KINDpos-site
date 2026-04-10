@@ -4,81 +4,91 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>KINDpos — Nice. Dependable. Yours.</title>
+    <meta name="description" content="KINDpos is a local-first, event-sourced point-of-sale system built for restaurants. Works offline, one-time purchase, built by industry veterans.">
+    <meta property="og:title" content="KINDpos — Nice. Dependable. Yours.">
+    <meta property="og:description" content="A POS system that keeps working when the internet doesn't. Built by industry veterans who got tired of blaming the system.">
+    <meta property="og:image" content="https://www.kindpos.com/logo.jpg">
+    <meta property="og:url" content="https://www.kindpos.com">
+    <meta property="og:type" content="website">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400..900&family=Space+Mono:ital,wght@0,400;0,700;1,400;1,700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Chakra+Petch:wght@700&family=B612:ital,wght@0,400;0,700;1,400;1,700&display=swap" rel="stylesheet">
     <style>
+        /* ── COLOR TOKENS ─────────────────────────────────── */
         :root {
-            --color-bg: #333333;
-            --color-panel: #111122;
-            --color-yellow: #FFD700;
-            --color-mint: #7FFFD4;
-            --color-red: #CC0000;
-            --color-text: #E0E0E0;
-            --font-display: 'Orbitron', sans-serif;
-            --font-body: 'Space Mono', monospace;
-            --palm-width: 277px;
+            --gold:        #fbb03b;
+            --mint:        #87f79c;
+            --vermillion:  #ff4422;
+            --bg-dark:     #333333;
+            --chart-well:  #1a1a1a;
+            --bevel-light: #5a5a5a;
+            --bevel-dark:  #151515;
+            --text:        #e0e0e0;
+            --sage:        #6bc987;
+            --palm-width:  277px;
+            --font-display: 'Chakra Petch', sans-serif;
+            --font-body:    'B612', sans-serif;
         }
 
-        * {
+        /* ── RESET ────────────────────────────────────────── */
+        *, *::before, *::after {
             box-sizing: border-box;
             margin: 0;
             padding: 0;
+            border-radius: 0 !important;
         }
 
         body {
-            background-color: var(--color-bg);
-            color: var(--color-text);
+            background: var(--bg-dark);
+            color: var(--text);
             font-family: var(--font-body);
             line-height: 1.6;
             overflow-x: hidden;
         }
 
-        /* Navigation */
+        /* ── NAVIGATION ───────────────────────────────────── */
         nav {
             position: sticky;
             top: 0;
-            background-color: var(--color-bg);
+            background: var(--chart-well);
+            border-bottom: 2px solid var(--mint);
             z-index: 1000;
-            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
         }
 
         .nav-container {
             display: flex;
             justify-content: center;
-            align-items: center;
-            padding: 1rem 0;
+            align-items: stretch;
             overflow-x: auto;
             white-space: nowrap;
             -webkit-overflow-scrolling: touch;
-            scrollbar-width: none; /* Hide scrollbar for Firefox */
+            scrollbar-width: none;
         }
-
-        .nav-container::-webkit-scrollbar {
-            display: none; /* Hide scrollbar for Chrome/Safari */
-        }
+        .nav-container::-webkit-scrollbar { display: none; }
 
         .nav-link {
             font-family: var(--font-display);
-            color: var(--color-yellow);
+            color: var(--gold);
             text-decoration: none;
             text-transform: uppercase;
-            padding: 0.5rem 1rem;
-            margin: 0 0.5rem;
-            font-size: 0.9rem;
+            padding: 0.85rem 1rem;
+            font-size: 0.68rem;
+            letter-spacing: 1.5px;
             cursor: pointer;
-            transition: border-bottom 0.2s;
-            border-bottom: 2px solid transparent;
+            border-bottom: 3px solid transparent;
+            transition: color 0.15s, border-color 0.15s;
+            display: inline-block;
         }
-
+        .nav-link:hover { color: var(--mint); }
         .nav-link.active {
-            border-bottom: 2px solid var(--color-mint);
+            color: var(--mint);
+            border-bottom: 3px solid var(--mint);
         }
 
-        /* Layout Structure */
+        /* ── LAYOUT ───────────────────────────────────────── */
         .page-container {
             display: flex;
-            min-height: calc(100vh - 60px);
+            min-height: calc(100vh - 55px);
             position: relative;
         }
 
@@ -93,7 +103,7 @@
             background-size: contain;
             background-repeat: no-repeat;
             background-position: center center;
-            display: none; /* Hidden by default for Home */
+            display: none;
         }
 
         .content-area {
@@ -102,154 +112,385 @@
             width: 100%;
         }
 
-        /* Home Layout Adjustment */
-        .home-tab .palm-sidebar {
-            display: none !important;
-        }
-        .home-tab .content-area {
-            padding: 0;
-            margin-left: 0 !important;
-        }
+        .home-tab .palm-sidebar { display: none !important; }
+        .home-tab .content-area { padding: 0; margin-left: 0 !important; }
 
-        /* Two-column layout adjustment for other tabs */
-        .other-tab .palm-sidebar {
-            display: block;
-        }
-        .other-tab .content-area {
-            margin-left: var(--palm-width);
-            padding-left: 0;
-        }
+        .other-tab .palm-sidebar { display: block; }
+        .other-tab .content-area { margin-left: var(--palm-width); padding-left: 50px; }
 
-        @media (max-width: 768px) {
-            .other-tab .palm-sidebar {
-                display: none !important;
-            }
-            .other-tab .content-area {
-                margin-left: 0 !important;
-                padding: 40px 20px;
-            }
-        }
-
-        /* Typography & Components */
+        /* ── TYPOGRAPHY ───────────────────────────────────── */
         h1, h2, h3 {
             font-family: var(--font-display);
-            color: var(--color-yellow);
-            margin-bottom: 1.5rem;
             text-transform: uppercase;
         }
+        h1 { font-size: 2.1rem; letter-spacing: 2px; }
+        h2 { font-size: 1.35rem; letter-spacing: 2px; margin-bottom: 1.5rem; }
+        h3 { font-size: 0.85rem; letter-spacing: 2px; margin-bottom: 0.75rem; }
+        p  { margin-bottom: 1rem; }
 
-        .mint-text { color: var(--color-mint); }
-        .yellow-text { color: var(--color-yellow); }
-        .red-text { color: var(--color-red); }
+        .gold       { color: var(--gold); }
+        .mint       { color: var(--mint); }
+        .sage       { color: var(--sage); }
+        .vermillion { color: var(--vermillion); }
 
+        /* ── STYLE D BUTTON ───────────────────────────────── */
         .btn {
-            font-family: var(--font-display);
-            background-color: var(--color-yellow);
-            color: var(--color-bg);
-            border: none;
-            padding: 1rem 2rem;
-            border-radius: 8px;
-            cursor: pointer;
-            text-transform: uppercase;
-            font-weight: bold;
             display: inline-block;
+            font-family: var(--font-display);
+            font-weight: 700;
+            font-size: 0.72rem;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            border: none;
+            cursor: pointer;
+            padding: 0.9rem 2rem;
+            background: var(--gold);
+            color: var(--chart-well);
             text-decoration: none;
-            transition: transform 0.2s, opacity 0.2s;
+            clip-path: polygon(8px 0%, calc(100% - 8px) 0%, 100% 8px, 100% calc(100% - 8px), calc(100% - 8px) 100%, 8px 100%, 0% calc(100% - 8px), 0% 8px);
+            filter: drop-shadow(3px 4px 0px rgba(251,176,59,0.7));
+            transition: filter 0.1s, transform 0.1s;
         }
+        .btn:hover  { filter: drop-shadow(3px 4px 0px rgba(251,176,59,1)) brightness(1.06); }
+        .btn:active { filter: none; transform: translate(3px, 4px); }
 
-        .btn:hover {
-            opacity: 0.9;
-            transform: translateY(-2px);
+        .btn-mint {
+            background: var(--mint);
+            color: var(--chart-well);
+            filter: drop-shadow(3px 4px 0px rgba(135,247,156,0.55));
         }
+        .btn-mint:hover { filter: drop-shadow(3px 4px 0px rgba(135,247,156,0.9)) brightness(1.05); }
 
+        /* ── CARDS ────────────────────────────────────────── */
+        /* Outer wrapper = chamfer clip, mint bg shows as 2px border on sides/bottom */
         .card {
-            background-color: var(--color-panel);
-            border: 2px solid var(--color-yellow);
-            padding: 2rem;
+            background: var(--mint);
+            padding: 0 2px 2px 2px;
+            clip-path: polygon(8px 0%, calc(100% - 8px) 0%, 100% 8px, 100% calc(100% - 8px), calc(100% - 8px) 100%, 8px 100%, 0% calc(100% - 8px), 0% 8px);
             margin-bottom: 2rem;
+            filter: drop-shadow(0 4px 16px rgba(0,0,0,0.5));
         }
+        .card-gold { background: var(--gold); }
 
-        /* Form Styling */
-        form {
+        .card-hdr {
+            background: var(--mint);
+            color: var(--chart-well);
+            font-family: var(--font-display);
+            font-size: 0.6rem;
+            font-weight: 700;
+            letter-spacing: 3px;
+            padding: 6px 16px;
+            text-transform: uppercase;
+        }
+        .card-gold .card-hdr { background: var(--gold); }
+
+        .card-bdy {
+            background: var(--chart-well);
+            padding: 1.5rem;
+        }
+        .card-bdy h3 { color: var(--gold); }
+
+        /* ── FORMS ────────────────────────────────────────── */
+        .form {
             display: flex;
             flex-direction: column;
-            gap: 1.5rem;
-            max-width: 600px;
+            gap: 1.2rem;
+            max-width: 580px;
         }
-
         .form-group {
             display: flex;
             flex-direction: column;
-            gap: 0.5rem;
+            gap: 0.4rem;
         }
-
         label {
             font-family: var(--font-body);
-            color: var(--color-text);
-            font-size: 0.9rem;
+            color: var(--sage);
+            font-size: 0.72rem;
+            letter-spacing: 1px;
+            text-transform: uppercase;
         }
-
         input, textarea, select {
-            background-color: var(--color-panel);
-            border: 1px solid rgba(255, 255, 255, 0.2);
-            padding: 0.8rem;
-            color: var(--color-text);
+            background: var(--chart-well);
+            border: 1px solid var(--bevel-light);
+            padding: 0.75rem;
+            color: var(--text);
             font-family: var(--font-body);
-            border-radius: 4px;
+            font-size: 0.88rem;
         }
-
         input:focus, textarea:focus, select:focus {
             outline: none;
-            border-color: var(--color-mint);
+            border-color: var(--mint);
+            box-shadow: 0 0 0 1px var(--mint);
+        }
+        textarea { resize: vertical; }
+        select option { background: var(--chart-well); }
+
+        /* ── DIVIDERS ─────────────────────────────────────── */
+        .section-divider {
+            border: none;
+            border-top: 1px solid var(--bevel-light);
+            margin: 3rem 0;
+        }
+        .mint-divider {
+            border: none;
+            border-top: 2px solid var(--mint);
+            margin: 2rem 0;
         }
 
-        textarea {
-            resize: vertical;
+        /* ── HERO ─────────────────────────────────────────── */
+        #hero {
+            height: calc(100vh - 55px);
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+        }
+        #hero::after {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: repeating-linear-gradient(
+                0deg,
+                transparent, transparent 2px,
+                rgba(0,0,0,0.07) 2px, rgba(0,0,0,0.07) 4px
+            );
+            pointer-events: none;
         }
 
-        /* Hide tabs by default */
-        .tab-content {
-            display: none;
+        /* ── UPDATES TIMELINE ─────────────────────────────── */
+        .update-item {
+            display: flex;
+            gap: 1.5rem;
+            align-items: flex-start;
+            padding: 0.85rem 0;
+            border-bottom: 1px solid var(--bevel-light);
         }
-        .tab-content.active {
+        .update-item:last-child { border-bottom: none; }
+        .update-date {
+            font-family: var(--font-display);
+            font-size: 0.6rem;
+            color: var(--mint);
+            letter-spacing: 1px;
+            white-space: nowrap;
+            padding-top: 3px;
+            min-width: 75px;
+        }
+
+        /* ── COMPARISON TABLE ─────────────────────────────── */
+        .comparison-table {
+            width: 100%;
+            border-collapse: collapse;
+            background: var(--chart-well);
+            border: 2px solid var(--bevel-light);
+            margin-bottom: 1rem;
+        }
+        .comparison-table th {
+            background: var(--mint);
+            color: var(--chart-well);
+            font-family: var(--font-display);
+            font-size: 0.65rem;
+            letter-spacing: 2px;
+            padding: 0.75rem 1.5rem;
+            text-align: center;
+            text-transform: uppercase;
+            border-right: 2px solid var(--bg-dark);
+        }
+        .comparison-table th:last-child { border-right: none; }
+        .comparison-table th.col-kindpos { background: var(--gold); }
+        .comparison-table td {
+            padding: 1.5rem;
+            text-align: center;
+            vertical-align: top;
+            border-right: 2px solid var(--bg-dark);
+        }
+        .comparison-table td:last-child { border-right: none; }
+        .price-big {
+            font-family: var(--font-display);
+            font-size: 1.8rem;
+            font-weight: 700;
+            display: block;
+            margin-bottom: 0.5rem;
+        }
+
+        /* ── PILOT STEPS ──────────────────────────────────── */
+        .pilot-step {
+            display: flex;
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+            align-items: flex-start;
+        }
+        .step-number {
+            font-family: var(--font-display);
+            font-size: 2.4rem;
+            font-weight: 900;
+            color: var(--gold);
+            line-height: 1;
+            min-width: 48px;
+        }
+        .step-content h3 { color: var(--mint); }
+        .step-content p  { font-size: 0.9rem; margin: 0; }
+
+        /* ── SOLUTION PILLARS ─────────────────────────────── */
+        .pillar {
+            background: var(--mint);
+            padding: 0 2px 2px 2px;
+            clip-path: polygon(8px 0%, calc(100% - 8px) 0%, 100% 8px, 100% calc(100% - 8px), calc(100% - 8px) 100%, 8px 100%, 0% calc(100% - 8px), 0% 8px);
+            margin-bottom: 1.5rem;
+            filter: drop-shadow(0 4px 12px rgba(0,0,0,0.4));
+        }
+        .pillar-label {
+            background: var(--mint);
+            color: var(--chart-well);
+            font-family: var(--font-display);
+            font-size: 0.68rem;
+            font-weight: 700;
+            letter-spacing: 4px;
+            padding: 6px 16px;
+            text-transform: uppercase;
+        }
+        .pillar-body {
+            background: var(--chart-well);
+            padding: 1.25rem 1.5rem;
+        }
+        .pillar-body p { margin: 0; }
+
+        /* ── FEATURE LIST ─────────────────────────────────── */
+        .feature-list { list-style: none; padding: 0; }
+        .feature-list li {
+            padding: 0.6rem 0;
+            border-bottom: 1px solid var(--bevel-light);
+            display: flex;
+            gap: 1rem;
+            align-items: flex-start;
+            font-size: 0.9rem;
+        }
+        .feature-list li:last-child { border-bottom: none; }
+        .feature-list li::before {
+            content: '▸';
+            color: var(--mint);
+            flex-shrink: 0;
+            margin-top: 2px;
+        }
+
+        /* ── STAT CALLOUT ─────────────────────────────────── */
+        .stat-callout {
+            background: var(--chart-well);
+            border-left: 4px solid var(--gold);
+            padding: 1.5rem;
+            margin: 2rem 0;
+        }
+        .stat-callout .big-number {
+            font-family: var(--font-display);
+            font-size: 2.2rem;
+            color: var(--gold);
+            font-weight: 700;
+            display: block;
+            line-height: 1.1;
+        }
+        .stat-callout .stat-label {
+            font-size: 0.78rem;
+            color: var(--sage);
+            letter-spacing: 1px;
+            margin-top: 0.4rem;
             display: block;
         }
 
-        /* Mobile Breakpoint */
+        /* ── PATH CARDS ───────────────────────────────────── */
+        .path-cards {
+            display: flex;
+            gap: 2rem;
+            flex-wrap: wrap;
+            justify-content: center;
+            margin-top: 2.5rem;
+        }
+        .path-card {
+            flex: 1;
+            min-width: 280px;
+            max-width: 420px;
+        }
+        .path-link {
+            color: var(--mint);
+            text-decoration: none;
+            font-size: 0.82rem;
+            cursor: pointer;
+            font-family: var(--font-body);
+            display: inline-block;
+            margin-top: 0.75rem;
+            transition: color 0.15s;
+        }
+        .path-link:hover { color: var(--gold); }
+
+        /* ── INFO BOX ─────────────────────────────────────── */
+        .info-box {
+            background: var(--chart-well);
+            border-left: 4px solid var(--mint);
+            padding: 1.25rem 1.5rem;
+            margin: 2rem 0;
+        }
+        .info-box h3 { color: var(--mint); margin-bottom: 0.5rem; }
+        .info-box p  { font-size: 0.88rem; color: var(--sage); margin: 0; }
+
+        /* ── TAGLINE DISPLAY ──────────────────────────────── */
+        .tagline-display {
+            font-family: var(--font-display);
+            font-size: 1.1rem;
+            letter-spacing: 4px;
+            text-align: center;
+            color: var(--mint);
+            background: var(--chart-well);
+            border-left: 4px solid var(--mint);
+            padding: 1.25rem 2rem;
+            margin: 3rem 0;
+            text-transform: uppercase;
+        }
+
+        /* ── TABS ─────────────────────────────────────────── */
+        .tab-content { display: none; }
+        .tab-content.active { display: block; }
+
+        /* ── FOOTER ───────────────────────────────────────── */
+        footer {
+            background: var(--chart-well);
+            border-top: 2px solid var(--mint);
+            padding: 1.5rem 2rem;
+            text-align: center;
+        }
+        footer p {
+            font-family: var(--font-display);
+            font-size: 0.58rem;
+            color: var(--sage);
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            margin: 0;
+        }
+
+        /* ── MOBILE ───────────────────────────────────────── */
         @media (max-width: 768px) {
-            .palm-sidebar {
-                display: none !important;
-            }
-            .content-area {
-                margin-left: 0 !important;
-                padding: 40px 20px;
-            }
-            .nav-container {
-                justify-content: flex-start;
-                padding: 1rem 0.5rem;
-            }
-            .nav-link {
-                font-size: 0.8rem;
-                padding: 0.5rem;
-                margin: 0 0.25rem;
-            }
-            
-            #hero h1 {
-                font-size: 1.8rem !important;
-            }
-            #hero img {
-                max-width: 300px !important;
-            }
+            .other-tab .palm-sidebar { display: none !important; }
+            .other-tab .content-area { margin-left: 0 !important; padding: 30px 20px; }
+            .content-area { padding: 30px 20px; }
+            h1 { font-size: 1.45rem !important; }
+            h2 { font-size: 1.1rem; }
+            #hero img { max-width: 260px !important; }
+            .nav-link { font-size: 0.58rem; padding: 0.85rem 0.5rem; letter-spacing: 1px; }
+            .comparison-table th, .comparison-table td { padding: 0.75rem 0.5rem; }
+            .price-big { font-size: 1.3rem; }
+            .path-cards { flex-direction: column; }
+            .stat-callout .big-number { font-size: 1.6rem; }
         }
     </style>
 </head>
 <body class="home-tab">
+
     <nav>
         <div class="nav-container">
             <a class="nav-link active" onclick="showTab('home')">Home</a>
             <a class="nav-link" onclick="showTab('story')">Story</a>
             <a class="nav-link" onclick="showTab('solution')">Solution</a>
-            <a class="nav-link" onclick="showTab('feedback')">Feedback & Feature Requests</a>
+            <a class="nav-link" onclick="showTab('feedback')">Feedback</a>
             <a class="nav-link" onclick="showTab('joinus')">Join Us</a>
             <a class="nav-link" onclick="showTab('pilot')">Pilot</a>
         </div>
@@ -258,226 +499,328 @@
     <div class="page-container">
         <div class="palm-sidebar"></div>
         <div class="content-area">
-            <!-- Home Tab Content -->
+
+            <!-- ═══════════════ HOME ═══════════════ -->
             <div id="home" class="tab-content active">
-                <section id="hero" style="height: calc(100vh - 60px); display: flex; flex-direction: column; justify-content: center; align-items: center; text-align: center;">
-                    <img src="logo.jpg" alt="KINDpos Logo" style="max-width: 500px; width: 90%; margin-bottom: 2rem;">
-                    <h1 class="mint-text" style="font-size: 2.5rem; max-width: 800px; padding: 0 20px;">Restaurants are chaotic. Your POS shouldn't be.</h1>
-                    <p style="color: white; font-size: 1.2rem; margin-bottom: 2rem;">Nice. Dependable. Yours.</p>
-                    <button class="btn" onclick="document.getElementById('what-is-kindpos').scrollIntoView({ behavior: 'smooth' })">See What We're Building</button>
+
+                <!-- Hero -->
+                <section id="hero">
+                    <img src="logo.jpg" alt="KINDpos Logo"
+                         style="max-width: 480px; width: 88%; margin-bottom: 2.5rem; position: relative; z-index: 1;">
+                    <h1 class="mint"
+                        style="max-width: 700px; padding: 0 20px; position: relative; z-index: 1; line-height: 1.35;">
+                        Restaurants are chaotic.<br>Your POS shouldn't be.
+                    </h1>
+                    <p style="font-family: var(--font-display); color: var(--gold); font-size: 0.85rem;
+                               letter-spacing: 4px; margin: 1.2rem 0 2.5rem; text-transform: uppercase;
+                               position: relative; z-index: 1;">
+                        Nice &mdash; Dependable &mdash; Yours
+                    </p>
+                    <button class="btn"
+                            onclick="document.getElementById('what-is-kindpos').scrollIntoView({ behavior: 'smooth' })"
+                            style="position: relative; z-index: 1;">
+                        See What We're Building
+                    </button>
                 </section>
 
-                <section id="what-is-kindpos" style="background-color: var(--color-panel); padding: 80px 20px; text-align: center;">
-                    <div style="max-width: 800px; margin: 0 auto;">
-                        <p style="font-size: 1.2rem; color: var(--color-text);">
-                            KINDpos is a point-of-sale system built for the real world of restaurants — where the internet goes down, printers jam, and every second counts. Unlike cloud-dependent systems, KINDpos runs locally, records every action permanently, and keeps working no matter what. Built by industry veterans who got tired of blaming the system.
+                <!-- What is KINDpos -->
+                <section id="what-is-kindpos"
+                         style="background: var(--chart-well); padding: 80px 20px; text-align: center;
+                                border-top: 2px solid var(--mint); border-bottom: 2px solid var(--mint);">
+                    <div style="max-width: 720px; margin: 0 auto;">
+                        <p style="font-size: 1.05rem; line-height: 1.85; color: var(--text);">
+                            KINDpos is a point-of-sale system built for the real world of restaurants —
+                            where the internet goes down, printers jam, and every second counts.
+                            Unlike cloud-dependent systems, KINDpos runs locally, records every action
+                            permanently, and keeps working no matter what. Built by industry veterans
+                            who got tired of blaming the system.
                         </p>
+                        <div class="stat-callout"
+                             style="text-align: left; max-width: 420px; margin: 3rem auto 0; display: inline-block;">
+                            <span class="big-number">$40,000+</span>
+                            <span class="stat-label">Saved vs Toast or Square over 3 years, per 5-terminal restaurant</span>
+                        </div>
                     </div>
                 </section>
 
-                <section id="updates" style="padding: 80px 20px; max-width: 800px; margin: 0 auto;">
-                    <h2 class="yellow-text">Updates & Announcements</h2>
-                    <ul style="list-style: none; padding: 0;">
-                        <li style="margin-bottom: 1rem;">
-                            <span class="mint-text">Feb 2026 —</span> Pilot partnership confirmed with Limoncello Naples
-                        </li>
-                        <li style="margin-bottom: 1rem;">
-                            <span class="mint-text">Feb 2026 —</span> 200+ backend tests passing
-                        </li>
-                        <li style="margin-bottom: 1rem;">
-                            <span class="mint-text">Jan 2026 —</span> Printer integration complete
-                        </li>
-                        <li style="margin-bottom: 1rem;">
-                            <span class="mint-text">Dec 2025 —</span> Event ledger and hash-chaining implemented
-                        </li>
-                    </ul>
-                </section>
-
-                <section id="find-your-path" style="padding: 80px 20px; max-width: 1000px; margin: 0 auto; display: flex; gap: 2rem; flex-wrap: wrap; justify-content: center;">
-                    <div class="card" style="flex: 1; min-width: 300px;">
-                        <h3 class="yellow-text">I'm a Restaurant Operator</h3>
-                        <p style="margin-bottom: 1.5rem;">Tired of your POS letting you down at the worst possible moment?</p>
-                        <a onclick="showTab('story')" class="mint-text" style="text-decoration: none; cursor: pointer;">→ Read Our Story</a>
+                <!-- Updates -->
+                <section style="padding: 70px 20px; max-width: 740px; margin: 0 auto;">
+                    <h2 class="gold">Updates &amp; Announcements</h2>
+                    <div class="update-item">
+                        <span class="update-date">Feb 2026</span>
+                        <span>Pilot partnership confirmed with Limoncello Naples</span>
                     </div>
-                    <div class="card" style="flex: 1; min-width: 300px;">
-                        <h3 class="yellow-text">I'm an Investor</h3>
-                        <p style="margin-bottom: 1.5rem;">Looking at a $25B market with a fundamentally better approach?</p>
-                        <a onclick="showTab('solution')" class="mint-text" style="text-decoration: none; cursor: pointer;">→ See the Solution</a>
+                    <div class="update-item">
+                        <span class="update-date">Feb 2026</span>
+                        <span>200+ backend tests passing — payment and print pipeline complete</span>
+                    </div>
+                    <div class="update-item">
+                        <span class="update-date">Jan 2026</span>
+                        <span>Printer integration complete — kitchen and receipt</span>
+                    </div>
+                    <div class="update-item">
+                        <span class="update-date">Dec 2025</span>
+                        <span>Event ledger and hash-chaining implemented — immutable by design</span>
                     </div>
                 </section>
-            </div>
 
-            <!-- Tab 2: Story Content -->
+                <!-- Find Your Path -->
+                <section style="padding: 0 20px 80px; max-width: 940px; margin: 0 auto;">
+                    <h2 class="gold" style="text-align: center; margin-bottom: 0;">Where do you fit?</h2>
+                    <div class="path-cards">
+                        <div class="path-card">
+                            <div class="card">
+                                <div class="card-hdr">Restaurant Operator</div>
+                                <div class="card-bdy">
+                                    <h3>Tired of your POS letting you down?</h3>
+                                    <p style="font-size: 0.88rem; color: var(--sage); margin-bottom: 0.5rem;">
+                                        You've been blamed for a system failure one too many times. There's a better way.
+                                    </p>
+                                    <a onclick="showTab('story')" class="path-link">→ Read Our Story</a>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="path-card">
+                            <div class="card card-gold">
+                                <div class="card-hdr">Investor</div>
+                                <div class="card-bdy">
+                                    <h3 style="color: var(--mint);">$25B market. Fundamentally better approach.</h3>
+                                    <p style="font-size: 0.88rem; color: var(--sage); margin-bottom: 0.5rem;">
+                                        A local-first architecture that cloud POS systems cannot replicate without rebuilding from scratch.
+                                    </p>
+                                    <a onclick="showTab('solution')" class="path-link">→ See the Solution</a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+            </div><!-- /home -->
+
+
+            <!-- ═══════════════ STORY ═══════════════ -->
             <div id="story" class="tab-content">
-                <section style="max-width: 800px;">
-                    <h2 class="yellow-text">The system is broken. Everyone knows it.</h2>
-                    <p style="margin-bottom: 1.5rem;">Internet goes down. Sales stop. The room panics.</p>
-                    <p style="margin-bottom: 1.5rem;">Ghost orders appear. Double charges hit customers. Staff get blamed.</p>
-                    <p style="margin-bottom: 1.5rem;">You call support. They tell you to restart the device.</p>
-                    <p style="margin-bottom: 1.5rem;">The moment has passed. The evidence is gone. The system has moved on.</p>
-                    <p style="margin-bottom: 1.5rem;">This isn't a bug. It's how these systems are designed.</p>
+                <section style="max-width: 720px;">
 
-                    <h2 class="yellow-text" style="margin-top: 4rem;">15 years on the floor.</h2>
-                    <p style="margin-bottom: 1.5rem;">Worked every role from server to director of implementation.</p>
-                    <p style="margin-bottom: 1.5rem;">Saw the same failures repeat across every system, every venue.</p>
-                    <p style="margin-bottom: 1.5rem;">Spent years implementing POS systems and watching them fail operators.</p>
-                    <p style="margin-bottom: 1.5rem;">The founding moment: decided to build the system that should have existed.</p>
+                    <h2 class="gold">The system is broken. Everyone knows it.</h2>
 
-                    <h2 class="yellow-text" style="margin-top: 4rem;">So we built it differently.</h2>
-                    <p style="margin-bottom: 1.5rem;">Bridge from the problem and experience into the solution. Short. Sets up the Solution tab.</p>
-                    <div style="font-family: var(--font-display); font-size: 1.5rem; text-align: center; margin-top: 2rem; border: 1px solid var(--color-mint); padding: 1rem;">
-                        Nice. Dependable. Yours.
+                    <p>Internet goes down. Sales stop. The room panics.</p>
+                    <p>Ghost orders appear. Double charges hit customers. Staff get blamed.</p>
+                    <p>You call support. They tell you to restart the device.</p>
+                    <p>The moment has passed. The evidence is gone. The system has moved on.</p>
+                    <p style="color: var(--mint); font-family: var(--font-display); font-size: 0.78rem;
+                               letter-spacing: 1.5px; text-transform: uppercase;">
+                        This isn't a bug. It's how these systems are designed.
+                    </p>
+
+                    <hr class="section-divider">
+
+                    <h2 class="gold">15 years on the floor.</h2>
+
+                    <p>Worked every role from server to director of implementation.</p>
+                    <p>Saw the same failures repeat across every system, every venue.</p>
+                    <p>Spent years implementing POS systems and watching them fail operators.</p>
+                    <p>The founding moment: decided to build the system that should have existed.</p>
+
+                    <hr class="section-divider">
+
+                    <h2 class="gold">So we built it differently.</h2>
+
+                    <p>Local-first. Event-sourced. Offline-resilient. Transparent by design.</p>
+                    <p>
+                        Every action recorded as a permanent, verifiable fact — nothing overwritten, nothing lost.
+                        A system that behaves like a good coworker: consistent, honest, and there when you need it.
+                    </p>
+
+                    <div class="tagline-display">
+                        Nice &mdash; Dependable &mdash; Yours
                     </div>
+
+                    <button class="btn" onclick="showTab('solution')">See the Solution →</button>
+
                 </section>
-            </div>
+            </div><!-- /story -->
 
-            <!-- Tab 3: Solution Content -->
+
+            <!-- ═══════════════ SOLUTION ═══════════════ -->
             <div id="solution" class="tab-content">
-                <section style="max-width: 800px;">
-                    <h2 class="yellow-text" style="font-size: 2rem;">Nice. Dependable. Yours.</h2>
-                    
-                    <div style="margin-bottom: 3rem;">
-                        <h3 class="mint-text">NICE</h3>
-                        <p>The system should feel calm and predictable, even during a Saturday dinner rush. KINDpos is designed to reduce stress, not amplify it. Failures surface clearly. Behavior is consistent. A POS should behave like a good coworker.</p>
+                <section style="max-width: 720px;">
+
+                    <h2 class="gold" style="font-size: 1.7rem; margin-bottom: 2.5rem;">
+                        Nice. Dependable. Yours.
+                    </h2>
+
+                    <div class="pillar">
+                        <div class="pillar-label">Nice</div>
+                        <div class="pillar-body">
+                            <p>The system should feel calm and predictable, even during a Saturday dinner rush. KINDpos is designed to reduce stress, not amplify it. Failures surface clearly. Behavior is consistent. A POS should behave like a good coworker.</p>
+                        </div>
                     </div>
 
-                    <div style="margin-bottom: 3rem;">
-                        <h3 class="mint-text">DEPENDABLE</h3>
-                        <p>When the internet goes down, your system keeps running. Orders still fire. Printers still work. Every action is recorded permanently in an immutable ledger that cannot be altered or lost. Connectivity enhances the system — it does not control it.</p>
+                    <div class="pillar">
+                        <div class="pillar-label">Dependable</div>
+                        <div class="pillar-body">
+                            <p>When the internet goes down, your system keeps running. Orders still fire. Printers still work. Every action is recorded permanently in an immutable ledger that cannot be altered or lost. Connectivity enhances the system — it does not control it.</p>
+                        </div>
                     </div>
 
-                    <div style="margin-bottom: 3rem;">
-                        <h3 class="mint-text">YOURS</h3>
-                        <p>Your data belongs to you. Your hardware is not locked to a vendor. Your workflows reflect how your restaurant actually operates, not how a software company thinks it should. KINDpos adapts to the restaurant — not the other way around.</p>
+                    <div class="pillar">
+                        <div class="pillar-label">Yours</div>
+                        <div class="pillar-body">
+                            <p>Your data belongs to you. Your hardware is not locked to a vendor. Your workflows reflect how your restaurant actually operates — not how a software company thinks it should. KINDpos adapts to the restaurant, not the other way around.</p>
+                        </div>
                     </div>
 
-                    <h2 class="yellow-text" style="margin-top: 4rem;">Built for how restaurants actually work.</h2>
-                    <p style="margin-bottom: 1.5rem;"><strong>Local-first:</strong> Runs on hardware in your restaurant. Cloud is optional, never required.</p>
-                    <p style="margin-bottom: 1.5rem;"><strong>Event-sourced:</strong> Every action is recorded as a permanent fact. Nothing is overwritten. Ghost orders and double charges become impossible.</p>
-                    <p style="margin-bottom: 1.5rem;"><strong>Offline resilient:</strong> Designed to operate through failure, not collapse because of it.</p>
-                    <p style="margin-bottom: 1.5rem;"><strong>Show your work:</strong> Every calculation is transparent. Plain English. No black boxes.</p>
+                    <hr class="section-divider">
+                    <h2 class="gold">Built for how restaurants actually work.</h2>
 
-                    <h2 class="yellow-text" style="margin-top: 4rem;">For your team. For your data. For your peace of mind.</h2>
-                    <ul style="list-style: none; padding: 0;">
-                        <li style="margin-bottom: 1rem;">• No more ghost orders or double charges</li>
-                        <li style="margin-bottom: 1rem;">• Staff can learn the system without a training manual</li>
-                        <li style="margin-bottom: 1rem;">• You own your data — always, unconditionally</li>
-                        <li style="margin-bottom: 1rem;">• Works on consumer hardware you can buy yourself</li>
-                        <li style="margin-bottom: 1rem;">• One-time purchase, not an ongoing subscription rental</li>
+                    <ul class="feature-list" style="margin-bottom: 3rem;">
+                        <li>
+                            <div><strong style="color: var(--text);">Local-first</strong> —
+                            Runs on hardware in your restaurant. Cloud is optional, never required.</div>
+                        </li>
+                        <li>
+                            <div><strong style="color: var(--text);">Event-sourced</strong> —
+                            Every action is recorded as a permanent fact. Nothing is overwritten.
+                            Ghost orders and double charges become impossible.</div>
+                        </li>
+                        <li>
+                            <div><strong style="color: var(--text);">Offline-resilient</strong> —
+                            Designed to operate through failure, not collapse because of it.</div>
+                        </li>
+                        <li>
+                            <div><strong style="color: var(--text);">Show your work</strong> —
+                            Every calculation is transparent. Plain English. No black boxes.</div>
+                        </li>
+                        <li>
+                            <div><strong style="color: var(--text);">One-time purchase</strong> —
+                            Not an ongoing subscription rental. You own the software, forever.</div>
+                        </li>
                     </ul>
 
-                    <h2 class="yellow-text" style="margin-top: 4rem;">The math is simple.</h2>
+                    <hr class="section-divider">
+                    <h2 class="gold">The math is simple.</h2>
+
                     <div style="overflow-x: auto; margin-bottom: 1rem;">
-                        <table style="width: 100%; border-collapse: collapse; background-color: var(--color-panel); text-align: center;">
+                        <table class="comparison-table">
                             <thead>
-                                <tr style="border-bottom: 2px solid var(--color-bg);">
-                                    <th style="padding: 1.5rem; border-right: 2px solid var(--color-bg);">KINDpos</th>
-                                    <th style="padding: 1.5rem; border-right: 2px solid var(--color-bg);">Toast</th>
-                                    <th style="padding: 1.5rem;">Square</th>
+                                <tr>
+                                    <th class="col-kindpos">KINDpos</th>
+                                    <th>Toast</th>
+                                    <th>Square</th>
                                 </tr>
                             </thead>
                             <tbody>
                                 <tr>
-                                    <td style="padding: 2rem; border-right: 2px solid var(--color-bg); vertical-align: top;">
-                                        <div class="mint-text" style="font-size: 1.8rem; font-family: var(--font-display);">$1,500</div>
-                                        <div style="margin-top: 0.5rem; font-size: 0.9rem;">One-time.<br>Yours forever.</div>
+                                    <td>
+                                        <span class="price-big gold">$1,500</span>
+                                        <span style="font-size: 0.78rem; color: var(--sage);">One-time.<br>Yours forever.</span>
                                     </td>
-                                    <td style="padding: 2rem; border-right: 2px solid var(--color-bg); vertical-align: top;">
-                                        <div class="red-text" style="font-size: 1.8rem; font-family: var(--font-display);">$9,837+</div>
-                                        <div style="margin-top: 0.5rem; font-size: 0.9rem;">Monthly fees<br>+ integ.</div>
+                                    <td>
+                                        <span class="price-big vermillion">$9,837+</span>
+                                        <span style="font-size: 0.78rem; color: var(--sage);">Monthly fees<br>+ integrations</span>
                                     </td>
-                                    <td style="padding: 2rem; vertical-align: top;">
-                                        <div class="red-text" style="font-size: 1.8rem; font-family: var(--font-display);">$8,500+</div>
-                                        <div style="margin-top: 0.5rem; font-size: 0.9rem;">Monthly fees<br>+ trans. %</div>
+                                    <td>
+                                        <span class="price-big vermillion">$8,500+</span>
+                                        <span style="font-size: 0.78rem; color: var(--sage);">Monthly fees<br>+ transaction %</span>
                                     </td>
                                 </tr>
                             </tbody>
                         </table>
                     </div>
-                    <p style="font-size: 0.9rem; font-style: italic;">
-                        Per terminal, 3-year total cost.<br>
-                        5-terminal restaurant saves $40,000+ with KINDpos.
+                    <p style="font-size: 0.78rem; color: var(--sage); font-style: italic; margin-bottom: 3rem;">
+                        Per terminal, 3-year total cost. 5-terminal restaurant saves $40,000+ with KINDpos.
                     </p>
+
+                    <button class="btn" onclick="showTab('pilot')">Apply for Pilot →</button>
+
                 </section>
-            </div>
-            <!-- Tab 4: Feedback Content -->
+            </div><!-- /solution -->
+
+
+            <!-- ═══════════════ FEEDBACK ═══════════════ -->
             <div id="feedback" class="tab-content">
-                <section style="max-width: 800px;">
-                    <h2 class="yellow-text">You've lived it. We want to hear it.</h2>
-                    <p style="margin-bottom: 2rem;">
-                        We built KINDpos because we got tired of the same failures happening to good restaurants with good teams. But we don't have a monopoly on frustration. Tell us what your current system gets wrong. Tell us what you wish it could do. Every submission is read personally by the founder. Nothing goes into a ticket queue.
+                <section style="max-width: 680px;">
+
+                    <h2 class="gold">You've lived it. We want to hear it.</h2>
+                    <p>
+                        We built KINDpos because we got tired of the same failures happening to good
+                        restaurants with good teams. Tell us what your current system gets wrong. Tell us
+                        what you wish it could do. Every submission is read personally by the founder.
+                        Nothing goes into a ticket queue.
                     </p>
 
-                    <form action="https://formspree.io/f/xdalrqgv" method="POST">
-                        <div class="form-group">
-                            <h3 class="yellow-text" style="font-size: 1.2rem; margin-bottom: 0.5rem;">Horror Stories</h3>
-                            <p style="font-size: 0.9rem; margin-bottom: 1rem; font-style: italic;">Tell us your worst POS moment. Lost orders? Phantom charges? Crashed during a full house? We've heard some things, but nothing surprises us anymore.</p>
-                        </div>
+                    <hr class="mint-divider">
 
-                        <div class="form-group">
-                            <h3 class="yellow-text" style="font-size: 1.2rem; margin-bottom: 0.5rem;">Feature Requests</h3>
-                            <p style="font-size: 0.9rem; margin-bottom: 1rem; font-style: italic;">What do you wish your POS could do? We're actively building and your ideas directly shape what gets prioritized.</p>
-                        </div>
-
+                    <form class="form" action="https://formspree.io/f/xdalrqgv" method="POST">
                         <div class="form-group">
                             <label for="feedback-name">Name (Optional)</label>
-                            <input type="text" id="feedback-name" name="name">
+                            <input type="text" id="feedback-name" name="name" placeholder="Your name">
                         </div>
-
                         <div class="form-group">
                             <label for="restaurant-name">Restaurant Name (Optional)</label>
-                            <input type="text" id="restaurant-name" name="restaurant">
+                            <input type="text" id="restaurant-name" name="restaurant" placeholder="Your restaurant">
                         </div>
-
                         <div class="form-group">
-                            <label for="feedback-story">Your Story / Feature Request (Required)</label>
-                            <textarea id="feedback-story" name="message" required style="min-height: 160px;" placeholder="Tell us everything."></textarea>
+                            <label for="feedback-story">Horror Story or Feature Request *</label>
+                            <p style="font-size: 0.75rem; color: var(--sage); margin-bottom: 0.5rem;">
+                                Worst POS moment? Feature you wish existed? We've heard some things — nothing surprises us anymore.
+                            </p>
+                            <textarea id="feedback-story" name="message" required
+                                      style="min-height: 140px;" placeholder="Tell us everything."></textarea>
                         </div>
-
                         <div class="form-group">
-                            <label for="feedback-email">Email (Optional)</label>
-                            <p style="font-size: 0.8rem; margin-bottom: 0.5rem;">Only if you'd like a response.</p>
-                            <input type="email" id="feedback-email" name="email">
+                            <label for="feedback-email">Email (Optional — only if you'd like a response)</label>
+                            <input type="email" id="feedback-email" name="email" placeholder="you@restaurant.com">
                         </div>
-
-                        <button type="submit" class="btn">Send It</button>
+                        <div>
+                            <button type="submit" class="btn">Send It</button>
+                        </div>
                     </form>
 
-                    <div style="margin-top: 4rem;">
-                        <h3 class="mint-text">What happens next</h3>
+                    <div class="info-box" style="margin-top: 3rem;">
+                        <h3>What happens next</h3>
                         <p>Every submission is read personally. We're building KINDpos for operators, so your input directly shapes what we build next. Thank you for taking the time.</p>
                     </div>
+
                 </section>
-            </div>
-            <!-- Tab 5: Join Us Content -->
+            </div><!-- /feedback -->
+
+
+            <!-- ═══════════════ JOIN US ═══════════════ -->
             <div id="joinus" class="tab-content">
-                <section style="max-width: 800px;">
-                    <h2 class="yellow-text">A front row seat.</h2>
-                    <p style="margin-bottom: 2rem;">
-                        KINDpos is being built in the open. No hype, no vaporware — just real progress on a system that restaurants actually need. If you want to follow along, leave your email and we'll keep you in the loop.
+                <section style="max-width: 680px;">
+
+                    <h2 class="gold">A front row seat.</h2>
+                    <p>
+                        KINDpos is being built in the open. No hype, no vaporware — just real progress
+                        on a system that restaurants actually need. Leave your email and we'll keep you
+                        in the loop.
                     </p>
 
-                    <div style="margin-bottom: 3rem;">
-                        <h3 class="mint-text">What you'll hear about:</h3>
-                        <ul style="list-style: none; padding: 0;">
-                            <li style="margin-bottom: 0.8rem;"><span class="mint-text">—</span> Development milestones and release updates</li>
-                            <li style="margin-bottom: 0.8rem;"><span class="mint-text">—</span> Pilot program openings</li>
-                            <li style="margin-bottom: 0.8rem;"><span class="mint-text">—</span> Launch announcements and early access opportunities</li>
-                            <li style="margin-bottom: 0.8rem;"><span class="mint-text">—</span> Industry insights from the KINDpos team</li>
-                        </ul>
+                    <div class="card" style="margin: 2rem 0;">
+                        <div class="card-hdr">What you'll hear about</div>
+                        <div class="card-bdy">
+                            <ul class="feature-list">
+                                <li>Development milestones and release updates</li>
+                                <li>Pilot program openings</li>
+                                <li>Launch announcements and early access opportunities</li>
+                                <li>Industry insights from the KINDpos team</li>
+                            </ul>
+                        </div>
                     </div>
 
-                    <form action="https://formspree.io/f/mzdalngz" method="POST">
-                        <div class="form-group">
-                            <label for="join-name">Name</label>
-                            <input type="text" id="join-name" name="name" required>
-                        </div>
+                    <hr class="mint-divider">
 
+                    <form class="form" action="https://formspree.io/f/mzdalngz" method="POST">
                         <div class="form-group">
-                            <label for="join-email">Email</label>
-                            <input type="email" id="join-email" name="email" required>
+                            <label for="join-name">Name *</label>
+                            <input type="text" id="join-name" name="name" required placeholder="Your name">
                         </div>
-
+                        <div class="form-group">
+                            <label for="join-email">Email *</label>
+                            <input type="email" id="join-email" name="email" required placeholder="you@example.com">
+                        </div>
                         <div class="form-group">
                             <label for="join-role">I am a...</label>
                             <select id="join-role" name="role">
@@ -488,108 +831,131 @@
                                 <option value="Curious">Just Curious</option>
                             </select>
                         </div>
-
-                        <button type="submit" class="btn">Count Me In</button>
+                        <div>
+                            <button type="submit" class="btn">Count Me In</button>
+                        </div>
                     </form>
 
-                    <p style="margin-top: 3rem; text-align: center; color: var(--color-mint); font-style: italic;">
-                        "No spam. No noise. Just progress."
+                    <p style="margin-top: 2.5rem; color: var(--mint); font-family: var(--font-display);
+                               font-size: 0.65rem; letter-spacing: 3px; text-align: center; text-transform: uppercase;">
+                        No spam. No noise. Just progress.
                     </p>
+
                 </section>
-            </div>
-            <!-- Tab 6: Pilot Content -->
+            </div><!-- /joinus -->
+
+
+            <!-- ═══════════════ PILOT ═══════════════ -->
             <div id="pilot" class="tab-content">
-                <section style="max-width: 800px;">
-                    <h2 class="yellow-text">Be part of building something real.</h2>
-                    <p style="margin-bottom: 2rem;">
-                        KINDpos is currently selecting a small number of pilot partner restaurants. You get a fully functional, locally-run POS system and hands-on support from the team that built it. We get real-world feedback that shapes the final product. This is a genuine partnership — not a beta test.
+                <section style="max-width: 720px;">
+
+                    <h2 class="gold">Be part of building something real.</h2>
+                    <p>
+                        KINDpos is currently selecting a small number of pilot partner restaurants.
+                        You get a fully functional, locally-run POS system and hands-on support from
+                        the team that built it. We get real-world feedback that shapes the final product.
+                        This is a genuine partnership — not a beta test.
                     </p>
 
-                    <h2 class="yellow-text" style="margin-top: 4rem;">Preferred pricing for early partners.</h2>
-                    <p style="margin-bottom: 2rem;">
-                        Pilot partners receive exclusive preferred pricing that will not be available after general availability. Because you're taking a chance on us, we're taking care of you. Pricing is discussed personally — every situation is a little different and we want to get it right.
-                    </p>
+                    <div class="stat-callout">
+                        <span class="big-number">Preferred Pricing</span>
+                        <span class="stat-label">
+                            Exclusive rates for early partners — not available after general availability.
+                            Discussed personally. Every situation is a little different and we want to get it right.
+                        </span>
+                    </div>
 
-                    <h2 class="yellow-text" style="margin-top: 4rem;">Here's how it works.</h2>
+                    <hr class="section-divider">
+                    <h2 class="gold">Here's how it works.</h2>
+
                     <div style="margin-bottom: 3rem;">
-                        <div style="display: flex; gap: 1.5rem; margin-bottom: 1.5rem;">
-                            <div class="yellow-text" style="font-family: var(--font-display); font-size: 1.5rem; font-weight: bold;">1</div>
-                            <p>Fill out the interest form below. Tell us about your restaurant.</p>
+                        <div class="pilot-step">
+                            <div class="step-number">1</div>
+                            <div class="step-content">
+                                <h3>Apply below</h3>
+                                <p>Fill out the interest form. Tell us about your restaurant — type, size, setup, and what's been frustrating you.</p>
+                            </div>
                         </div>
-                        <div style="display: flex; gap: 1.5rem; margin-bottom: 1.5rem;">
-                            <div class="yellow-text" style="font-family: var(--font-display); font-size: 1.5rem; font-weight: bold;">2</div>
-                            <p>Alex follows up personally to learn more about your setup and answer any questions.</p>
+                        <div class="pilot-step">
+                            <div class="step-number">2</div>
+                            <div class="step-content">
+                                <h3>Personal follow-up</h3>
+                                <p>Alex follows up directly — not a sales rep, not a CRM sequence — to learn more about your setup and answer questions.</p>
+                            </div>
                         </div>
-                        <div style="display: flex; gap: 1.5rem; margin-bottom: 1.5rem;">
-                            <div class="yellow-text" style="font-family: var(--font-display); font-size: 1.5rem; font-weight: bold;">3</div>
-                            <p>We agree on pricing, timeline, and what feedback looks like during the pilot.</p>
+                        <div class="pilot-step">
+                            <div class="step-number">3</div>
+                            <div class="step-content">
+                                <h3>Agree on terms</h3>
+                                <p>We agree on pricing, timeline, and what feedback looks like during the pilot. Every situation is a little different and we want to get it right.</p>
+                            </div>
                         </div>
-                        <div style="display: flex; gap: 1.5rem;">
-                            <div class="yellow-text" style="font-family: var(--font-display); font-size: 1.5rem; font-weight: bold;">4</div>
-                            <p>Installation, onboarding, and ongoing support from the team that built it — not a support ticket queue.</p>
+                        <div class="pilot-step">
+                            <div class="step-number">4</div>
+                            <div class="step-content">
+                                <h3>Install &amp; support</h3>
+                                <p>Installation, onboarding, and ongoing support from the team that built it — not a support ticket queue.</p>
+                            </div>
                         </div>
                     </div>
 
-                    <form action="https://formspree.io/f/mgoljgyk" method="POST">
-                        <div class="form-group">
-                            <label for="pilot-contact">Contact Name</label>
-                            <input type="text" id="pilot-contact" name="contact_name" required>
-                        </div>
+                    <hr class="mint-divider">
 
+                    <form class="form" action="https://formspree.io/f/mgoljgyk" method="POST">
                         <div class="form-group">
-                            <label for="pilot-restaurant">Restaurant Name</label>
-                            <input type="text" id="pilot-restaurant" name="restaurant_name" required>
+                            <label for="pilot-contact">Contact Name *</label>
+                            <input type="text" id="pilot-contact" name="contact_name" required placeholder="Your name">
                         </div>
-
                         <div class="form-group">
-                            <label for="pilot-location">Location (City, State)</label>
-                            <input type="text" id="pilot-location" name="location" required>
+                            <label for="pilot-restaurant">Restaurant Name *</label>
+                            <input type="text" id="pilot-restaurant" name="restaurant_name" required placeholder="Your restaurant">
                         </div>
-
                         <div class="form-group">
-                            <label for="pilot-type">Restaurant Type (e.g. Full service, bar, café)</label>
-                            <input type="text" id="pilot-type" name="type" required>
+                            <label for="pilot-location">Location *</label>
+                            <input type="text" id="pilot-location" name="location" required placeholder="City, State">
                         </div>
-
+                        <div class="form-group">
+                            <label for="pilot-type">Restaurant Type *</label>
+                            <input type="text" id="pilot-type" name="type" required
+                                   placeholder="e.g. Full service, bar, café, food truck">
+                        </div>
                         <div class="form-group">
                             <label for="pilot-seats">Approximate Seat Count (Optional)</label>
-                            <input type="text" id="pilot-seats" name="seat_count">
+                            <input type="text" id="pilot-seats" name="seat_count" placeholder="e.g. 60">
                         </div>
-
                         <div class="form-group">
-                            <label for="pilot-email">Email</label>
-                            <input type="email" id="pilot-email" name="email" required>
+                            <label for="pilot-email">Email *</label>
+                            <input type="email" id="pilot-email" name="email" required placeholder="you@restaurant.com">
                         </div>
-
                         <div class="form-group">
                             <label for="pilot-extra">Anything else?</label>
-                            <textarea id="pilot-extra" name="extra" style="min-height: 100px;"></textarea>
+                            <textarea id="pilot-extra" name="extra" style="min-height: 90px;"
+                                      placeholder="Current system, biggest pain points, timeline, questions..."></textarea>
                         </div>
-
-                        <button type="submit" class="btn">I'm Interested</button>
+                        <div>
+                            <button type="submit" class="btn">I'm Interested</button>
+                        </div>
                     </form>
+
                 </section>
-            </div>
-        </div>
-    </div>
+            </div><!-- /pilot -->
+
+        </div><!-- /content-area -->
+    </div><!-- /page-container -->
+
+    <footer>
+        <p>KINDpos // KIND Technologies LLC // Nice. Dependable. Yours.</p>
+    </footer>
 
     <script>
         function showTab(tabId) {
-            // Update active state in nav
             document.querySelectorAll('.nav-link').forEach(link => {
                 link.classList.remove('active');
-                if (link.getAttribute('onclick').includes("'" + tabId + "'")) {
-                    link.classList.add('active');
-                }
+                const oc = link.getAttribute('onclick') || '';
+                if (oc.includes("'" + tabId + "'")) link.classList.add('active');
             });
-
-            // Update active tab content
-            document.querySelectorAll('.tab-content').forEach(content => {
-                content.classList.remove('active');
-            });
+            document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
             document.getElementById(tabId).classList.add('active');
-
-            // Toggle layout classes based on tab
             if (tabId === 'home') {
                 document.body.classList.remove('other-tab');
                 document.body.classList.add('home-tab');
@@ -597,10 +963,9 @@
                 document.body.classList.remove('home-tab');
                 document.body.classList.add('other-tab');
             }
-
-            // Scroll to top
             window.scrollTo({ top: 0, behavior: 'smooth' });
         }
     </script>
+
 </body>
 </html>
