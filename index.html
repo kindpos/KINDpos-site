@@ -161,33 +161,43 @@
         }
         .btn-mint:hover { filter: drop-shadow(3px 4px 0px rgba(135,247,156,0.9)) brightness(1.05); }
 
-        /* ── CARDS ────────────────────────────────────────── */
-        /* Outer wrapper = chamfer clip, mint bg shows as 2px border on sides/bottom */
+        /* ── CARDS — clock-in bevel border style ─────────── */
+        /* lightenHex(mint,0.2)=#9ff9b0  darkenHex(mint,0.3)=#5fad6d */
         .card {
-            background: var(--mint);
-            padding: 0 2px 2px 2px;
-            clip-path: polygon(8px 0%, calc(100% - 8px) 0%, 100% 8px, 100% calc(100% - 8px), calc(100% - 8px) 100%, 8px 100%, 0% calc(100% - 8px), 0% 8px);
+            background: var(--bg-dark);
+            border-top:    7px solid #9ff9b0;
+            border-left:   7px solid #9ff9b0;
+            border-bottom: 7px solid #5fad6d;
+            border-right:  7px solid #5fad6d;
+            clip-path: polygon(10px 0%, calc(100% - 10px) 0%, 100% 10px, 100% calc(100% - 10px), calc(100% - 10px) 100%, 10px 100%, 0% calc(100% - 10px), 0% 10px);
             margin-bottom: 2rem;
-            filter: drop-shadow(0 4px 16px rgba(0,0,0,0.5));
+            filter: drop-shadow(3px 4px 0px rgba(0,0,0,0.6)) drop-shadow(0 0 16px rgba(135,247,156,0.15));
         }
-        .card-gold { background: var(--gold); }
+        /* lightenHex(gold,0.2)=#fcc062  darkenHex(gold,0.3)=#b07b29 */
+        .card-gold {
+            border-top-color:    #fcc062;
+            border-left-color:   #fcc062;
+            border-bottom-color: #b07b29;
+            border-right-color:  #b07b29;
+            filter: drop-shadow(3px 4px 0px rgba(0,0,0,0.6)) drop-shadow(0 0 16px rgba(251,176,59,0.15));
+        }
 
         .card-hdr {
-            background: var(--mint);
-            color: var(--chart-well);
             font-family: var(--font-display);
             font-size: 0.6rem;
             font-weight: 700;
             letter-spacing: 3px;
-            padding: 6px 16px;
+            padding: 10px 16px 8px;
             text-transform: uppercase;
+            color: var(--mint);
+            border-bottom: 1px solid rgba(135,247,156,0.25);
         }
-        .card-gold .card-hdr { background: var(--gold); }
+        .card-gold .card-hdr {
+            color: var(--gold);
+            border-bottom-color: rgba(251,176,59,0.25);
+        }
 
-        .card-bdy {
-            background: var(--chart-well);
-            padding: 1.5rem;
-        }
+        .card-bdy { padding: 1.25rem 1.5rem; }
         .card-bdy h3 { color: var(--gold); }
 
         /* ── FORMS ────────────────────────────────────────── */
@@ -335,24 +345,26 @@
 
         /* ── SOLUTION PILLARS ─────────────────────────────── */
         .pillar {
-            background: var(--mint);
-            padding: 0 2px 2px 2px;
-            clip-path: polygon(8px 0%, calc(100% - 8px) 0%, 100% 8px, 100% calc(100% - 8px), calc(100% - 8px) 100%, 8px 100%, 0% calc(100% - 8px), 0% 8px);
+            background: var(--bg-dark);
+            border-top:    7px solid #9ff9b0;
+            border-left:   7px solid #9ff9b0;
+            border-bottom: 7px solid #5fad6d;
+            border-right:  7px solid #5fad6d;
+            clip-path: polygon(10px 0%, calc(100% - 10px) 0%, 100% 10px, 100% calc(100% - 10px), calc(100% - 10px) 100%, 10px 100%, 0% calc(100% - 10px), 0% 10px);
             margin-bottom: 1.5rem;
-            filter: drop-shadow(0 4px 12px rgba(0,0,0,0.4));
+            filter: drop-shadow(3px 4px 0px rgba(0,0,0,0.6)) drop-shadow(0 0 16px rgba(135,247,156,0.15));
         }
         .pillar-label {
-            background: var(--mint);
-            color: var(--chart-well);
             font-family: var(--font-display);
             font-size: 0.68rem;
             font-weight: 700;
             letter-spacing: 4px;
-            padding: 6px 16px;
+            padding: 8px 16px;
             text-transform: uppercase;
+            color: var(--mint);
+            border-bottom: 1px solid rgba(135,247,156,0.25);
         }
         .pillar-body {
-            background: var(--chart-well);
             padding: 1.25rem 1.5rem;
         }
         .pillar-body p { margin: 0; }
