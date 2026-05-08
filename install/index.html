@@ -292,9 +292,10 @@ if %errorlevel% == 0 (
     goto :download_installer
 )
 
-if exist "%LocalAppData%\Programs\Python\Python311\python.exe" (
+set PY311=%LocalAppData%\Programs\Python\Python311\python.exe
+if exist "%PY311%" (
     echo  [OK] Found existing Python 3.11
-    set PYTHON_EXE=%LocalAppData%\Programs\Python\Python311\python.exe
+    set PYTHON_EXE=%PY311%
     goto :download_installer
 )
 
