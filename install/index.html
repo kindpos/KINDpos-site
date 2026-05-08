@@ -241,28 +241,23 @@
 
     <div class="body">
       Installs all Python dependencies and configures autostart.
-      The <span class="elec">.bat</span> bootstrapper works on any Windows 10/11 machine — no Python required.
+      No pre-installed software required.
       Run the downloaded file to launch the setup wizard.
     </div>
 
-    <button class="download-btn" onclick="downloadBat()">
-      <span>↓ DOWNLOAD FOR WINDOWS (.bat)</span>
+    <button class="download-btn" onclick="downloadExe()">
+      <span>↓ DOWNLOAD FOR WINDOWS (.exe)</span>
       <span>→</span>
     </button>
-    <button class="download-btn-secondary" onclick="downloadPy()">
-      <span>↓ Download Python script (.py)</span>
-      <span>→</span>
-    </button>
-    <div class="py-note">Requires Python 3.10+ already installed</div>
 
     <div class="sysinfo">
       <div class="sysinfo-row">
         <span class="sysinfo-label">FILE</span>
-        <span class="sysinfo-value">kindpos_setup.bat · kindpos_installer.py</span>
+        <span class="sysinfo-value">kindpos_setup.exe</span>
       </div>
       <div class="sysinfo-row">
         <span class="sysinfo-label">REQUIRES</span>
-        <span class="sysinfo-value">Windows 10/11  ·  Internet connection</span>
+        <span class="sysinfo-value">Windows 10/11  ·  No dependencies</span>
       </div>
       <div class="sysinfo-row">
         <span class="sysinfo-label">VERSION</span>
@@ -275,77 +270,6 @@
 </div>
 
 <script>
-const LAUNCHER_BAT = `@echo off
-setlocal enabledelayedexpansion
-title KINDpos Setup
-
-echo.
-echo  KIND POS - Setup Bootstrapper
-echo  ==============================
-echo.
-
-echo  [1/5] Checking for Python...
-python --version >nul 2>&1
-if %errorlevel% == 0 (
-    for /f "tokens=*" %%v in ('python --version 2^>^&1') do echo  [OK] Found %%v
-    set PYTHON_EXE=python
-    goto :download_installer
-)
-
-set PY311=%LocalAppData%\Programs\Python\Python311\python.exe
-if exist "%PY311%" (
-    echo  [OK] Found existing Python 3.11
-    set PYTHON_EXE=%PY311%
-    goto :download_installer
-)
-
-echo  [..] Python not found. Downloading Python 3.11.9 installer...
-set BOOTSTRAP_DIR=%TEMP%\kindpos_bootstrap
-set PYTHON_INSTALLER=%BOOTSTRAP_DIR%\python_installer.exe
-set PYTHON_EXE=%LocalAppData%\Programs\Python\Python311\python.exe
-
-if not exist "%BOOTSTRAP_DIR%" mkdir "%BOOTSTRAP_DIR%"
-
-echo  [2/5] Downloading Python 3.11.9 (~25 MB)...
-powershell -NoProfile -Command "Invoke-WebRequest -Uri 'https://www.python.org/ftp/python/3.11.9/python-3.11.9-amd64.exe' -OutFile '%PYTHON_INSTALLER%' -UseBasicParsing"
-if %errorlevel% neq 0 (
-    echo  [ERROR] Failed to download Python. Check your internet connection.
-    pause & exit /b 1
-)
-echo  [OK] Download complete
-
-echo  [3/5] Installing Python 3.11.9 silently...
-"%PYTHON_INSTALLER%" /quiet InstallAllUsers=0 PrependPath=1 Include_tcltk=1 Include_pip=1
-if %errorlevel% neq 0 (
-    echo  [ERROR] Python installation failed.
-    pause & exit /b 1
-)
-echo  [OK] Python installed
-
-goto :download_installer
-
-:download_installer
-echo  [4/5] Checking pip...
-"%PYTHON_EXE%" -m pip --version >nul 2>&1
-if %errorlevel% neq 0 (
-    echo  [..] Installing pip...
-    powershell -NoProfile -Command "Invoke-WebRequest -Uri 'https://bootstrap.pypa.io/get-pip.py' -OutFile '%TEMP%\get-pip.py' -UseBasicParsing"
-    "%PYTHON_EXE%" "%TEMP%\get-pip.py" --no-warn-script-location
-)
-echo  [OK] pip ready
-
-echo  [5/5] Downloading KINDpos installer...
-set INSTALLER=%TEMP%\kindpos_installer.py
-powershell -NoProfile -Command "Invoke-WebRequest -Uri 'https://kindpos.com/install/kindpos_installer.py' -OutFile '%INSTALLER%' -UseBasicParsing"
-if %errorlevel% neq 0 (
-    echo  [ERROR] Failed to download installer. Check your internet connection.
-    pause & exit /b 1
-)
-echo  [OK] Launching KINDpos Setup...
-echo.
-"%PYTHON_EXE%" "%INSTALLER%"
-pause`;
-
 const INSTALLER_CONTENT = `#!/usr/bin/env python3
 """KINDpos Setup Wizard — v2.0"""
 
@@ -1050,12 +974,8 @@ if __name__ == '__main__':
     app.mainloop()
 `;
 
-function downloadBat() {
-  const blob = new Blob([LAUNCHER_BAT], { type: 'application/octet-stream' });
-  const url  = URL.createObjectURL(blob);
-  const a    = Object.assign(document.createElement('a'), { href: url, download: 'kindpos_setup.bat' });
-  a.click();
-  URL.revokeObjectURL(url);
+function downloadExe() {
+  window.location.href = '/install/kindpos_setup.exe';
 }
 
 function downloadPy() {
