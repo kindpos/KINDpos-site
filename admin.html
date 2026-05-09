@@ -501,7 +501,7 @@
       });
       if (!res.ok) throw new Error(`HTTP ${res.status} ${res.statusText}`);
       const data = await res.json();
-      generatedKey = data.code || data.license_key || data.key;
+      generatedKey = data.code;
       document.getElementById('ov-key-value').textContent = generatedKey;
       document.getElementById('ov-key-box').style.display = 'block';
       const saveBtn = document.getElementById('ov-save-btn');
@@ -538,6 +538,7 @@
       last_seen:   null,
     });
     renderMain(customer);
+    renderCustomers(sortCustomers(allCustomers));
     return true;
   }
 
