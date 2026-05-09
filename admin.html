@@ -16,6 +16,10 @@
     #terminal-cards::-webkit-scrollbar { width: 4px; }
     #terminal-cards::-webkit-scrollbar-track { background: #383c42; }
     #terminal-cards::-webkit-scrollbar-thumb { background: #5a5f66; border-radius: 2px; }
+    #overlay-panel::-webkit-scrollbar { width: 4px; }
+    #overlay-panel::-webkit-scrollbar-track { background: #2e3236; }
+    #overlay-panel::-webkit-scrollbar-thumb { background: #5a5f66; border-radius: 2px; }
+    input[readonly]:focus { border-color: #5a5f66 !important; }
   </style>
 </head>
 <body>
@@ -74,6 +78,77 @@
       </div>
       <div id="terminal-cards" style="flex:1; overflow-y:auto; padding:12px; display:flex; flex-direction:column; gap:10px;"></div>
     </div>
+
+  </div>
+</div>
+
+<!-- OVERLAY BACKDROP -->
+<div id="overlay-backdrop"
+  style="position:fixed; inset:0; background:rgba(0,0,0,0.7); z-index:100; display:none;"
+  onclick="closeOverlay()"></div>
+
+<!-- OVERLAY PANEL -->
+<div id="overlay-panel"
+  style="position:fixed; bottom:0; left:0; right:0; max-height:90vh; overflow-y:auto; background:#2e3236; border-top:1px solid #5a5f66; border-radius:8px 8px 0 0; padding:20px; z-index:101; display:none; transition:transform 0.25s ease;">
+
+  <!-- Header -->
+  <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:20px;">
+    <span id="overlay-title" style="color:#86efac; font-size:13px; letter-spacing:0.08em; font-family:'JetBrains Mono',monospace;"></span>
+    <span style="color:#e8eaed; font-size:20px; cursor:pointer; line-height:1;" onclick="closeOverlay()">×</span>
+  </div>
+
+  <!-- Form -->
+  <div style="display:flex; flex-direction:column; gap:14px;">
+
+    <!-- Row 1: Terminal Name + Node Number -->
+    <div style="display:flex; gap:10px;">
+      <div style="flex:2; display:flex; flex-direction:column;">
+        <label style="color:#e8eaed; font-size:10px; letter-spacing:0.08em; margin-bottom:4px;">TERMINAL NAME</label>
+        <input id="ov-terminal-name" type="text"
+          style="background:#22252a; border:1px solid #5a5f66; border-radius:4px; padding:8px 10px; color:#86efac; font-size:12px; font-family:'JetBrains Mono',monospace; width:100%;">
+      </div>
+      <div style="flex:1; display:flex; flex-direction:column;">
+        <label style="color:#e8eaed; font-size:10px; letter-spacing:0.08em; margin-bottom:4px;">NODE NUMBER</label>
+        <input id="ov-node-number" type="number" min="1"
+          style="background:#22252a; border:1px solid #5a5f66; border-radius:4px; padding:8px 10px; color:#86efac; font-size:12px; font-family:'JetBrains Mono',monospace; width:100%;">
+      </div>
+    </div>
+
+    <!-- Row 2: Store Ref (read-only) -->
+    <div style="display:flex; flex-direction:column;">
+      <label style="color:#e8eaed; font-size:10px; letter-spacing:0.08em; margin-bottom:4px;">STORE REF</label>
+      <input id="ov-store-ref" type="text" readonly
+        style="background:#22252a; border:1px solid #5a5f66; border-radius:4px; padding:8px 10px; color:#e8eaed; font-size:12px; font-family:'JetBrains Mono',monospace; width:100%; cursor:default;">
+    </div>
+
+    <!-- Row 3: Prefix + SKU -->
+    <div style="display:flex; gap:10px;">
+      <div style="flex:1; display:flex; flex-direction:column;">
+        <label style="color:#e8eaed; font-size:10px; letter-spacing:0.08em; margin-bottom:4px;">PREFIX</label>
+        <input id="ov-prefix" type="text" maxlength="4"
+          style="background:#22252a; border:1px solid #5a5f66; border-radius:4px; padding:8px 10px; color:#86efac; font-size:12px; font-family:'JetBrains Mono',monospace; width:100%;"
+          oninput="this.value=this.value.toUpperCase()">
+      </div>
+      <div style="flex:2; display:flex; flex-direction:column;">
+        <label style="color:#e8eaed; font-size:10px; letter-spacing:0.08em; margin-bottom:4px;">SKU</label>
+        <input id="ov-sku" type="text"
+          style="background:#22252a; border:1px solid #5a5f66; border-radius:4px; padding:8px 10px; color:#86efac; font-size:12px; font-family:'JetBrains Mono',monospace; width:100%;">
+      </div>
+    </div>
+
+    <!-- Generated key box (hidden until key returned) -->
+    <div id="ov-key-box" style="display:none; background:#22252a; border:1px solid #86efac; border-radius:4px; padding:12px;">
+      <div style="color:#e8eaed; font-size:10px; letter-spacing:0.08em; margin-bottom:6px;">GENERATED KEY</div>
+      <div id="ov-key-value" style="color:#22d3ee; font-size:13px; word-break:break-all; margin-bottom:8px;"></div>
+      <button id="ov-copy-btn" onclick="copyKey()"
+        style="background:#383c42; border:1px solid #5a5f66; color:#e8eaed; padding:5px 12px; border-radius:4px; font-size:11px; cursor:pointer; font-family:'JetBrains Mono',monospace; letter-spacing:0.06em;">COPY</button>
+    </div>
+
+    <!-- Inline error -->
+    <div id="ov-error" style="display:none; color:#e8472a; font-size:11px;"></div>
+
+    <!-- Action buttons (rendered by JS based on mode) -->
+    <div id="ov-buttons" style="display:flex; gap:10px; margin-top:8px;"></div>
 
   </div>
 </div>
@@ -262,10 +337,207 @@
     });
   }
 
-  // ── Overlay stubs (Chunk 3) ──────────────────────────
-  function openOverlay()              { console.log('open add overlay'); }
-  function openEditOverlay(terminal)  { console.log(terminal); }
-  function closeOverlay()             { console.log('close overlay'); }
+  // ── Chunk 3: overlay ────────────────────────────────
+
+  let overlayMode = 'add';
+  let overlayTerminal = null;
+  let generatedKey = null;
+
+  function showOvError(msg) {
+    const el = document.getElementById('ov-error');
+    el.textContent = msg;
+    el.style.display = 'block';
+  }
+
+  function clearOvError() {
+    const el = document.getElementById('ov-error');
+    el.textContent = '';
+    el.style.display = 'none';
+  }
+
+  const BTN_BASE = "border-radius:4px; font-size:12px; letter-spacing:0.06em; cursor:pointer; font-family:'JetBrains Mono',monospace; flex:1; padding:10px; border:none;";
+
+  function renderOverlayButtons() {
+    const btns = document.getElementById('ov-buttons');
+    if (overlayMode === 'add') {
+      btns.innerHTML = `
+        <button onclick="generateKey()"
+          style="${BTN_BASE} background:#86efac; color:#22252a; font-weight:600;">GENERATE KEY</button>
+        <button id="ov-save-btn" onclick="handleSaveTerminal()" disabled
+          style="${BTN_BASE} background:#383c42; border:1px solid #5a5f66 !important; color:#e8eaed; opacity:0.5; cursor:not-allowed;">SAVE &amp; CLOSE</button>
+      `;
+    } else {
+      btns.innerHTML = `
+        <button onclick="handleSaveEdit()"
+          style="${BTN_BASE} background:#86efac; color:#22252a; font-weight:600;">SAVE</button>
+        <button onclick="handleRevoke()"
+          style="${BTN_BASE} background:#6b1a0e; color:#e8472a; border:1px solid #e8472a !important;">REVOKE</button>
+      `;
+    }
+  }
+
+  function openOverlay() {
+    overlayMode = 'add';
+    overlayTerminal = null;
+    generatedKey = null;
+    const customer = allCustomers.find(c => c.store_ref === activeRef);
+    document.getElementById('ov-terminal-name').value = '';
+    document.getElementById('ov-node-number').value = '';
+    document.getElementById('ov-store-ref').value = customer ? customer.store_ref : '';
+    document.getElementById('ov-prefix').value = '';
+    document.getElementById('ov-sku').value = 'KINDPOS-PI-5';
+    document.getElementById('ov-key-box').style.display = 'none';
+    document.getElementById('ov-key-value').textContent = '';
+    document.getElementById('overlay-title').textContent = 'NEW TERMINAL';
+    clearOvError();
+    renderOverlayButtons();
+    document.getElementById('overlay-backdrop').style.display = 'block';
+    document.getElementById('overlay-panel').style.display = 'block';
+  }
+
+  function openEditOverlay(terminal) {
+    overlayMode = 'edit';
+    overlayTerminal = terminal;
+    generatedKey = null;
+    const customer = allCustomers.find(c => c.store_ref === activeRef);
+    document.getElementById('ov-terminal-name').value = terminal.terminal_name || '';
+    document.getElementById('ov-node-number').value = terminal.node_number ?? '';
+    document.getElementById('ov-store-ref').value = terminal.store_ref !== undefined
+      ? terminal.store_ref
+      : (customer ? customer.store_ref : '');
+    document.getElementById('ov-prefix').value = terminal.prefix || '';
+    document.getElementById('ov-sku').value = terminal.sku || 'KINDPOS-PI-5';
+    document.getElementById('ov-key-box').style.display = 'none';
+    document.getElementById('ov-key-value').textContent = '';
+    const name = terminal.terminal_name || `Terminal ${terminal.node_number}`;
+    document.getElementById('overlay-title').textContent = `EDIT TERMINAL · ${name}`;
+    clearOvError();
+    renderOverlayButtons();
+    document.getElementById('overlay-backdrop').style.display = 'block';
+    document.getElementById('overlay-panel').style.display = 'block';
+  }
+
+  function closeOverlay() {
+    document.getElementById('overlay-backdrop').style.display = 'none';
+    document.getElementById('overlay-panel').style.display = 'none';
+    clearOvError();
+    generatedKey = null;
+  }
+
+  function copyKey() {
+    if (!generatedKey) return;
+    navigator.clipboard.writeText(generatedKey);
+    const btn = document.getElementById('ov-copy-btn');
+    btn.textContent = 'COPIED!';
+    setTimeout(() => { btn.textContent = 'COPY'; }, 1500);
+  }
+
+  async function generateKey() {
+    const prefix      = document.getElementById('ov-prefix').value.trim();
+    const node_number = document.getElementById('ov-node-number').value;
+    const sku         = document.getElementById('ov-sku').value.trim();
+    const store_ref   = document.getElementById('ov-store-ref').value;
+    if (!prefix || !node_number || !sku) {
+      showOvError('Fill in prefix, node number, and SKU first.');
+      return;
+    }
+    clearOvError();
+    try {
+      const res = await fetch(`${API}/api/admin/generate`, {
+        method: 'POST',
+        headers: {
+          Authorization: `Bearer ${ADMIN_SECRET}`,
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ prefix, node_number: Number(node_number), sku, store_ref }),
+      });
+      if (!res.ok) throw new Error(`HTTP ${res.status} ${res.statusText}`);
+      const data = await res.json();
+      generatedKey = data.code || data.license_key || data.key;
+      document.getElementById('ov-key-value').textContent = generatedKey;
+      document.getElementById('ov-key-box').style.display = 'block';
+      const saveBtn = document.getElementById('ov-save-btn');
+      if (saveBtn) {
+        saveBtn.disabled = false;
+        saveBtn.style.opacity = '1';
+        saveBtn.style.cursor = 'pointer';
+      }
+    } catch (err) {
+      showOvError(err.message);
+    }
+  }
+
+  async function saveTerminal() {
+    if (!generatedKey) {
+      showOvError('Generate a key first.');
+      return false;
+    }
+    const customer = allCustomers.find(c => c.store_ref === activeRef);
+    if (!customer) return false;
+    const terminal_name = document.getElementById('ov-terminal-name').value.trim();
+    const node_number   = Number(document.getElementById('ov-node-number').value);
+    customer.terminals = customer.terminals || [];
+    customer.terminals.push({
+      terminal_name: terminal_name || `Terminal ${node_number}`,
+      node_number,
+      prefix:      document.getElementById('ov-prefix').value.trim(),
+      sku:         document.getElementById('ov-sku').value.trim(),
+      store_ref:   document.getElementById('ov-store-ref').value,
+      license_key: generatedKey,
+      status:      'PENDING',
+      mac:         null,
+      ip:          null,
+      last_seen:   null,
+    });
+    renderMain(customer);
+    return true;
+  }
+
+  async function handleSaveTerminal() {
+    const ok = await saveTerminal();
+    if (ok) closeOverlay();
+  }
+
+  async function saveEdit() {
+    const customer = allCustomers.find(c => c.store_ref === activeRef);
+    if (customer) renderMain(customer);
+  }
+
+  async function handleSaveEdit() {
+    await saveEdit();
+    closeOverlay();
+  }
+
+  async function revokeTerminal() {
+    try {
+      const res = await fetch(`${API}/api/admin/revoke`, {
+        method: 'POST',
+        headers: {
+          Authorization: `Bearer ${ADMIN_SECRET}`,
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ license_key: overlayTerminal.license_key }),
+      });
+      if (!res.ok) throw new Error(`HTTP ${res.status} ${res.statusText}`);
+      const customer = allCustomers.find(c => c.store_ref === activeRef);
+      if (customer) {
+        customer.terminals = customer.terminals.filter(
+          t => t.license_key !== overlayTerminal.license_key
+        );
+        renderMain(customer);
+      }
+      return true;
+    } catch (err) {
+      showOvError(err.message);
+      return false;
+    }
+  }
+
+  async function handleRevoke() {
+    if (!confirm('Revoke this license?')) return;
+    const ok = await revokeTerminal();
+    if (ok) closeOverlay();
+  }
 </script>
 
 </body>
