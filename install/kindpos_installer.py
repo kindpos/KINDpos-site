@@ -1,7 +1,8 @@
 #!/usr/bin/env python3
 """KINDpos Setup Wizard — v2.0"""
 
-import sys, os, tkinter as tk
+import sys, os, re, tkinter as tk
+import hashlib, uuid, subprocess
 from tkinter import filedialog
 
 # ── Tokens ──────────────────────────────────────────
@@ -23,7 +24,7 @@ T = {
     'border':      '#5a5f66',
 }
 FONT = 'Courier'
-STEPS = ['Welcome', 'Directory', 'Install', 'Shortcuts', 'Finish']
+STEPS = ['Welcome', 'Directory', 'Activation', 'Install', 'Shortcuts', 'Finish']
 
 
 def default_install_dir():
@@ -41,6 +42,32 @@ def get_lan_ip():
             return s.getsockname()[0]
     except Exception:
         return '127.0.0.1'
+
+
+def _get_hardware_fingerprint():
+    serial = 'UNKNOWN'
+    try:
+        result = subprocess.run(
+            ['wmic', 'bios', 'get', 'serialnumber', '/value'],
+            capture_output=True, text=True, timeout=10
+        )
+        for line in result.stdout.splitlines():
+            if line.upper().startswith('SERIALNUMBER='):
+                value = line.split('=', 1)[1].strip()
+                if value:
+                    serial = value
+                break
+    except Exception:
+        pass
+
+    try:
+        raw = uuid.getnode()
+        mac = ':'.join(f'{(raw >> (8 * i)) & 0xFF:02X}' for i in reversed(range(6)))
+    except Exception:
+        mac = '00:00:00:00:00:00'
+
+    digest = hashlib.sha256(f'{serial}:{mac}'.encode()).hexdigest().upper()
+    return digest
 
 
 def _create_shortcut(target_py, pythonw, dest_lnk):
@@ -176,6 +203,7 @@ class KINDposSetup(tk.Tk):
 
         self.step = 0
         self.install_dir = tk.StringVar(value=default_install_dir())
+        self._license_key = None
 
         self._pip_labels = []
         self._step_labels = []
@@ -262,7 +290,7 @@ class KINDposSetup(tk.Tk):
 
         tk.Frame(footer_bar, bg=T['border'], height=1).pack(fill=tk.X, side=tk.TOP)
 
-        self.step_lbl = tk.Label(footer_bar, text='Step 1 of 5',
+        self.step_lbl = tk.Label(footer_bar, text='Step 1 of 6',
                                   bg=T['well'], fg=T['text'], font=(FONT, 8))
         self.step_lbl.pack(side=tk.LEFT, padx=18)
 
@@ -291,7 +319,7 @@ class KINDposSetup(tk.Tk):
             else:
                 pip.config(bg=T['moon'], fg=T['moonText'])
                 lbl.config(fg=T['text'], font=(FONT, 9))
-        self.step_lbl.config(text=f'Step {step + 1} of 5')
+        self.step_lbl.config(text=f'Step {step + 1} of 6')
 
     # ── Navigation ──────────────────────────────────
 
@@ -300,9 +328,9 @@ class KINDposSetup(tk.Tk):
             w.destroy()
         self.step = step
         self._refresh_left(step)
-        [self._p_welcome, self._p_directory, self._p_install,
-         self._p_shortcuts, self._p_finish][step]()
-        if step == 4:
+        [self._p_welcome, self._p_directory, self._p_activation,
+         self._p_install, self._p_shortcuts, self._p_finish][step]()
+        if step == 5:
             self._apply_shortcut_prefs()
             self.back_btn.pack_forget()
             self.next_btn.config(text='Finish', bg=T['greenWarm'], fg=T['well'],
@@ -318,7 +346,15 @@ class KINDposSetup(tk.Tk):
             self._goto(self.step - 1)
 
     def _next(self):
-        if self.step < 4:
+        if self.step == 2:
+            val = self._key_entry.get().strip()
+            if not re.match(r'^[A-Z0-9]+(-[A-Z0-9]+){2,}$', val):
+                self._key_error.config(
+                    text='Invalid license key. Expected format: XXXX-XXXX-XXXX')
+                return
+            self._key_error.config(text='')
+            self._license_key = val
+        if self.step < 5:
             self._goto(self.step + 1)
 
     # ── Page builders (placeholders) ────────────────
@@ -370,6 +406,54 @@ class KINDposSetup(tk.Tk):
                  bg=T['bg'], fg=T['text'], font=(FONT, 9),
                  justify=tk.LEFT).pack(anchor=tk.W, pady=(8, 0))
 
+    def _p_activation(self):
+        tk.Label(self.content, text='License Activation',
+                 bg=T['bg'], fg=T['green'], font=(FONT, 15, 'bold')).pack(anchor='w')
+        tk.Label(self.content,
+                 text='Enter your license key to register this terminal',
+                 bg=T['bg'], fg=T['text'], font=(FONT, 9)).pack(
+            anchor='w', pady=(2, 16))
+        tk.Frame(self.content, bg=T['border'], height=1).pack(fill=tk.X, pady=(0, 16))
+
+        tk.Label(self.content, text='LICENSE KEY',
+                 bg=T['bg'], fg=T['moon'], font=(FONT, 8, 'bold'),
+                 anchor='w').pack(anchor='w', pady=(0, 4))
+
+        self._key_entry = tk.Entry(
+            self.content,
+            bg=T['well'], fg=T['green'],
+            insertbackground=T['green'],
+            font=(FONT, 13), relief=tk.FLAT,
+            width=28,
+        )
+        self._key_entry.pack(anchor='w')
+
+        def _sanitise(event):
+            e = self._key_entry
+            raw = e.get().upper()
+            cleaned = re.sub(r'[^A-Z0-9\-]', '', raw)
+            if cleaned != e.get():
+                cur = e.index(tk.INSERT)
+                e.delete(0, tk.END)
+                e.insert(0, cleaned)
+                e.icursor(min(cur, len(cleaned)))
+
+        self._key_entry.bind('<KeyRelease>', _sanitise)
+
+        self._key_error = tk.Label(self.content, text='',
+                                   bg=T['bg'], fg=T['verm'], font=(FONT, 9))
+        self._key_error.pack(anchor='w', pady=(4, 0))
+
+        info_outer = tk.Frame(self.content, bg=T['well'], bd=0, relief=tk.FLAT)
+        info_outer.pack(fill=tk.X, pady=(16, 0))
+        tk.Frame(info_outer, bg=T['gold'], width=4).pack(side=tk.LEFT, fill=tk.Y)
+        tk.Label(info_outer,
+                 text=('Your terminal will be registered automatically\n'
+                       'using the name and store profile set up by\n'
+                       'your KIND Technologies administrator.'),
+                 bg=T['well'], fg=T['text'], font=(FONT, 9),
+                 padx=10, pady=10, justify=tk.LEFT).pack(side=tk.LEFT)
+
     def _p_install(self):
         tk.Label(self.content, text='Installing KINDpos',
                  bg=T['bg'], fg=T['green'], font=(FONT, 15, 'bold')).pack(anchor=tk.W)
@@ -378,6 +462,7 @@ class KINDposSetup(tk.Tk):
         tk.Frame(self.content, bg=T['border'], height=1).pack(fill=tk.X)
 
         INSTALL_STEPS = [
+            'Activating license',
             'Download Python 3.11 embeddable',
             'Extract Python runtime',
             'Clone KINDpos repository',
@@ -508,7 +593,21 @@ class KINDposSetup(tk.Tk):
         tk.Label(self.content,
                  text='KINDpos v2.0 has been successfully installed.\nA shortcut has been added to your Start Menu and Desktop.',
                  bg=T['bg'], fg=T['green'], font=(FONT, 11),
-                 justify=tk.LEFT).pack(anchor=tk.W, pady=(16, 20))
+                 justify=tk.LEFT).pack(anchor=tk.W, pady=(16, 4))
+        try:
+            import json
+            lic_path = os.path.join(self.install_dir.get(), 'data', 'license.json')
+            with open(lic_path) as fh:
+                lic = json.load(fh)
+            terminal_name = lic.get('terminal_name', '')
+            store_name    = lic.get('store_name', '')
+            if terminal_name or store_name:
+                tk.Label(self.content,
+                         text=f'Registered as: {terminal_name} — {store_name}',
+                         bg=T['bg'], fg=T['green'], font=(FONT, 10, 'bold')).pack(
+                    anchor=tk.W, pady=(0, 16))
+        except Exception:
+            tk.Frame(self.content, height=16, bg=T['bg']).pack()
         self.cb_launch = tk.BooleanVar(value=True)
         tk.Checkbutton(self.content, text='Launch KINDpos Launcher now',
                        variable=self.cb_launch, bg=T['bg'], fg=T['green'],
@@ -520,6 +619,37 @@ class KINDposSetup(tk.Tk):
                        selectcolor=T['well'], activebackground=T['bg'],
                        font=(FONT, 10)).pack(anchor=tk.W)
 
+    def _do_activation(self):
+        import urllib.request, json as _json
+        ui = lambda fn, *a, **kw: self.after(0, lambda: fn(*a, **kw))
+        fingerprint = _get_hardware_fingerprint()
+        body = _json.dumps({
+            'license_key':          self._license_key,
+            'hardware_fingerprint': fingerprint,
+        }).encode()
+        req = urllib.request.Request(
+            'https://kindpos.com/api/activate',
+            data=body,
+            headers={'Content-Type': 'application/json'},
+            method='POST',
+        )
+        try:
+            with urllib.request.urlopen(req, timeout=15) as resp:
+                data = _json.loads(resp.read().decode())
+        except Exception as e:
+            ui(self._log, f'Activation error: {e}', 'err')
+            raise RuntimeError('Activation failed: ' + str(e))
+        try:
+            data_dir = os.path.join(self._install_dir, 'data')
+            os.makedirs(data_dir, exist_ok=True)
+            lic_path = os.path.join(data_dir, 'license.json')
+            with open(lic_path, 'w') as fh:
+                _json.dump(data, fh, indent=2)
+        except Exception as e:
+            ui(self._log, f'WARNING: could not write license.json: {e}', 'dim')
+        terminal_name = data.get('terminal_name', self._license_key)
+        ui(self._log, f'Activated: {terminal_name}', 'ok')
+
     def _run_install(self):
         import threading
         t = threading.Thread(target=self._install_thread, daemon=True)
@@ -528,6 +658,7 @@ class KINDposSetup(tk.Tk):
     def _install_thread(self):
         import threading, zipfile, urllib.request, subprocess
         idir     = self.install_dir.get()
+        self._install_dir = idir
         rt_dir   = os.path.join(idir, 'runtime')
         app_dir  = os.path.join(idir, 'app')
         py_zip   = os.path.join(rt_dir, 'python-embed.zip')
@@ -536,8 +667,14 @@ class KINDposSetup(tk.Tk):
         ui = lambda fn, *a, **kw: self.after(0, lambda: fn(*a, **kw))
 
         try:
-            # ── Step 0: Download Python embeddable ──────────────
+            # ── Step 0: Activate license ─────────────────────────
             ui(self._set_step, 0)
+            ui(self._log, 'Activating license…', 'info')
+            self._do_activation()
+            ui(self._set_progress, 5, 'License activated.')
+
+            # ── Step 1: Download Python embeddable ──────────────
+            ui(self._set_step, 1)
             ui(self._log, 'Downloading Python 3.11 embeddable…', 'info')
             url = 'https://www.python.org/ftp/python/3.11.9/python-3.11.9-embed-amd64.zip'
             os.makedirs(rt_dir, exist_ok=True)
@@ -559,8 +696,8 @@ class KINDposSetup(tk.Tk):
                         ui(self._log, f'  {tens}% downloaded', 'dim')
                     ui(self._set_progress, pct, f'Downloading… {pct}%')
 
-            # ── Step 1: Extract Python ───────────────────────────
-            ui(self._set_step, 1)
+            # ── Step 2: Extract Python ───────────────────────────
+            ui(self._set_step, 2)
             ui(self._log, 'Extracting Python runtime…', 'info')
             ui(self._set_progress, 25, 'Extracting…')
             with zipfile.ZipFile(py_zip) as zf:
@@ -574,8 +711,8 @@ class KINDposSetup(tk.Tk):
             ui(self._log, 'Runtime ready.', 'ok')
             ui(self._set_progress, 35, 'Python extracted.')
 
-            # ── Step 2: Clone repository ─────────────────────────
-            ui(self._set_step, 2)
+            # ── Step 3: Clone repository ─────────────────────────
+            ui(self._set_step, 3)
             ui(self._log, 'Cloning KINDpos repository…', 'info')
             ui(self._set_progress, 35, 'Cloning…')
             try:
@@ -599,8 +736,8 @@ class KINDposSetup(tk.Tk):
                 ui(self._log, 'Repository downloaded via zip.', 'ok')
             ui(self._set_progress, 60, 'Repository ready.')
 
-            # ── Step 3: Install dependencies ─────────────────────
-            ui(self._set_step, 3)
+            # ── Step 4: Install dependencies ─────────────────────
+            ui(self._set_step, 4)
             ui(self._log, 'Installing Python dependencies…', 'info')
             req_file = os.path.join(app_dir, 'backend', 'requirements.txt')
             cmd = [py_exe, '-m', 'pip', 'install', '-r', req_file, '--upgrade']
@@ -625,8 +762,8 @@ class KINDposSetup(tk.Tk):
             ui(self._log, 'Dependencies installed.', 'ok')
             ui(self._set_progress, 90, 'Dependencies ready.')
 
-            # ── Step 4: Launcher + shortcuts ─────────────────────
-            ui(self._set_step, 4)
+            # ── Step 5: Launcher + shortcuts ─────────────────────
+            ui(self._set_step, 5)
             ui(self._log, 'Writing launcher and shortcuts…', 'info')
             launcher_py = os.path.join(idir, 'kindpos_launcher.py')
             open(launcher_py, 'w').write(_LAUNCHER_CONTENT)
