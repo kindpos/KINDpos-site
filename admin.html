@@ -63,7 +63,7 @@
         style="border-top:1px solid #5a5f66; padding:10px 12px; cursor:pointer; display:flex; align-items:center; gap:8px; color:#e8eaed; font-size:12px; flex-shrink:0; background:transparent;"
         onmouseenter="this.style.background='#2e3236'"
         onmouseleave="this.style.background='transparent'"
-        onclick="console.log('new customer')"
+        onclick="openNewCustomer()"
       >
         <span style="font-size:16px; line-height:1;">+</span>
         <span>New customer</span>
@@ -149,6 +149,54 @@
 
     <!-- Action buttons (rendered by JS based on mode) -->
     <div id="ov-buttons" style="display:flex; gap:10px; margin-top:8px;"></div>
+
+  </div>
+</div>
+
+<!-- NEW CUSTOMER BACKDROP -->
+<div id="new-customer-backdrop"
+  style="position:fixed; inset:0; background:rgba(0,0,0,0.7); z-index:200; display:none;"
+  onclick="closeNewCustomer()"></div>
+
+<!-- NEW CUSTOMER MODAL -->
+<div id="new-customer-modal"
+  style="position:fixed; top:50%; left:50%; transform:translate(-50%,-50%); width:320px; background:#2e3236; border:1px solid #5a5f66; border-radius:8px; padding:20px; z-index:201; display:none;">
+
+  <!-- Header -->
+  <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:20px;">
+    <span style="color:#86efac; font-size:13px; letter-spacing:0.08em; font-family:'JetBrains Mono',monospace;">NEW CUSTOMER</span>
+    <span style="color:#e8eaed; font-size:20px; cursor:pointer; line-height:1;" onclick="closeNewCustomer()">×</span>
+  </div>
+
+  <!-- Form -->
+  <div style="display:flex; flex-direction:column; gap:14px;">
+
+    <!-- Store Name -->
+    <div style="display:flex; flex-direction:column;">
+      <label style="color:#e8eaed; font-size:10px; letter-spacing:0.08em; margin-bottom:4px;">STORE NAME</label>
+      <input id="nc-store-name" type="text" placeholder="Sammy's Pizza"
+        style="background:#22252a; border:1px solid #5a5f66; border-radius:4px; padding:8px 10px; color:#86efac; font-size:12px; font-family:'JetBrains Mono',monospace; width:100%;">
+    </div>
+
+    <!-- Store Ref -->
+    <div style="display:flex; flex-direction:column;">
+      <label style="color:#e8eaed; font-size:10px; letter-spacing:0.08em; margin-bottom:2px;">STORE REF</label>
+      <span style="color:#e8eaed; font-size:9px; opacity:0.6; margin-bottom:4px;">Unique ID, no spaces</span>
+      <input id="nc-store-ref" type="text" placeholder="SAMMYS-WESTDULUTH"
+        style="background:#22252a; border:1px solid #5a5f66; border-radius:4px; padding:8px 10px; color:#86efac; font-size:12px; font-family:'JetBrains Mono',monospace; width:100%;"
+        oninput="this.value=this.value.toUpperCase().replace(/ /g,'-')">
+    </div>
+
+    <!-- Error -->
+    <div id="nc-error" style="display:none; color:#e8472a; font-size:11px;"></div>
+
+    <!-- Buttons -->
+    <div style="display:flex; gap:10px; margin-top:8px;">
+      <button onclick="closeNewCustomer()"
+        style="background:#383c42; border:1px solid #5a5f66; color:#e8eaed; flex:1; padding:10px; border-radius:4px; font-size:12px; letter-spacing:0.06em; cursor:pointer; font-family:'JetBrains Mono',monospace;">CANCEL</button>
+      <button onclick="createCustomer()"
+        style="background:#86efac; color:#22252a; font-weight:600; flex:1; padding:10px; border-radius:4px; font-size:12px; letter-spacing:0.06em; cursor:pointer; border:none; font-family:'JetBrains Mono',monospace;">CREATE</button>
+    </div>
 
   </div>
 </div>
@@ -537,6 +585,51 @@
     if (!confirm('Revoke this license?')) return;
     const ok = await revokeTerminal();
     if (ok) closeOverlay();
+  }
+
+  // ── New Customer modal ───────────────────────────────
+
+  function openNewCustomer() {
+    document.getElementById('nc-store-name').value = '';
+    document.getElementById('nc-store-ref').value = '';
+    const errEl = document.getElementById('nc-error');
+    errEl.textContent = '';
+    errEl.style.display = 'none';
+    document.getElementById('new-customer-backdrop').style.display = 'block';
+    document.getElementById('new-customer-modal').style.display = 'block';
+  }
+
+  function closeNewCustomer() {
+    document.getElementById('new-customer-backdrop').style.display = 'none';
+    document.getElementById('new-customer-modal').style.display = 'none';
+    const errEl = document.getElementById('nc-error');
+    errEl.textContent = '';
+    errEl.style.display = 'none';
+  }
+
+  function createCustomer() {
+    const store_name = document.getElementById('nc-store-name').value.trim();
+    const store_ref  = document.getElementById('nc-store-ref').value.trim();
+    const errEl = document.getElementById('nc-error');
+
+    function ncErr(msg) {
+      errEl.textContent = msg;
+      errEl.style.display = 'block';
+    }
+
+    if (!store_name || !store_ref) { ncErr('Both fields are required.'); return; }
+    if (/\s/.test(store_ref))      { ncErr('Store Ref must not contain spaces.'); return; }
+    if (allCustomers.some(c => c.store_ref.toUpperCase() === store_ref.toUpperCase())) {
+      ncErr('Store Ref already exists.');
+      return;
+    }
+
+    const newCustomer = { store_ref: store_ref.toUpperCase(), store_name, terminals: [] };
+    allCustomers.push(newCustomer);
+    activeRef = newCustomer.store_ref;
+    renderCustomers(sortCustomers(allCustomers));
+    renderMain(newCustomer);
+    closeNewCustomer();
   }
 </script>
 
