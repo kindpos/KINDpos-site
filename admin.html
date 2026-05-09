@@ -524,22 +524,41 @@
     if (!customer) return false;
     const terminal_name = document.getElementById('ov-terminal-name').value.trim();
     const node_number   = Number(document.getElementById('ov-node-number').value);
-    customer.terminals = customer.terminals || [];
-    customer.terminals.push({
+    const terminal_data = {
+      license_key: generatedKey,
+      store_ref: document.getElementById('ov-store-ref').value,
       terminal_name: terminal_name || `Terminal ${node_number}`,
       node_number,
-      prefix:      document.getElementById('ov-prefix').value.trim(),
-      sku:         document.getElementById('ov-sku').value.trim(),
-      store_ref:   document.getElementById('ov-store-ref').value,
-      license_key: generatedKey,
-      status:      'PENDING',
-      mac:         null,
-      ip:          null,
-      last_seen:   null,
-    });
-    renderMain(customer);
-    renderCustomers(sortCustomers(allCustomers));
-    return true;
+      prefix: document.getElementById('ov-prefix').value.trim(),
+      sku: document.getElementById('ov-sku').value.trim()
+    };
+
+    customer.terminals = customer.terminals || [];
+    customer.terminals.push(terminal_data);
+
+    try {
+      const res = await fetch(`${API}/api/admin/terminals`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${ADMIN_SECRET}`
+        },
+        body: JSON.stringify(terminal_data)
+      });
+      if (!res.ok) {
+        customer.terminals.pop();
+        showOvError('Failed to save terminal.');
+        return false;
+      }
+      customer.terminals[customer.terminals.length - 1] = await res.json();
+      renderMain(customer);
+      renderCustomers(sortCustomers(allCustomers));
+      return true;
+    } catch (err) {
+      customer.terminals.pop();
+      showOvError('Network error.');
+      return false;
+    }
   }
 
   async function handleSaveTerminal() {
@@ -553,8 +572,37 @@
   }
 
   async function handleSaveEdit() {
-    await saveEdit();
-    closeOverlay();
+    if (!overlayTerminal) return;
+    const license_key = overlayTerminal.license_key;
+    const terminal_name = document.getElementById('ov-terminal-name').value.trim();
+    const node_number = Number(document.getElementById('ov-node-number').value) || null;
+    const prefix = document.getElementById('ov-prefix').value.trim();
+    const sku = document.getElementById('ov-sku').value.trim();
+
+    try {
+      const res = await fetch(`${API}/api/admin/terminals/${encodeURIComponent(license_key)}`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${ADMIN_SECRET}`
+        },
+        body: JSON.stringify({ terminal_name, node_number, prefix, sku })
+      });
+      if (!res.ok) {
+        const e = await res.json();
+        showOvError(e.error || 'Save failed');
+        return;
+      }
+      const updated = await res.json();
+      const cust = allCustomers.find(c => c.store_ref === updated.store_ref);
+      if (cust) {
+        const idx = cust.terminals.findIndex(t => t.license_key === license_key);
+        if (idx >= 0) cust.terminals[idx] = updated;
+      }
+      closeOverlay();
+    } catch (err) {
+      showOvError('Network error.');
+    }
   }
 
   async function revokeTerminal() {
@@ -608,7 +656,7 @@
     errEl.style.display = 'none';
   }
 
-  function createCustomer() {
+  async function createCustomer() {
     const store_name = document.getElementById('nc-store-name').value.trim();
     const store_ref  = document.getElementById('nc-store-ref').value.trim();
     const errEl = document.getElementById('nc-error');
@@ -625,12 +673,29 @@
       return;
     }
 
-    const newCustomer = { store_ref: store_ref.toUpperCase(), store_name, terminals: [] };
-    allCustomers.push(newCustomer);
-    activeRef = newCustomer.store_ref;
-    renderCustomers(sortCustomers(allCustomers));
-    renderMain(newCustomer);
-    closeNewCustomer();
+    try {
+      const res = await fetch(`${API}/api/admin/customers`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${ADMIN_SECRET}`
+        },
+        body: JSON.stringify({ store_ref: store_ref.toUpperCase(), store_name })
+      });
+      if (!res.ok) {
+        const e = await res.json();
+        ncErr(e.error || 'Server error');
+        return;
+      }
+      const newCustomer = await res.json();
+      allCustomers.push(newCustomer);
+      activeRef = newCustomer.store_ref;
+      renderCustomers(sortCustomers(allCustomers));
+      renderMain(newCustomer);
+      closeNewCustomer();
+    } catch (err) {
+      ncErr('Network error.');
+    }
   }
 </script>
 

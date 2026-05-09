@@ -46,10 +46,14 @@ export async function onRequest({ request, env }) {
   const code = generateCode(prefix.toUpperCase(), node_number);
   const now = new Date().toISOString();
 
+  if (!store_ref) {
+    return json({ error: 'store_ref is required' }, 400);
+  }
+
   await env.KINDPOS_DB.prepare(
-    `INSERT INTO licenses (id, prefix, node_number, sku, store_ref, activated, created_at)
-     VALUES (?, ?, ?, ?, ?, 0, ?)`
-  ).bind(code, prefix.toUpperCase(), node_number, sku, store_ref || null, now).run();
+    `INSERT INTO terminals (license_key, store_ref, prefix, node_number, sku, created_at)
+     VALUES (?, ?, ?, ?, ?, ?)`
+  ).bind(code, store_ref, prefix.toUpperCase(), node_number, sku, now).run();
 
   return json({ code });
 }

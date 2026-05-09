@@ -22,51 +22,94 @@ export async function onRequest({ request, env }) {
   if (!requireAdmin(request, env)) {
     return json({ error: 'Unauthorized' }, 401);
   }
-  if (request.method !== 'GET') {
+
+  if (request.method === 'GET') {
+    return handleGet(request, env);
+  } else if (request.method === 'POST') {
+    return handlePost(request, env);
+  } else {
     return json({ error: 'Method not allowed' }, 405);
   }
+}
 
+async function handleGet(request, env) {
   const { results } = await env.KINDPOS_DB.prepare(
     `SELECT
-       l.id                  AS license_key,
-       l.prefix,
-       l.node_number,
-       l.sku,
-       l.store_ref,
-       l.store_name,
-       l.terminal_name,
-       l.activated,
-       l.activated_at,
-       l.last_seen,
-       l.hardware_fingerprint,
-       n.ip,
-       n.mac
-     FROM licenses l
-     LEFT JOIN nodes n ON n.license_id = l.id
-     ORDER BY l.store_ref, l.prefix, l.node_number`
+       c.store_ref,
+       c.store_name,
+       c.created_at,
+       t.license_key,
+       t.terminal_name,
+       t.node_number,
+       t.prefix,
+       t.sku,
+       t.status,
+       t.hardware_fingerprint,
+       t.ip,
+       t.last_seen,
+       t.created_at AS t_created_at,
+       t.activated_at
+     FROM customers c
+     LEFT JOIN terminals t ON t.store_ref = c.store_ref
+     ORDER BY c.store_ref, t.created_at`
   ).all();
 
   const grouped = {};
   for (const row of results) {
-    const key = row.store_ref ?? '__none__';
+    const key = row.store_ref;
     if (!grouped[key]) {
-      grouped[key] = { store_ref: row.store_ref, terminals: [] };
+      grouped[key] = {
+        store_ref: row.store_ref,
+        store_name: row.store_name,
+        created_at: row.created_at,
+        terminals: []
+      };
     }
-    grouped[key].terminals.push({
-      license_key:          row.license_key,
-      prefix:               row.prefix,
-      node_number:          row.node_number,
-      sku:                  row.sku,
-      store_name:           row.store_name,
-      terminal_name:        row.terminal_name,
-      activated:            Boolean(row.activated),
-      activated_at:         row.activated_at,
-      last_seen:            row.last_seen,
-      hardware_fingerprint: row.hardware_fingerprint,
-      ip:                   row.ip,
-      mac:                  row.mac,
-    });
+    if (row.license_key) {
+      grouped[key].terminals.push({
+        license_key: row.license_key,
+        terminal_name: row.terminal_name,
+        node_number: row.node_number,
+        prefix: row.prefix,
+        sku: row.sku,
+        status: row.status,
+        hardware_fingerprint: row.hardware_fingerprint,
+        ip: row.ip,
+        last_seen: row.last_seen,
+        created_at: row.t_created_at,
+        activated_at: row.activated_at
+      });
+    }
   }
 
   return json({ customers: Object.values(grouped) });
+}
+
+async function handlePost(request, env) {
+  let body;
+  try {
+    body = await request.json();
+  } catch {
+    return json({ error: 'Invalid JSON' }, 400);
+  }
+
+  const { store_ref, store_name } = body;
+  if (!store_ref || !store_name) {
+    return json({ error: 'store_ref and store_name are required' }, 400);
+  }
+
+  const db = env.KINDPOS_DB;
+  try {
+    await db.prepare(
+      `INSERT INTO customers (store_ref, store_name)
+       VALUES (?, ?)`
+    ).bind(store_ref, store_name).run();
+  } catch (err) {
+    if (err.message && err.message.includes('UNIQUE')) {
+      return json({ error: 'Store Ref already exists' }, 409);
+    }
+    throw err;
+  }
+
+  return json({ store_ref, store_name, created_at: new Date().toISOString(), terminals: [] }, 201);
 }

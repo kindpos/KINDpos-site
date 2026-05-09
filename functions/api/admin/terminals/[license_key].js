@@ -1,6 +1,6 @@
 const CORS = {
   'Access-Control-Allow-Origin': '*',
-  'Access-Control-Allow-Methods': 'GET, POST, OPTIONS',
+  'Access-Control-Allow-Methods': 'GET, PUT, OPTIONS',
   'Access-Control-Allow-Headers': 'Content-Type, Authorization',
   'Content-Type': 'application/json',
 };
@@ -15,16 +15,18 @@ function requireAdmin(request, env) {
   return token === env.ADMIN_SECRET;
 }
 
-export async function onRequest({ request, env }) {
+export async function onRequest({ request, env, params }) {
   if (request.method === 'OPTIONS') {
     return new Response(null, { status: 204, headers: CORS });
   }
   if (!requireAdmin(request, env)) {
     return json({ error: 'Unauthorized' }, 401);
   }
-  if (request.method !== 'POST') {
+  if (request.method !== 'PUT') {
     return json({ error: 'Method not allowed' }, 405);
   }
+
+  const license_key = params.license_key;
 
   let body;
   try {
@@ -33,26 +35,30 @@ export async function onRequest({ request, env }) {
     return json({ error: 'Invalid JSON' }, 400);
   }
 
-  const { license_key } = body;
-  if (!license_key) {
-    return json({ error: 'license_key is required' }, 400);
-  }
+  const { terminal_name, node_number, prefix, sku } = body;
 
   const db = env.KINDPOS_DB;
 
-  const terminal = await db.prepare(
+  const existing = await db.prepare(
     'SELECT license_key FROM terminals WHERE license_key = ?'
   ).bind(license_key).first();
 
-  if (!terminal) {
-    return json({ error: 'License not found' }, 404);
+  if (!existing) {
+    return json({ error: 'Terminal not found' }, 404);
   }
 
   await db.prepare(
     `UPDATE terminals
-     SET status = 'REVOKED', hardware_fingerprint = NULL
+     SET terminal_name = ?, node_number = ?, prefix = ?, sku = ?
      WHERE license_key = ?`
-  ).bind(license_key).run();
+  ).bind(terminal_name || null, node_number || null, prefix || null, sku || null, license_key).run();
 
-  return json({ success: true, revoked: license_key });
+  const updated = await db.prepare(
+    `SELECT t.*, c.store_name
+     FROM terminals t
+     JOIN customers c ON c.store_ref = t.store_ref
+     WHERE t.license_key = ?`
+  ).bind(license_key).first();
+
+  return json(updated, 200);
 }
