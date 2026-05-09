@@ -33,6 +33,16 @@ def default_install_dir():
     )
 
 
+def get_lan_ip():
+    import socket
+    try:
+        with socket.socket(socket.AF_INET, socket.SOCK_DGRAM) as s:
+            s.connect(('8.8.8.8', 80))
+            return s.getsockname()[0]
+    except Exception:
+        return '127.0.0.1'
+
+
 def _create_shortcut(target_py, pythonw, dest_lnk):
     import subprocess
     ps = (
@@ -647,6 +657,37 @@ class KINDposSetup(tk.Tk):
                         '/SC', 'ONLOGON', '/RL', 'LIMITED',
                     ], capture_output=True)
             ui(self._log, 'Shortcuts created.', 'ok')
+
+            # ── Step 5: hosts file ───────────────────────────────
+            try:
+                lan_ip = get_lan_ip()
+                hosts_path = os.path.join(
+                    os.environ.get('SystemRoot', r'C:\Windows'),
+                    'System32', 'drivers', 'etc', 'hosts'
+                )
+                try:
+                    with open(hosts_path, 'r') as fh:
+                        existing_lines = fh.readlines()
+                except FileNotFoundError:
+                    existing_lines = []
+                cleaned = [l for l in existing_lines
+                           if 'kindpos.local' not in l]
+                if lan_ip == '127.0.0.1':
+                    ui(self._log,
+                       'WARNING: could not detect LAN IP — skipping hosts entry.',
+                       'dim')
+                    new_content = ''.join(cleaned)
+                else:
+                    entry = f'{lan_ip}\tkindpos.local\n'
+                    new_content = ''.join(cleaned) + entry
+                    ui(self._log, f'hosts: {entry.strip()}', 'ok')
+                with open(hosts_path, 'w') as fh:
+                    fh.write(new_content)
+            except Exception as hosts_exc:
+                ui(self._log,
+                   f'WARNING: could not update hosts file: {hosts_exc}',
+                   'dim')
+
             ui(self._set_progress, 100, 'Done.')
             ui(self._install_done, True)
 
