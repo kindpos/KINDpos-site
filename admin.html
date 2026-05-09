@@ -13,6 +13,9 @@
     #customer-list::-webkit-scrollbar { width: 4px; }
     #customer-list::-webkit-scrollbar-track { background: #22252a; }
     #customer-list::-webkit-scrollbar-thumb { background: #5a5f66; border-radius: 2px; }
+    #terminal-cards::-webkit-scrollbar { width: 4px; }
+    #terminal-cards::-webkit-scrollbar-track { background: #383c42; }
+    #terminal-cards::-webkit-scrollbar-thumb { background: #5a5f66; border-radius: 2px; }
   </style>
 </head>
 <body>
@@ -64,8 +67,13 @@
 
     </div>
 
-    <!-- MAIN (empty placeholder) -->
-    <div id="main" style="flex:1; background:#383c42;"></div>
+    <!-- MAIN -->
+    <div id="main" style="flex:1; background:#383c42; display:flex; flex-direction:column; overflow:hidden;">
+      <div id="profile-header" style="height:44px; background:#2e3236; border-bottom:1px solid #5a5f66; padding:10px 14px; display:flex; align-items:center; justify-content:center; flex-shrink:0;">
+        <span style="color:#e8eaed; font-size:12px;">Select a customer</span>
+      </div>
+      <div id="terminal-cards" style="flex:1; overflow-y:auto; padding:12px; display:flex; flex-direction:column; gap:10px;"></div>
+    </div>
 
   </div>
 </div>
@@ -135,7 +143,7 @@
         });
         tab.style.background = '#383c42';
         tab.style.borderLeftColor = '#86efac';
-        console.log(c.store_ref);
+        renderMain(c);
       });
 
       listEl.appendChild(tab);
@@ -169,6 +177,95 @@
   }
 
   loadCustomers();
+
+  // ── Chunk 2: main panel ──────────────────────────────
+
+  function renderMain(customer) {
+    renderProfileHeader(customer);
+    renderTerminalCards(customer);
+  }
+
+  function renderProfileHeader(customer) {
+    const el = document.getElementById('profile-header');
+    if (!customer) {
+      el.style.justifyContent = 'center';
+      el.innerHTML = '<span style="color:#e8eaed; font-size:12px;">Select a customer</span>';
+      return;
+    }
+    el.style.justifyContent = 'space-between';
+    const ref = displayRef(customer.store_ref);
+    const termCount = Array.isArray(customer.terminals) ? customer.terminals.length : 0;
+    const termLabel = termCount === 1 ? '1 terminal' : `${termCount} terminals`;
+    const bottomLine = customer.store_name ? `${customer.store_name} · ${termLabel}` : termLabel;
+    el.innerHTML = `
+      <div>
+        <div style="color:#86efac; font-size:12px; letter-spacing:0.06em; font-weight:500;">${ref}</div>
+        <div style="color:#e8eaed; font-size:10px; margin-top:2px;">${bottomLine}</div>
+      </div>
+      <button
+        style="background:#86efac; color:#22252a; font-size:11px; padding:6px 12px; border-radius:4px; font-weight:600; letter-spacing:0.06em; cursor:pointer; border:none; font-family:'JetBrains Mono',monospace;"
+        onclick="openOverlay()"
+      >+ TERMINAL</button>
+    `;
+  }
+
+  function relativeTime(ts) {
+    if (!ts) return 'Never';
+    const diff = Math.floor((Date.now() - new Date(ts)) / 1000);
+    if (diff < 60) return 'Just now';
+    if (diff < 3600) return `${Math.floor(diff / 60)}m ago`;
+    if (diff < 86400) return `${Math.floor(diff / 3600)}h ago`;
+    return `${Math.floor(diff / 86400)}d ago`;
+  }
+
+  function termRow(label, value, valueColor) {
+    return `<div style="display:flex; justify-content:space-between; align-items:center;">
+      <span style="color:#e8eaed; font-size:10px; letter-spacing:0.08em;">${label}</span>
+      <span style="color:${valueColor}; font-size:11px;">${value}</span>
+    </div>`;
+  }
+
+  function renderTerminalCards(customer) {
+    const el = document.getElementById('terminal-cards');
+    el.innerHTML = '';
+    const terminals = customer && Array.isArray(customer.terminals) ? customer.terminals : [];
+    if (terminals.length === 0) {
+      el.innerHTML = '<div style="color:#e8eaed; text-align:center; font-size:12px; margin-top:20px;">No terminals</div>';
+      return;
+    }
+    terminals.forEach(t => {
+      const isActivated = String(t.status).toUpperCase() === 'ACTIVATED';
+      const badgeBg    = isActivated ? '#166534' : '#7a4d00';
+      const badgeColor = isActivated ? '#4ade80' : '#f5a623';
+      const badgeText  = isActivated ? 'ACTIVATED' : 'PENDING';
+      const name = t.terminal_name || (t.node_number != null ? `Terminal ${t.node_number}` : 'Terminal');
+      const lsColor = t.last_seen ? '#86efac' : '#e8eaed';
+
+      const card = document.createElement('div');
+      card.style.cssText = 'background:#2e3236; border:1px solid #5a5f66; border-radius:6px; cursor:pointer;';
+      card.innerHTML = `
+        <div style="background:#22252a; padding:8px 12px; border-bottom:1px solid #5a5f66; border-radius:6px 6px 0 0; display:flex; justify-content:space-between; align-items:center;">
+          <span style="color:#86efac; font-size:12px;">${name}</span>
+          <span style="background:${badgeBg}; color:${badgeColor}; font-size:10px; padding:2px 8px; border-radius:3px; letter-spacing:0.06em;">${badgeText}</span>
+        </div>
+        <div style="padding:10px 12px; display:flex; flex-direction:column; gap:6px;">
+          ${termRow('KEY',       t.license_key || '—', t.license_key ? '#22d3ee' : '#e8eaed')}
+          ${termRow('MAC',       t.mac         || '—', t.mac         ? '#86efac' : '#e8eaed')}
+          ${termRow('IP',        t.ip          || '—', t.ip          ? '#86efac' : '#e8eaed')}
+          ${termRow('LAST SEEN', relativeTime(t.last_seen), lsColor)}
+        </div>
+      `;
+      card.addEventListener('mouseenter', () => { card.style.borderColor = '#86efac'; });
+      card.addEventListener('mouseleave', () => { card.style.borderColor = '#5a5f66'; });
+      card.addEventListener('click', () => openEditOverlay(t));
+      el.appendChild(card);
+    });
+  }
+
+  // ── Overlay stubs (Chunk 3) ──────────────────────────
+  function openOverlay()              { console.log('open add overlay'); }
+  function openEditOverlay(terminal)  { console.log(terminal); }
+  function closeOverlay()             { console.log('close overlay'); }
 </script>
 
 </body>
