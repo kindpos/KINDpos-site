@@ -2,7 +2,7 @@
 """KINDpos Setup Wizard — v2.0"""
 
 import sys, os, re, tkinter as tk
-import hashlib, uuid, subprocess
+import hashlib, uuid, subprocess, threading
 from tkinter import filedialog
 
 # ── Tokens ──────────────────────────────────────────
@@ -204,6 +204,7 @@ class KINDposSetup(tk.Tk):
         self.step = 0
         self.install_dir = tk.StringVar(value=default_install_dir())
         self._license_key = None
+        self._activation_data = None
 
         self._pip_labels = []
         self._step_labels = []
@@ -294,11 +295,11 @@ class KINDposSetup(tk.Tk):
                                   bg=T['well'], fg=T['text'], font=(FONT, 8))
         self.step_lbl.pack(side=tk.LEFT, padx=18)
 
-        self.next_btn = tk.Button(footer_bar, text='Next →', bg=T['green'],
+        self._btn_next = tk.Button(footer_bar, text='Next →', bg=T['green'],
                                    fg=T['well'], font=(FONT, 9, 'bold'),
                                    relief=tk.FLAT, padx=18, pady=7,
                                    cursor='hand2', command=self._next)
-        self.next_btn.pack(side=tk.RIGHT, padx=(0, 18))
+        self._btn_next.pack(side=tk.RIGHT, padx=(0, 18))
 
         self.back_btn = tk.Button(footer_bar, text='Back', bg=T['card'],
                                    fg=T['green'], font=(FONT, 9, 'bold'),
@@ -333,12 +334,12 @@ class KINDposSetup(tk.Tk):
         if step == 5:
             self._apply_shortcut_prefs()
             self.back_btn.pack_forget()
-            self.next_btn.config(text='Finish', bg=T['greenWarm'], fg=T['well'],
+            self._btn_next.config(text='Finish', bg=T['greenWarm'], fg=T['well'],
                                   command=self._finish)
         else:
             self.back_btn.pack(side=tk.RIGHT, padx=(0, 8))
             self.back_btn.config(state=tk.DISABLED if step == 0 else tk.NORMAL)
-            self.next_btn.config(text='Next →', bg=T['green'], fg=T['well'],
+            self._btn_next.config(text='Next →', bg=T['green'], fg=T['well'],
                                   command=self._next)
 
     def _back(self):
@@ -354,6 +355,10 @@ class KINDposSetup(tk.Tk):
                 return
             self._key_error.config(text='')
             self._license_key = val
+            self._install_dir = self.install_dir.get()
+            self._btn_next.config(text='Validating…', state='disabled')
+            threading.Thread(target=self._validate_and_proceed, daemon=True).start()
+            return
         if self.step < 5:
             self._goto(self.step + 1)
 
@@ -462,7 +467,6 @@ class KINDposSetup(tk.Tk):
         tk.Frame(self.content, bg=T['border'], height=1).pack(fill=tk.X)
 
         INSTALL_STEPS = [
-            'Activating license',
             'Download Python 3.11 embeddable',
             'Extract Python runtime',
             'Clone KINDpos repository',
@@ -514,7 +518,7 @@ class KINDposSetup(tk.Tk):
         self.log_text.tag_config('err',  foreground=T['verm'])
 
         self.back_btn.pack_forget()
-        self.next_btn.config(state=tk.DISABLED, bg=T['moon'], fg=T['moonText'])
+        self._btn_next.config(state=tk.DISABLED, bg=T['moon'], fg=T['moonText'])
 
         self._run_install()
 
@@ -531,6 +535,8 @@ class KINDposSetup(tk.Tk):
                 lbl.config(fg=T['text'])
 
     def _log(self, msg, tag='dim'):
+        if not hasattr(self, 'log_text'):
+            return
         self.log_text.config(state=tk.NORMAL)
         self.log_text.insert(tk.END, msg if msg.endswith('\n') else msg + '\n', tag)
         self.log_text.see(tk.END)
@@ -545,7 +551,7 @@ class KINDposSetup(tk.Tk):
         if ok:
             self._set_progress(100, 'Installation complete.')
             self._log('All steps completed successfully.', 'ok')
-            self.next_btn.config(state=tk.NORMAL, bg=T['green'], fg=T['well'])
+            self._btn_next.config(state=tk.NORMAL, bg=T['green'], fg=T['well'])
         else:
             self._log('Installation failed. See errors above.', 'err')
             self.back_btn.pack(side=tk.RIGHT, padx=(0, 8))
@@ -595,10 +601,13 @@ class KINDposSetup(tk.Tk):
                  bg=T['bg'], fg=T['green'], font=(FONT, 11),
                  justify=tk.LEFT).pack(anchor=tk.W, pady=(16, 4))
         try:
-            import json
-            lic_path = os.path.join(self.install_dir.get(), 'data', 'license.json')
-            with open(lic_path) as fh:
-                lic = json.load(fh)
+            if self._activation_data:
+                lic = self._activation_data
+            else:
+                import json
+                lic_path = os.path.join(self.install_dir.get(), 'data', 'license.json')
+                with open(lic_path) as fh:
+                    lic = json.load(fh)
             terminal_name = lic.get('terminal_name', '')
             store_name    = lic.get('store_name', '')
             if terminal_name or store_name:
@@ -618,6 +627,19 @@ class KINDposSetup(tk.Tk):
                        variable=self.cb_site, bg=T['bg'], fg=T['green'],
                        selectcolor=T['well'], activebackground=T['bg'],
                        font=(FONT, 10)).pack(anchor=tk.W)
+
+    def _validate_and_proceed(self):
+        try:
+            data = self._do_activation()
+            self._activation_data = data
+            self.after(0, lambda: self._goto(3))
+        except RuntimeError as e:
+            msg = str(e)
+            self.after(0, lambda: self._show_activation_error(msg))
+            self.after(0, lambda: self._btn_next.config(text='Next →', state='normal'))
+
+    def _show_activation_error(self, msg):
+        self._key_error.config(text=msg)
 
     def _do_activation(self):
         import urllib.request, json as _json
@@ -649,14 +671,14 @@ class KINDposSetup(tk.Tk):
             ui(self._log, f'WARNING: could not write license.json: {e}', 'dim')
         terminal_name = data.get('terminal_name', self._license_key)
         ui(self._log, f'Activated: {terminal_name}', 'ok')
+        return data
 
     def _run_install(self):
-        import threading
         t = threading.Thread(target=self._install_thread, daemon=True)
         t.start()
 
     def _install_thread(self):
-        import threading, zipfile, urllib.request, subprocess
+        import zipfile, urllib.request, subprocess
         idir     = self.install_dir.get()
         self._install_dir = idir
         rt_dir   = os.path.join(idir, 'runtime')
@@ -667,14 +689,8 @@ class KINDposSetup(tk.Tk):
         ui = lambda fn, *a, **kw: self.after(0, lambda: fn(*a, **kw))
 
         try:
-            # ── Step 0: Activate license ─────────────────────────
+            # ── Step 0: Download Python embeddable ──────────────
             ui(self._set_step, 0)
-            ui(self._log, 'Activating license…', 'info')
-            self._do_activation()
-            ui(self._set_progress, 5, 'License activated.')
-
-            # ── Step 1: Download Python embeddable ──────────────
-            ui(self._set_step, 1)
             ui(self._log, 'Downloading Python 3.11 embeddable…', 'info')
             url = 'https://www.python.org/ftp/python/3.11.9/python-3.11.9-embed-amd64.zip'
             os.makedirs(rt_dir, exist_ok=True)
@@ -696,8 +712,8 @@ class KINDposSetup(tk.Tk):
                         ui(self._log, f'  {tens}% downloaded', 'dim')
                     ui(self._set_progress, pct, f'Downloading… {pct}%')
 
-            # ── Step 2: Extract Python ───────────────────────────
-            ui(self._set_step, 2)
+            # ── Step 1: Extract Python ───────────────────────────
+            ui(self._set_step, 1)
             ui(self._log, 'Extracting Python runtime…', 'info')
             ui(self._set_progress, 25, 'Extracting…')
             with zipfile.ZipFile(py_zip) as zf:
@@ -711,8 +727,8 @@ class KINDposSetup(tk.Tk):
             ui(self._log, 'Runtime ready.', 'ok')
             ui(self._set_progress, 35, 'Python extracted.')
 
-            # ── Step 3: Clone repository ─────────────────────────
-            ui(self._set_step, 3)
+            # ── Step 2: Clone repository ─────────────────────────
+            ui(self._set_step, 2)
             ui(self._log, 'Cloning KINDpos repository…', 'info')
             ui(self._set_progress, 35, 'Cloning…')
             try:
@@ -736,8 +752,8 @@ class KINDposSetup(tk.Tk):
                 ui(self._log, 'Repository downloaded via zip.', 'ok')
             ui(self._set_progress, 60, 'Repository ready.')
 
-            # ── Step 4: Install dependencies ─────────────────────
-            ui(self._set_step, 4)
+            # ── Step 3: Install dependencies ─────────────────────
+            ui(self._set_step, 3)
             ui(self._log, 'Installing Python dependencies…', 'info')
             req_file = os.path.join(app_dir, 'backend', 'requirements.txt')
             cmd = [py_exe, '-m', 'pip', 'install', '-r', req_file, '--upgrade']
@@ -762,8 +778,8 @@ class KINDposSetup(tk.Tk):
             ui(self._log, 'Dependencies installed.', 'ok')
             ui(self._set_progress, 90, 'Dependencies ready.')
 
-            # ── Step 5: Launcher + shortcuts ─────────────────────
-            ui(self._set_step, 5)
+            # ── Step 4: Launcher + shortcuts ─────────────────────
+            ui(self._set_step, 4)
             ui(self._log, 'Writing launcher and shortcuts…', 'info')
             launcher_py = os.path.join(idir, 'kindpos_launcher.py')
             open(launcher_py, 'w').write(_LAUNCHER_CONTENT)
