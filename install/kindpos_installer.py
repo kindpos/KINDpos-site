@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """KINDpos Setup Wizard — v2.0"""
 
-import sys, os, tkinter as tk
+import sys, os, re, tkinter as tk
 import hashlib, uuid, subprocess
 from tkinter import filedialog
 
@@ -24,7 +24,7 @@ T = {
     'border':      '#5a5f66',
 }
 FONT = 'Courier'
-STEPS = ['Welcome', 'Directory', 'Install', 'Shortcuts', 'Finish']
+STEPS = ['Welcome', 'Directory', 'Activation', 'Install', 'Shortcuts', 'Finish']
 
 
 def default_install_dir():
@@ -203,6 +203,7 @@ class KINDposSetup(tk.Tk):
 
         self.step = 0
         self.install_dir = tk.StringVar(value=default_install_dir())
+        self._license_key = None
 
         self._pip_labels = []
         self._step_labels = []
@@ -289,7 +290,7 @@ class KINDposSetup(tk.Tk):
 
         tk.Frame(footer_bar, bg=T['border'], height=1).pack(fill=tk.X, side=tk.TOP)
 
-        self.step_lbl = tk.Label(footer_bar, text='Step 1 of 5',
+        self.step_lbl = tk.Label(footer_bar, text='Step 1 of 6',
                                   bg=T['well'], fg=T['text'], font=(FONT, 8))
         self.step_lbl.pack(side=tk.LEFT, padx=18)
 
@@ -318,7 +319,7 @@ class KINDposSetup(tk.Tk):
             else:
                 pip.config(bg=T['moon'], fg=T['moonText'])
                 lbl.config(fg=T['text'], font=(FONT, 9))
-        self.step_lbl.config(text=f'Step {step + 1} of 5')
+        self.step_lbl.config(text=f'Step {step + 1} of 6')
 
     # ── Navigation ──────────────────────────────────
 
@@ -327,9 +328,9 @@ class KINDposSetup(tk.Tk):
             w.destroy()
         self.step = step
         self._refresh_left(step)
-        [self._p_welcome, self._p_directory, self._p_install,
-         self._p_shortcuts, self._p_finish][step]()
-        if step == 4:
+        [self._p_welcome, self._p_directory, self._p_activation,
+         self._p_install, self._p_shortcuts, self._p_finish][step]()
+        if step == 5:
             self._apply_shortcut_prefs()
             self.back_btn.pack_forget()
             self.next_btn.config(text='Finish', bg=T['greenWarm'], fg=T['well'],
@@ -345,7 +346,15 @@ class KINDposSetup(tk.Tk):
             self._goto(self.step - 1)
 
     def _next(self):
-        if self.step < 4:
+        if self.step == 2:
+            val = self._key_entry.get().strip()
+            if not re.match(r'^[A-Z0-9]+(-[A-Z0-9]+){2,}$', val):
+                self._key_error.config(
+                    text='Invalid license key. Expected format: XXXX-XXXX-XXXX')
+                return
+            self._key_error.config(text='')
+            self._license_key = val
+        if self.step < 5:
             self._goto(self.step + 1)
 
     # ── Page builders (placeholders) ────────────────
@@ -396,6 +405,54 @@ class KINDposSetup(tk.Tk):
                  text='Default location requires no administrator rights.\nAt least 250 MB of free space is required.',
                  bg=T['bg'], fg=T['text'], font=(FONT, 9),
                  justify=tk.LEFT).pack(anchor=tk.W, pady=(8, 0))
+
+    def _p_activation(self):
+        tk.Label(self.content, text='License Activation',
+                 bg=T['bg'], fg=T['green'], font=(FONT, 15, 'bold')).pack(anchor='w')
+        tk.Label(self.content,
+                 text='Enter your license key to register this terminal',
+                 bg=T['bg'], fg=T['text'], font=(FONT, 9)).pack(
+            anchor='w', pady=(2, 16))
+        tk.Frame(self.content, bg=T['border'], height=1).pack(fill=tk.X, pady=(0, 16))
+
+        tk.Label(self.content, text='LICENSE KEY',
+                 bg=T['bg'], fg=T['moon'], font=(FONT, 8, 'bold'),
+                 anchor='w').pack(anchor='w', pady=(0, 4))
+
+        self._key_entry = tk.Entry(
+            self.content,
+            bg=T['well'], fg=T['green'],
+            insertbackground=T['green'],
+            font=(FONT, 13), relief=tk.FLAT,
+            width=28,
+        )
+        self._key_entry.pack(anchor='w')
+
+        def _sanitise(event):
+            e = self._key_entry
+            raw = e.get().upper()
+            cleaned = re.sub(r'[^A-Z0-9\-]', '', raw)
+            if cleaned != e.get():
+                cur = e.index(tk.INSERT)
+                e.delete(0, tk.END)
+                e.insert(0, cleaned)
+                e.icursor(min(cur, len(cleaned)))
+
+        self._key_entry.bind('<KeyRelease>', _sanitise)
+
+        self._key_error = tk.Label(self.content, text='',
+                                   bg=T['bg'], fg=T['verm'], font=(FONT, 9))
+        self._key_error.pack(anchor='w', pady=(4, 0))
+
+        info_outer = tk.Frame(self.content, bg=T['well'], bd=0, relief=tk.FLAT)
+        info_outer.pack(fill=tk.X, pady=(16, 0))
+        tk.Frame(info_outer, bg=T['gold'], width=4).pack(side=tk.LEFT, fill=tk.Y)
+        tk.Label(info_outer,
+                 text=('Your terminal will be registered automatically\n'
+                       'using the name and store profile set up by\n'
+                       'your KIND Technologies administrator.'),
+                 bg=T['well'], fg=T['text'], font=(FONT, 9),
+                 padx=10, pady=10, justify=tk.LEFT).pack(side=tk.LEFT)
 
     def _p_install(self):
         tk.Label(self.content, text='Installing KINDpos',
