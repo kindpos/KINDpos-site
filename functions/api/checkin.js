@@ -9,18 +9,9 @@ function json(data, status = 200) {
   return new Response(JSON.stringify(data), { status, headers: CORS });
 }
 
-function requireAdmin(request, env) {
-  const auth = request.headers.get('Authorization') || '';
-  const token = auth.replace(/^Bearer\s+/i, '');
-  return token === env.ADMIN_SECRET;
-}
-
 export async function onRequest({ request, env }) {
   if (request.method === 'OPTIONS') {
     return new Response(null, { status: 204, headers: CORS });
-  }
-  if (!requireAdmin(request, env)) {
-    return json({ error: 'Unauthorized' }, 401);
   }
   if (request.method !== 'POST') {
     return json({ error: 'Method not allowed' }, 405);
@@ -33,26 +24,35 @@ export async function onRequest({ request, env }) {
     return json({ error: 'Invalid JSON' }, 400);
   }
 
-  const { license_key } = body;
-  if (!license_key) {
-    return json({ error: 'license_key is required' }, 400);
+  const { license_key, hardware_fingerprint, ip } = body;
+  if (!license_key || !hardware_fingerprint) {
+    return json({ error: 'license_key and hardware_fingerprint are required' }, 400);
   }
 
   const db = env.KINDPOS_DB;
 
   const terminal = await db.prepare(
-    'SELECT license_key FROM terminals WHERE license_key = ?'
+    'SELECT * FROM terminals WHERE license_key = ?'
   ).bind(license_key).first();
 
   if (!terminal) {
-    return json({ error: 'License not found' }, 404);
+    return json({ error: 'License key not found' }, 400);
   }
 
+  if (terminal.status !== 'ACTIVATED') {
+    return json({ error: 'License not activated' }, 400);
+  }
+
+  if (terminal.hardware_fingerprint !== hardware_fingerprint) {
+    return json({ error: 'Hardware fingerprint mismatch' }, 400);
+  }
+
+  const now = new Date().toISOString();
   await db.prepare(
     `UPDATE terminals
-     SET status = 'REVOKED', hardware_fingerprint = NULL
+     SET ip = ?, last_seen = ?
      WHERE license_key = ?`
-  ).bind(license_key).run();
+  ).bind(ip || null, now, license_key).run();
 
-  return json({ success: true, revoked: license_key });
+  return json({ ok: true }, 200);
 }

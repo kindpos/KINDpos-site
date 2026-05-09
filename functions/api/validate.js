@@ -39,37 +39,26 @@ export async function onRequest({ request, env }) {
   ).bind(license_key).first();
 
   if (!terminal) {
-    return json({ error: 'License key not found' }, 400);
+    return json({ valid: false, reason: 'not_found' }, 200);
   }
 
   if (terminal.status === 'REVOKED') {
-    return json({ error: 'License revoked' }, 400);
+    return json({ valid: false, reason: 'revoked' }, 200);
   }
 
   if (terminal.status === 'ACTIVATED') {
-    if (terminal.hardware_fingerprint === hardware_fingerprint) {
-      return json(terminal, 200);
-    } else {
-      return json({ error: 'License already activated on another device' }, 400);
+    if (terminal.hardware_fingerprint !== hardware_fingerprint) {
+      return json({ valid: false, reason: 'already_activated' }, 200);
     }
+    return json({
+      valid: true,
+      store_ref: terminal.store_ref,
+      terminal_name: terminal.terminal_name,
+      prefix: terminal.prefix,
+      node_number: terminal.node_number,
+      activated_at: terminal.activated_at
+    }, 200);
   }
 
-  const now = new Date().toISOString();
-
-  await db.prepare(
-    `UPDATE terminals
-     SET status = 'ACTIVATED',
-         hardware_fingerprint = ?,
-         activated_at = ?
-     WHERE license_key = ?`
-  ).bind(hardware_fingerprint, now, license_key).run();
-
-  const updated = await db.prepare(
-    `SELECT t.*, c.store_name
-     FROM terminals t
-     JOIN customers c ON c.store_ref = t.store_ref
-     WHERE t.license_key = ?`
-  ).bind(license_key).first();
-
-  return json(updated, 200);
+  return json({ valid: false, reason: 'not_activated' }, 200);
 }
