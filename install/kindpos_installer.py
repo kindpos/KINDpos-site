@@ -2,6 +2,7 @@
 """KINDpos Setup Wizard — v2.0"""
 
 import sys, os, tkinter as tk
+import hashlib, uuid, subprocess
 from tkinter import filedialog
 
 # ── Tokens ──────────────────────────────────────────
@@ -41,6 +42,32 @@ def get_lan_ip():
             return s.getsockname()[0]
     except Exception:
         return '127.0.0.1'
+
+
+def _get_hardware_fingerprint():
+    serial = 'UNKNOWN'
+    try:
+        result = subprocess.run(
+            ['wmic', 'bios', 'get', 'serialnumber', '/value'],
+            capture_output=True, text=True, timeout=10
+        )
+        for line in result.stdout.splitlines():
+            if line.upper().startswith('SERIALNUMBER='):
+                value = line.split('=', 1)[1].strip()
+                if value:
+                    serial = value
+                break
+    except Exception:
+        pass
+
+    try:
+        raw = uuid.getnode()
+        mac = ':'.join(f'{(raw >> (8 * i)) & 0xFF:02X}' for i in reversed(range(6)))
+    except Exception:
+        mac = '00:00:00:00:00:00'
+
+    digest = hashlib.sha256(f'{serial}:{mac}'.encode()).hexdigest().upper()
+    return digest
 
 
 def _create_shortcut(target_py, pythonw, dest_lnk):
