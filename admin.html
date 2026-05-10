@@ -202,11 +202,25 @@
 </div>
 
 <script>
-  const ADMIN_SECRET = 'Fr76X5Rt5#@!';
+  let ADMIN_SECRET = '';
   const API = 'https://kindpos.com';
 
   let allCustomers = [];
   let activeRef = null;
+
+  async function initializeConfig() {
+    try {
+      const res = await fetch(`${API}/api/admin/config`);
+      if (res.ok) {
+        const config = await res.json();
+        ADMIN_SECRET = config.admin_secret || '';
+      }
+    } catch (err) {
+      console.error('Failed to load admin config:', err);
+    }
+  }
+
+  initializeConfig();
 
   function displayRef(store_ref) {
     return store_ref === '' ? 'UNGROUPED' : store_ref;

@@ -1,5 +1,5 @@
 const CORS = {
-  'Access-Control-Allow-Origin': '*',
+  'Access-Control-Allow-Origin': 'https://kindpos.com',
   'Access-Control-Allow-Methods': 'GET, POST, OPTIONS',
   'Access-Control-Allow-Headers': 'Content-Type, Authorization',
   'Content-Type': 'application/json',
@@ -52,10 +52,13 @@ export async function onRequest({ request, env }) {
     }
     return json({
       valid: true,
+      license_key: terminal.license_key,
       store_ref: terminal.store_ref,
+      store_name: terminal.store_name,
       terminal_name: terminal.terminal_name,
       prefix: terminal.prefix,
       node_number: terminal.node_number,
+      sku: terminal.sku,
       activated_at: terminal.activated_at
     }, 200);
   }
