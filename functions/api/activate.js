@@ -1,5 +1,5 @@
 const CORS = {
-  'Access-Control-Allow-Origin': '*',
+  'Access-Control-Allow-Origin': 'https://kindpos.com',
   'Access-Control-Allow-Methods': 'GET, POST, OPTIONS',
   'Access-Control-Allow-Headers': 'Content-Type, Authorization',
   'Content-Type': 'application/json',
@@ -48,7 +48,17 @@ export async function onRequest({ request, env }) {
 
   if (terminal.status === 'ACTIVATED') {
     if (terminal.hardware_fingerprint === hardware_fingerprint) {
-      return json(terminal, 200);
+      return json({
+        license_key: terminal.license_key,
+        store_ref: terminal.store_ref,
+        store_name: terminal.store_name,
+        terminal_name: terminal.terminal_name,
+        node_number: terminal.node_number,
+        prefix: terminal.prefix,
+        sku: terminal.sku,
+        status: terminal.status,
+        activated_at: terminal.activated_at
+      }, 200);
     } else {
       return json({ error: 'License already activated on another device' }, 400);
     }
@@ -71,5 +81,16 @@ export async function onRequest({ request, env }) {
      WHERE t.license_key = ?`
   ).bind(license_key).first();
 
-  return json(updated, 200);
+  return json({
+    license_key: updated.license_key,
+    store_ref: updated.store_ref,
+    store_name: updated.store_name,
+    terminal_name: updated.terminal_name,
+    node_number: updated.node_number,
+    prefix: updated.prefix,
+    sku: updated.sku,
+    status: updated.status,
+    hardware_fingerprint: updated.hardware_fingerprint,
+    activated_at: updated.activated_at
+  }, 200);
 }
