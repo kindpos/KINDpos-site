@@ -40,19 +40,28 @@ export async function onRequest({ request, env }) {
 
   const db = env.KINDPOS_DB;
 
-  const terminal = await db.prepare(
-    'SELECT license_key FROM terminals WHERE license_key = ?'
-  ).bind(license_key).first();
+  let terminal;
+  try {
+    terminal = await db.prepare(
+      'SELECT license_key FROM terminals WHERE license_key = ?'
+    ).bind(license_key).first();
+  } catch (err) {
+    return json({ error: err.message || 'Database error' }, 500);
+  }
 
   if (!terminal) {
     return json({ error: 'License not found' }, 404);
   }
 
-  await db.prepare(
-    `UPDATE terminals
-     SET status = 'REVOKED', hardware_fingerprint = NULL
-     WHERE license_key = ?`
-  ).bind(license_key).run();
+  try {
+    await db.prepare(
+      `UPDATE terminals
+       SET status = 'REVOKED', hardware_fingerprint = NULL
+       WHERE license_key = ?`
+    ).bind(license_key).run();
+  } catch (err) {
+    return json({ error: err.message || 'Revoke failed' }, 500);
+  }
 
   return json({ success: true, revoked: license_key });
 }

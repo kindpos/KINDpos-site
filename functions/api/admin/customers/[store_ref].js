@@ -27,15 +27,32 @@ export async function onRequest({ request, env, params }) {
   }
 
   const { store_ref } = params;
+  const db = env.KINDPOS_DB;
 
-  await env.KINDPOS_DB.prepare(`
-    UPDATE terminals SET status = 'REVOKED', hardware_fingerprint = NULL
-    WHERE store_ref = ?
-  `).bind(store_ref).run();
+  let customer;
+  try {
+    customer = await db.prepare(
+      'SELECT store_ref FROM customers WHERE store_ref = ?'
+    ).bind(store_ref).first();
+  } catch (err) {
+    return json({ error: err.message || 'Database error' }, 500);
+  }
 
-  await env.KINDPOS_DB.prepare(`
-    DELETE FROM customers WHERE store_ref = ?
-  `).bind(store_ref).run();
+  if (!customer) {
+    return json({ error: 'Customer not found' }, 404);
+  }
+
+  try {
+    await db.prepare(
+      'DELETE FROM terminals WHERE store_ref = ?'
+    ).bind(store_ref).run();
+
+    await db.prepare(
+      'DELETE FROM customers WHERE store_ref = ?'
+    ).bind(store_ref).run();
+  } catch (err) {
+    return json({ error: err.message || 'Delete failed' }, 500);
+  }
 
   return json({ deleted: store_ref });
 }
