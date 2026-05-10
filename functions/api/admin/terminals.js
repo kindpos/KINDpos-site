@@ -40,6 +40,14 @@ export async function onRequest({ request, env }) {
 
   const db = env.KINDPOS_DB;
 
+  const custCheck = await db.prepare(
+    'SELECT 1 FROM customers WHERE store_ref = ?'
+  ).bind(store_ref).first();
+
+  if (!custCheck) {
+    return json({ error: `Customer '${store_ref}' not found` }, 400);
+  }
+
   try {
     await db.prepare(
       `INSERT INTO terminals (license_key, store_ref, terminal_name, node_number, prefix, sku, created_at)
