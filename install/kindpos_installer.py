@@ -702,9 +702,9 @@ class KINDposSetup(tk.Tk):
                     time.sleep(5)
 
         if http_status == 200:
-            terminal_id = data.get('terminal_id', 'Unknown')
-            ui(show_status, f'✓ Activated — Terminal {terminal_id}', 'green')
-            ui(self._log, f'✓ Activated — Terminal {terminal_id}', 'ok')
+            node_number = data.get('node_number', 'Unknown')
+            ui(show_status, f'✓ License validated — Node {node_number}', 'green')
+            ui(self._log, f'✓ License validated — Node {node_number}', 'ok')
             ui(self._set_progress, 100, 'Activated')
             try:
                 data_dir = os.path.join(self._install_dir, 'data')
@@ -715,6 +715,50 @@ class KINDposSetup(tk.Tk):
             except Exception as e:
                 ui(self._log, f'WARNING: could not write license.json: {e}', 'dim')
             time.sleep(1)
+
+            ui(self._log, 'Registering terminal with local backend...', 'info')
+
+            try:
+                import uuid
+                mac_int = uuid.getnode()
+                server_mac = ':'.join(f'{(mac_int >> (i*8)) & 0xff:02X}'
+                                      for i in reversed(range(6)))
+            except Exception:
+                server_mac = '00:00:00:00:00:00'
+
+            backend_body = _json.dumps({
+                'activation_code': self._license_key,
+                'server_mac': server_mac,
+                'platform': 'pi',
+            }).encode()
+
+            backend_req = urllib.request.Request(
+                'http://127.0.0.1:8000/api/v1/hardware/activate',
+                data=backend_body,
+                headers={'Content-Type': 'application/json'},
+                method='POST',
+            )
+
+            backend_terminal_id = None
+            backend_success = False
+
+            try:
+                with urllib.request.urlopen(backend_req, timeout=15) as resp:
+                    backend_data = _json.loads(resp.read().decode())
+                    if resp.status == 200:
+                        backend_terminal_id = backend_data.get('terminal_id', 'Unknown')
+                        backend_success = True
+            except (urllib.error.HTTPError, urllib.error.URLError, TimeoutError) as e:
+                backend_success = False
+
+            if backend_success and backend_terminal_id:
+                ui(self._log, f'✓ Terminal registered as {backend_terminal_id}', 'ok')
+                time.sleep(1)
+            else:
+                ui(self._log, '⚠ Local backend registration failed.', 'dim')
+                ui(self._log, '  Terminal identity will be set on first POS launch.', 'dim')
+                time.sleep(1)
+
             return data
 
         if http_status == 409:
