@@ -34,7 +34,7 @@ export async function onRequest({ request, env }) {
   const terminal = await db.prepare(
     `SELECT t.*, c.store_name
      FROM terminals t
-     JOIN customers c ON c.store_ref = t.store_ref
+     LEFT JOIN customers c ON c.store_ref = t.store_ref
      WHERE t.license_key = ?`
   ).bind(license_key).first();
 
@@ -77,7 +77,7 @@ export async function onRequest({ request, env }) {
   const updated = await db.prepare(
     `SELECT t.*, c.store_name
      FROM terminals t
-     JOIN customers c ON c.store_ref = t.store_ref
+     LEFT JOIN customers c ON c.store_ref = t.store_ref
      WHERE t.license_key = ?`
   ).bind(license_key).first();
 
