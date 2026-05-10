@@ -220,7 +220,7 @@
     }
   }
 
-  initializeConfig();
+  initializeConfig().then(() => loadCustomers());
 
   function displayRef(store_ref) {
     return store_ref === '' ? 'UNGROUPED' : store_ref;
@@ -312,8 +312,6 @@
       listEl.innerHTML = `<div style="color:#e8472a; text-align:center; padding:20px 12px; font-size:11px;">${err.message}</div>`;
     }
   }
-
-  loadCustomers();
 
   // ── Chunk 2: main panel ──────────────────────────────
 
