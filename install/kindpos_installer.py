@@ -635,14 +635,21 @@ class KINDposSetup(tk.Tk):
             self.after(0, lambda: self._goto(3))
         except RuntimeError as e:
             msg = str(e)
-            self.after(0, lambda: self._show_activation_error(msg))
-            self.after(0, lambda: self._btn_next.config(text='Next →', state='normal'))
+            is_fatal = msg.startswith('FATAL:')
+            clean_msg = msg.replace('FATAL: ', '')
+            self.after(0, lambda: self._show_activation_error(clean_msg, fatal=is_fatal))
+            if not is_fatal:
+                self.after(0, lambda: self._btn_next.config(text='Next →', state='normal'))
 
-    def _show_activation_error(self, msg):
+    def _show_activation_error(self, msg, fatal=False):
         self._key_error.config(text=msg)
+        if fatal:
+            self.back_btn.config(state=tk.DISABLED)
+            self._btn_next.config(state=tk.DISABLED, text='Error — Close Window')
 
     def _do_activation(self):
-        import urllib.request, json as _json
+        import urllib.request, json as _json, time
+        import urllib.error
         ui = lambda fn, *a, **kw: self.after(0, lambda: fn(*a, **kw))
         fingerprint = _get_hardware_fingerprint()
         body = _json.dumps({
@@ -655,23 +662,81 @@ class KINDposSetup(tk.Tk):
             headers={'Content-Type': 'application/json'},
             method='POST',
         )
-        try:
-            with urllib.request.urlopen(req, timeout=15) as resp:
-                data = _json.loads(resp.read().decode())
-        except Exception as e:
-            ui(self._log, f'Activation error: {e}', 'err')
-            raise RuntimeError('Activation failed: ' + str(e))
-        try:
-            data_dir = os.path.join(self._install_dir, 'data')
-            os.makedirs(data_dir, exist_ok=True)
-            lic_path = os.path.join(data_dir, 'license.json')
-            with open(lic_path, 'w') as fh:
-                _json.dump(data, fh, indent=2)
-        except Exception as e:
-            ui(self._log, f'WARNING: could not write license.json: {e}', 'dim')
-        terminal_name = data.get('terminal_name', self._license_key)
-        ui(self._log, f'Activated: {terminal_name}', 'ok')
-        return data
+
+        def show_status(msg, color='green'):
+            if not hasattr(self, '_activation_status_lbl'):
+                fg_color = T['green'] if color == 'green' else (T['gold'] if color == 'warn' else T['verm'])
+                lbl = tk.Label(self.content, text=msg, bg=T['bg'], fg=fg_color, font=(FONT, 10))
+                lbl.pack(anchor='w', pady=(8, 0))
+                self._activation_status_lbl = lbl
+            else:
+                fg_color = T['green'] if color == 'green' else (T['gold'] if color == 'warn' else T['verm'])
+                self._activation_status_lbl.config(text=msg, fg=fg_color)
+
+        ui(self._log, 'Contacting KIND Technologies activation server...', 'info')
+        ui(self._set_progress, 50, 'Activating license...')
+        ui(show_status, 'Contacting KIND Technologies activation server...', 'green')
+
+        data = None
+        http_status = None
+        last_error = None
+
+        for attempt in range(1, 3):
+            try:
+                with urllib.request.urlopen(req, timeout=45) as resp:
+                    data = _json.loads(resp.read().decode())
+                    http_status = resp.status
+                    break
+            except urllib.error.HTTPError as e:
+                http_status = e.code
+                try:
+                    data = _json.loads(e.read().decode())
+                except:
+                    data = {}
+                break
+            except (urllib.error.URLError, TimeoutError) as e:
+                last_error = e
+                if attempt == 1:
+                    ui(show_status, 'Connection slow — retrying... (attempt 2 of 2)', 'green')
+                    ui(self._log, 'Connection slow — retrying... (attempt 2 of 2)', 'dim')
+                    time.sleep(5)
+
+        if http_status == 200:
+            terminal_id = data.get('terminal_id', 'Unknown')
+            ui(show_status, f'✓ Activated — Terminal {terminal_id}', 'green')
+            ui(self._log, f'✓ Activated — Terminal {terminal_id}', 'ok')
+            ui(self._set_progress, 100, 'Activated')
+            try:
+                data_dir = os.path.join(self._install_dir, 'data')
+                os.makedirs(data_dir, exist_ok=True)
+                lic_path = os.path.join(data_dir, 'license.json')
+                with open(lic_path, 'w') as fh:
+                    _json.dump(data, fh, indent=2)
+            except Exception as e:
+                ui(self._log, f'WARNING: could not write license.json: {e}', 'dim')
+            time.sleep(1)
+            return data
+
+        if http_status == 409:
+            ui(show_status, '✗ This key is already registered to another terminal.', 'red')
+            ui(self._log, '✗ This key is already registered to another terminal.', 'err')
+            ui(self._log, '  Contact KIND Technologies to transfer or reissue.', 'err')
+            raise RuntimeError('FATAL: This key is already registered to another terminal. Contact KIND Technologies to transfer or reissue.')
+
+        if http_status == 404:
+            ui(show_status, '✗ License key not recognized.', 'red')
+            ui(self._log, '✗ License key not recognized.', 'err')
+            ui(self._log, '  Check the key and try again.', 'err')
+            raise RuntimeError('License key not recognized. Check the key and try again.')
+
+        if last_error:
+            ui(show_status, '✗ Cannot reach activation server.', 'red')
+            ui(self._log, '✗ Cannot reach activation server.', 'err')
+            ui(self._log, '  Ensure internet connectivity and try again.', 'err')
+            ui(self._log, '  Or contact KIND Technologies for offline registration.', 'err')
+            raise RuntimeError('FATAL: Cannot reach activation server. Ensure internet connectivity and try again.')
+
+        raise RuntimeError('FATAL: Activation failed. Please try again.')
 
     def _run_install(self):
         t = threading.Thread(target=self._install_thread, daemon=True)
