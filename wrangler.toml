@@ -7,3 +7,10 @@ binding        = "KINDPOS_DB"
 database_name  = "kindpos-licenses"
 database_id    = "88d61c28-9bf2-4191-8e57-57623c04c5ed"
 migrations_dir = "migrations"
+
+[[r2_buckets]]
+binding = "KINDPOS_IMAGES"
+bucket_name = "kindpos-images"
+
+# Required secret: RESEND_API_KEY
+# Set via: wrangler secret put RESEND_API_KEY
