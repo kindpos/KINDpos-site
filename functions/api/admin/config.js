@@ -1,21 +1,10 @@
-const CORS = {
-  'Access-Control-Allow-Origin': 'https://kindpos.com',
-  'Access-Control-Allow-Methods': 'GET, OPTIONS',
-  'Access-Control-Allow-Headers': 'Content-Type',
-  'Content-Type': 'application/json',
-};
-
-function json(data, status = 200) {
-  return new Response(JSON.stringify(data), { status, headers: CORS });
-}
-
-export async function onRequest({ request, env }) {
-  if (request.method === 'OPTIONS') {
-    return new Response(null, { status: 204, headers: CORS });
-  }
-  if (request.method !== 'GET') {
-    return json({ error: 'Method not allowed' }, 405);
-  }
-
-  return json({ admin_secret: env.ADMIN_SECRET });
+// functions/api/admin/config.js
+// Retired — PROVISIONING_FLOW.md §11
+// Previously leaked the admin secret to any unauthenticated caller.
+// Admin auth is now handled by POST /api/admin/auth/login.
+export async function onRequest() {
+  return new Response(JSON.stringify({ error: 'gone', message: 'This endpoint has been retired. Use /api/admin/auth/login.' }), {
+    status: 410,
+    headers: { 'Content-Type': 'application/json' },
+  });
 }
