@@ -30,7 +30,12 @@ T = {
     'border':      '#5a5f66',
 }
 FONT = 'Courier'
-STEPS = ['Welcome', 'Directory', 'Activation', 'Install', 'Shortcuts', 'Finish']
+STEPS = ['Welcome', 'Directory', 'Provisioning',
+         'Install', 'Shortcuts', 'Finish']
+
+# PROVISIONING_FLOW.md §4.5 — Windows data directory
+DATA_DIR = os.path.join(os.environ.get('ProgramData', r'C:\ProgramData'),
+                        'KINDpos')
 
 
 def _logo_path():
@@ -291,6 +296,7 @@ class KINDposSetup(tk.Tk):
 
         self.step = 0
         self.install_dir = tk.StringVar(value=default_install_dir())
+        self._prov_url_var = tk.StringVar()
         self._license_key = None
         self._activation_data = None
 
@@ -419,7 +425,7 @@ class KINDposSetup(tk.Tk):
             w.destroy()
         self.step = step
         self._refresh_left(step)
-        [self._p_welcome, self._p_directory, self._p_activation,
+        [self._p_welcome, self._p_directory, self._p_provisioning,
          self._p_install, self._p_shortcuts, self._p_finish][step]()
         if step == 5:
             self._apply_shortcut_prefs()
@@ -438,16 +444,18 @@ class KINDposSetup(tk.Tk):
 
     def _next(self):
         if self.step == 2:
-            val = self._key_entry.get().strip()
-            if not re.match(r'^[A-Z0-9]+(-[A-Z0-9]+){2,}$', val):
-                self._key_error.config(
-                    text='Invalid license key. Expected format: XXXX-XXXX-XXXX')
+            url = self._prov_url_var.get().strip()
+            # Basic URL validation
+            if not url.startswith('https://kindpos.com/api/provision/download'):
+                self._prov_error.config(
+                    text='Invalid URL. Paste the full link from your email.')
                 return
-            self._key_error.config(text='')
-            self._license_key = val
-            self._install_dir = self.install_dir.get()
-            self._btn_next.config(text='Validating…', state='disabled')
-            threading.Thread(target=self._validate_and_proceed, daemon=True).start()
+            self._prov_error.config(text='')
+            self._btn_next.config(state='disabled', text='Downloading…')
+            self.back_btn.config(state='disabled')
+            threading.Thread(
+                target=self._download_provisioning,
+                args=(url,), daemon=True).start()
             return
         if self.step < 5:
             self._goto(self.step + 1)
@@ -501,53 +509,42 @@ class KINDposSetup(tk.Tk):
                  bg=T['bg'], fg=T['text'], font=(FONT, 9),
                  justify=tk.LEFT).pack(anchor=tk.W, pady=(8, 0))
 
-    def _p_activation(self):
-        tk.Label(self.content, text='License Activation',
-                 bg=T['bg'], fg=T['green'], font=(FONT, 15, 'bold')).pack(anchor='w')
+    def _p_provisioning(self):
+        # PROVISIONING_FLOW.md §7.7 — customer pastes provisioning URL
+        tk.Label(self.content, text='Provisioning',
+                 bg=T['bg'], fg=T['green'],
+                 font=(FONT, 18, 'bold')).pack(anchor='w', pady=(0, 4))
         tk.Label(self.content,
-                 text='Enter your license key to register this terminal',
-                 bg=T['bg'], fg=T['text'], font=(FONT, 9)).pack(
-            anchor='w', pady=(2, 16))
-        tk.Frame(self.content, bg=T['border'], height=1).pack(fill=tk.X, pady=(0, 16))
+                 text='Paste the provisioning URL from your welcome email.',
+                 bg=T['bg'], fg=T['text'],
+                 font=(FONT, 10), wraplength=420,
+                 justify='left').pack(anchor='w', pady=(0, 16))
 
-        tk.Label(self.content, text='LICENSE KEY',
-                 bg=T['bg'], fg=T['moon'], font=(FONT, 8, 'bold'),
-                 anchor='w').pack(anchor='w', pady=(0, 4))
+        tk.Label(self.content, text='Provisioning URL',
+                 bg=T['bg'], fg=T['moon'],
+                 font=(FONT, 9)).pack(anchor='w')
+        self._prov_entry = tk.Entry(
+            self.content, textvariable=self._prov_url_var,
+            bg=T['card'], fg=T['text'], insertbackground=T['text'],
+            font=(FONT, 10), relief='flat', width=54)
+        self._prov_entry.pack(anchor='w', pady=(2, 4), ipady=6)
 
-        self._key_entry = tk.Entry(
-            self.content,
-            bg=T['well'], fg=T['green'],
-            insertbackground=T['green'],
-            font=(FONT, 13), relief=tk.FLAT,
-            width=28,
-        )
-        self._key_entry.pack(anchor='w')
+        self._prov_error = tk.Label(self.content, text='',
+                                    bg=T['bg'], fg=T['verm'], font=(FONT, 9))
+        self._prov_error.pack(anchor='w', pady=(0, 12))
 
-        def _sanitise(event):
-            e = self._key_entry
-            raw = e.get().upper()
-            cleaned = re.sub(r'[^A-Z0-9\-]', '', raw)
-            if cleaned != e.get():
-                cur = e.index(tk.INSERT)
-                e.delete(0, tk.END)
-                e.insert(0, cleaned)
-                e.icursor(min(cur, len(cleaned)))
-
-        self._key_entry.bind('<KeyRelease>', _sanitise)
-
-        self._key_error = tk.Label(self.content, text='',
-                                   bg=T['bg'], fg=T['verm'], font=(FONT, 9))
-        self._key_error.pack(anchor='w', pady=(4, 0))
-
-        info_outer = tk.Frame(self.content, bg=T['well'], bd=0, relief=tk.FLAT)
-        info_outer.pack(fill=tk.X, pady=(16, 0))
-        tk.Frame(info_outer, bg=T['gold'], width=4).pack(side=tk.LEFT, fill=tk.Y)
-        tk.Label(info_outer,
-                 text=('Your terminal will be registered automatically\n'
-                       'using the name and store profile set up by\n'
-                       'your KIND Technologies administrator.'),
-                 bg=T['well'], fg=T['text'], font=(FONT, 9),
-                 padx=10, pady=10, justify=tk.LEFT).pack(side=tk.LEFT)
+        # Info card
+        card = tk.Frame(self.content, bg=T['card'],
+                        padx=14, pady=12)
+        card.pack(fill='x', pady=(0, 8))
+        tk.Label(card,
+                 text='The URL looks like:\n'
+                      'https://kindpos.com/api/provision/download?token=...\n\n'
+                      'It expires in 7 days or after first use.\n'
+                      'If your link has expired, contact your KINDpos\n'
+                      'onboarding specialist for a new one.',
+                 bg=T['card'], fg=T['moon'],
+                 font=(FONT, 9), justify='left').pack(anchor='w')
 
     def _p_install(self):
         tk.Label(self.content, text='Installing KINDpos',
@@ -557,6 +554,7 @@ class KINDposSetup(tk.Tk):
         tk.Frame(self.content, bg=T['border'], height=1).pack(fill=tk.X)
 
         INSTALL_STEPS = [
+            'Verify provisioning data',
             'Download Python 3.11 embeddable',
             'Extract Python runtime',
             'Clone KINDpos repository',
@@ -718,159 +716,68 @@ class KINDposSetup(tk.Tk):
                        selectcolor=T['well'], activebackground=T['bg'],
                        font=(FONT, 10)).pack(anchor=tk.W)
 
-    def _validate_and_proceed(self):
+    def _download_provisioning(self, url):
+        """
+        Download provisioning zip from kindpos.com, extract to DATA_DIR.
+        PROVISIONING_FLOW.md §7.7
+        Runs in a background thread (called from _next at step 2).
+        """
+        import urllib.request, urllib.error, zipfile, io, json
+
+        def _fail(msg):
+            self.after(0, lambda: (
+                self._prov_error.config(text=msg),
+                self._btn_next.config(state='normal', text='Next →'),
+                self.back_btn.config(state='normal')
+            ))
+
         try:
-            data = self._do_activation()
-            self._activation_data = data
-            self.after(0, lambda: self._goto(3))
-        except RuntimeError as e:
-            msg = str(e)
-            is_fatal = msg.startswith('FATAL:')
-            clean_msg = msg.replace('FATAL: ', '')
-            self.after(0, lambda: self._show_activation_error(clean_msg, fatal=is_fatal))
-            if not is_fatal:
-                self.after(0, lambda: self._btn_next.config(text='Next →', state='normal'))
+            req = urllib.request.Request(url, headers={'User-Agent': 'KINDpos-Installer/2.0'})
+            with urllib.request.urlopen(req, timeout=30) as resp:
+                data = resp.read()
 
-    def _show_activation_error(self, msg, fatal=False):
-        self._key_error.config(text=msg)
-        if fatal:
-            self.back_btn.config(state=tk.DISABLED)
-            self._btn_next.config(state=tk.DISABLED, text='Error — Close Window')
-
-    def _do_activation(self):
-        import urllib.request, json as _json, time
-        import urllib.error
-        ui = lambda fn, *a, **kw: self.after(0, lambda: fn(*a, **kw))
-        fingerprint = _get_hardware_fingerprint()
-        body = _json.dumps({
-            'license_key':          self._license_key,
-            'hardware_fingerprint': fingerprint,
-        }).encode()
-        req = urllib.request.Request(
-            'https://kindpos.com/api/activate',
-            data=body,
-            headers={'Content-Type': 'application/json'},
-            method='POST',
-        )
-
-        def show_status(msg, color='green'):
-            if not hasattr(self, '_activation_status_lbl'):
-                fg_color = T['green'] if color == 'green' else (T['gold'] if color == 'warn' else T['verm'])
-                lbl = tk.Label(self.content, text=msg, bg=T['bg'], fg=fg_color, font=(FONT, 10))
-                lbl.pack(anchor='w', pady=(8, 0))
-                self._activation_status_lbl = lbl
-            else:
-                fg_color = T['green'] if color == 'green' else (T['gold'] if color == 'warn' else T['verm'])
-                self._activation_status_lbl.config(text=msg, fg=fg_color)
-
-        ui(self._log, 'Contacting KIND Technologies activation server...', 'info')
-        ui(self._set_progress, 50, 'Activating license...')
-        ui(show_status, 'Contacting KIND Technologies activation server...', 'green')
-
-        data = None
-        http_status = None
-        last_error = None
-
-        for attempt in range(1, 3):
+        except urllib.error.HTTPError as e:
             try:
-                with urllib.request.urlopen(req, timeout=45) as resp:
-                    data = _json.loads(resp.read().decode())
-                    http_status = resp.status
-                    break
-            except urllib.error.HTTPError as e:
-                http_status = e.code
-                try:
-                    data = _json.loads(e.read().decode())
-                except:
-                    data = {}
-                break
-            except (urllib.error.URLError, TimeoutError) as e:
-                last_error = e
-                if attempt == 1:
-                    ui(show_status, 'Connection slow — retrying... (attempt 2 of 2)', 'green')
-                    ui(self._log, 'Connection slow — retrying... (attempt 2 of 2)', 'dim')
-                    time.sleep(5)
-
-        if http_status == 200:
-            node_number = data.get('node_number', 'Unknown')
-            ui(show_status, f'✓ License validated — Node {node_number}', 'green')
-            ui(self._log, f'✓ License validated — Node {node_number}', 'ok')
-            ui(self._set_progress, 100, 'Activated')
-            try:
-                data_dir = os.path.join(self._install_dir, 'data')
-                os.makedirs(data_dir, exist_ok=True)
-                lic_path = os.path.join(data_dir, 'license.json')
-                with open(lic_path, 'w') as fh:
-                    _json.dump(data, fh, indent=2)
-            except Exception as e:
-                ui(self._log, f'WARNING: could not write license.json: {e}', 'dim')
-            time.sleep(1)
-
-            ui(self._log, 'Registering terminal with local backend...', 'info')
-
-            try:
-                import uuid
-                mac_int = uuid.getnode()
-                server_mac = ':'.join(f'{(mac_int >> (i*8)) & 0xff:02X}'
-                                      for i in reversed(range(6)))
+                body = json.loads(e.read())
+                err = body.get('error', '')
             except Exception:
-                server_mac = '00:00:00:00:00:00'
-
-            backend_body = _json.dumps({
-                'activation_code': self._license_key,
-                'server_mac': server_mac,
-                'platform': 'pi',
-            }).encode()
-
-            backend_req = urllib.request.Request(
-                'http://127.0.0.1:8000/api/v1/hardware/activate',
-                data=backend_body,
-                headers={'Content-Type': 'application/json'},
-                method='POST',
-            )
-
-            backend_terminal_id = None
-            backend_success = False
-
-            try:
-                with urllib.request.urlopen(backend_req, timeout=15) as resp:
-                    backend_data = _json.loads(resp.read().decode())
-                    if resp.status == 200:
-                        backend_terminal_id = backend_data.get('terminal_id', 'Unknown')
-                        backend_success = True
-            except (urllib.error.HTTPError, urllib.error.URLError, TimeoutError) as e:
-                backend_success = False
-
-            if backend_success and backend_terminal_id:
-                ui(self._log, f'✓ Terminal registered as {backend_terminal_id}', 'ok')
-                time.sleep(1)
+                err = ''
+            if e.code == 410:
+                if err == 'token_already_used':
+                    _fail('FATAL: This link has already been used. '
+                          'Contact your onboarding specialist.')
+                else:
+                    _fail('FATAL: This link has expired (7-day limit). '
+                          'Contact your onboarding specialist.')
+            elif e.code == 404:
+                _fail('Link not found. Check the URL and try again.')
             else:
-                ui(self._log, '⚠ Local backend registration failed.', 'dim')
-                ui(self._log, '  Terminal identity will be set on first POS launch.', 'dim')
-                time.sleep(1)
+                _fail(f'Server error ({e.code}). Try again or contact support.')
+            return
 
-            return data
+        except Exception as e:
+            _fail(f'Network error: {e}')
+            return
 
-        if http_status == 409:
-            ui(show_status, '✗ This key is already registered to another terminal.', 'red')
-            ui(self._log, '✗ This key is already registered to another terminal.', 'err')
-            ui(self._log, '  Contact KIND Technologies to transfer or reissue.', 'err')
-            raise RuntimeError('FATAL: This key is already registered to another terminal. Contact KIND Technologies to transfer or reissue.')
+        # Extract zip to DATA_DIR — PROVISIONING_FLOW.md §4.5
+        try:
+            os.makedirs(DATA_DIR, exist_ok=True)
+            with zipfile.ZipFile(io.BytesIO(data)) as z:
+                z.extractall(DATA_DIR)
+        except Exception as e:
+            _fail(f'Failed to extract provisioning package: {e}')
+            return
 
-        if http_status == 404:
-            ui(show_status, '✗ License key not recognized.', 'red')
-            ui(self._log, '✗ License key not recognized.', 'err')
-            ui(self._log, '  Check the key and try again.', 'err')
-            raise RuntimeError('License key not recognized. Check the key and try again.')
+        # Validate required files
+        required = ['accounts.db', 'kindpos.toml']
+        missing = [f for f in required
+                   if not os.path.exists(os.path.join(DATA_DIR, f))]
+        if missing:
+            _fail(f'Provisioning package missing: {", ".join(missing)}')
+            return
 
-        if last_error:
-            ui(show_status, '✗ Cannot reach activation server.', 'red')
-            ui(self._log, '✗ Cannot reach activation server.', 'err')
-            ui(self._log, '  Ensure internet connectivity and try again.', 'err')
-            ui(self._log, '  Or contact KIND Technologies for offline registration.', 'err')
-            raise RuntimeError('FATAL: Cannot reach activation server. Ensure internet connectivity and try again.')
-
-        raise RuntimeError('FATAL: Activation failed. Please try again.')
+        # Success — advance to Install step
+        self.after(0, lambda: self._goto(3))
 
     def _run_install(self):
         t = threading.Thread(target=self._install_thread, daemon=True)
@@ -888,8 +795,21 @@ class KINDposSetup(tk.Tk):
         ui = lambda fn, *a, **kw: self.after(0, lambda: fn(*a, **kw))
 
         try:
-            # ── Step 0: Download Python embeddable ──────────────
+            # ── Step 0: Verify provisioning data ─────────────────
+            # PROVISIONING_FLOW.md §4.5 — verify provisioning data in place
             ui(self._set_step, 0)
+            ui(self._log, 'Verifying provisioning data…', 'info')
+            required = ['accounts.db', 'kindpos.toml']
+            missing = [f for f in required
+                       if not os.path.exists(os.path.join(DATA_DIR, f))]
+            if missing:
+                raise RuntimeError(
+                    f'Provisioning files missing from {DATA_DIR}: '
+                    f'{", ".join(missing)}. Return to the Provisioning step.')
+            ui(self._log, f'Provisioning data verified in {DATA_DIR}', 'ok')
+
+            # ── Step 1: Download Python embeddable ──────────────
+            ui(self._set_step, 1)
             ui(self._log, 'Downloading Python 3.11 embeddable…', 'info')
             url = 'https://www.python.org/ftp/python/3.11.9/python-3.11.9-embed-amd64.zip'
             os.makedirs(rt_dir, exist_ok=True)
@@ -911,8 +831,8 @@ class KINDposSetup(tk.Tk):
                         ui(self._log, f'  {tens}% downloaded', 'dim')
                     ui(self._set_progress, pct, f'Downloading… {pct}%')
 
-            # ── Step 1: Extract Python ───────────────────────────
-            ui(self._set_step, 1)
+            # ── Step 2: Extract Python ───────────────────────────
+            ui(self._set_step, 2)
             ui(self._log, 'Extracting Python runtime…', 'info')
             ui(self._set_progress, 25, 'Extracting…')
             with zipfile.ZipFile(py_zip) as zf:
@@ -926,8 +846,8 @@ class KINDposSetup(tk.Tk):
             ui(self._log, 'Runtime ready.', 'ok')
             ui(self._set_progress, 35, 'Python extracted.')
 
-            # ── Step 2: Clone repository ─────────────────────────
-            ui(self._set_step, 2)
+            # ── Step 3: Clone repository ─────────────────────────
+            ui(self._set_step, 3)
             ui(self._log, 'Cloning KINDpos repository…', 'info')
             ui(self._set_progress, 35, 'Cloning…')
             try:
@@ -951,8 +871,8 @@ class KINDposSetup(tk.Tk):
                 ui(self._log, 'Repository downloaded via zip.', 'ok')
             ui(self._set_progress, 60, 'Repository ready.')
 
-            # ── Step 3: Install dependencies ─────────────────────
-            ui(self._set_step, 3)
+            # ── Step 4: Install dependencies ─────────────────────
+            ui(self._set_step, 4)
             ui(self._log, 'Installing Python dependencies…', 'info')
             req_file = os.path.join(app_dir, 'backend', 'requirements.txt')
             cmd = [py_exe, '-m', 'pip', 'install', '-r', req_file, '--upgrade']
@@ -977,8 +897,8 @@ class KINDposSetup(tk.Tk):
             ui(self._log, 'Dependencies installed.', 'ok')
             ui(self._set_progress, 90, 'Dependencies ready.')
 
-            # ── Step 4: Launcher + shortcuts ─────────────────────
-            ui(self._set_step, 4)
+            # ── Step 5: Launcher + shortcuts ─────────────────────
+            ui(self._set_step, 5)
             ui(self._log, 'Writing launcher and shortcuts…', 'info')
             launcher_py = os.path.join(idir, 'kindpos_launcher.py')
             open(launcher_py, 'w').write(_LAUNCHER_CONTENT)
