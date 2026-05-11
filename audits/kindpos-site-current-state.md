@@ -230,10 +230,12 @@ functions/api/validate.js
   return !!token && token === env.ADMIN_SECRET;
   ```
   (Note: this version also checks `!!token`, unlike the others)
-- **Tables / operations:**
-  - `UPDATE terminals SET status='REVOKED', hardware_fingerprint=NULL WHERE store_ref=?`
+- **Tables / operations:** atomic D1 batch in FK order (commit `5097bd9`):
+  - `DELETE FROM provisioning_events WHERE store_ref=?`
+  - `DELETE FROM terminals WHERE store_ref=?`
   - `DELETE FROM customers WHERE store_ref=?`
 - **Success response shape:** `{ "deleted": "<store_ref>" }`
+- **History:** previously `UPDATE terminals SET status='REVOKED'` then `DELETE FROM customers`, which hit `FOREIGN KEY constraint failed` because `terminals.store_ref` and `provisioning_events.store_ref` reference `customers(store_ref)` with no `ON DELETE CASCADE`.
 
 ---
 
@@ -264,8 +266,9 @@ functions/api/validate.js
 - **Auth pattern:** `requireAdmin` at line 12–15 (same pattern)
 - **Tables / operations:**
   - `SELECT license_key FROM terminals WHERE license_key = ?`
-  - `UPDATE terminals SET status='REVOKED', hardware_fingerprint=NULL WHERE license_key=?`
+  - `UPDATE terminals SET status='revoked', hardware_fingerprint=NULL, updated_at=CURRENT_TIMESTAMP WHERE license_key=?` (commit `5097bd9`)
 - **Success response shape:** `{ "success": true, "revoked": "<license_key>" }`
+- **History:** previously wrote `status='REVOKED'` (uppercase) without bumping `updated_at`, which prevented revoked terminals from surfacing in the `/api/store/{store_ref}/revocations` cursor poll. Lowercase normalized per `PROVISIONING_FLOW.md` §2.2.
 
 ---
 
