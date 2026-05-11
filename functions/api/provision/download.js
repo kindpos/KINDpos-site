@@ -54,7 +54,8 @@ export async function onRequestGet({ request, env }) {
     env.KINDPOS_DB.prepare(
       `UPDATE customers SET
          installer_token_used_at     = ?,
-         windows_image_downloaded_at = ?
+         windows_image_downloaded_at = ?,
+         installer_token_url         = NULL
        WHERE store_ref = ?`,
     ).bind(now, now, customer.store_ref),
     env.KINDPOS_DB.prepare(

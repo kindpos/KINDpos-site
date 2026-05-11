@@ -28,7 +28,7 @@ export async function onRequestPost({ request, env, params }) {
   const db = env.KINDPOS_DB;
 
   const customer = await db.prepare(
-    `SELECT status, image_r2_key, windows_image_r2_key,
+    `SELECT status, image_r2_key, windows_image_r2_key, installer_token_url,
             pending_api_key_hash, pending_recovery_code_hash,
             customer_email, store_name
      FROM customers WHERE store_ref = ?`,
@@ -88,10 +88,9 @@ export async function onRequestPost({ request, env, params }) {
   return json({ store_ref, status: 'shipped', shipped_at: now });
 }
 
-// The installer-token plaintext is shown once at build time and is not
-// stored (PROVISIONING_FLOW.md §3.2 item 6, §7.7). Returning null
-// suppresses the Windows download block in the welcome email; the admin
-// currently relays the URL out-of-band with the temporary password.
-function provisioningUrlForEmail(_customer) {
-  return null;
+// installer_token_url is retained until the customer first downloads
+// the package (download.js nulls it then). After that, the column is
+// NULL and the welcome email omits the Windows download block.
+function provisioningUrlForEmail(customer) {
+  return customer.installer_token_url ?? null;
 }

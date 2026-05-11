@@ -456,10 +456,11 @@ export async function onRequestPost({ request, env, params }) {
          windows_image_r2_key       = ?,
          windows_image_built_at     = ?,
          installer_token_hash       = ?,
+         installer_token_url        = ?,
          pending_api_key_hash       = ?,
          pending_recovery_code_hash = ?
        WHERE store_ref = ?`,
-    ).bind(r2Key, now, installerTokenHash, pendingApiKeyHash, pendingRecoveryCodeHash, store_ref).run();
+    ).bind(r2Key, now, installerTokenHash, provisioningUrl, pendingApiKeyHash, pendingRecoveryCodeHash, store_ref).run();
   }
 
   return json({
