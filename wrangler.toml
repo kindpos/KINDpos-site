@@ -1,0 +1,9 @@
+name = "kindpos-site"
+compatibility_date = "2025-01-01"
+pages_build_output_dir = "."
+
+[[d1_databases]]
+binding        = "KINDPOS_DB"
+database_name  = "kindpos-licenses"
+database_id    = "88d61c28-9bf2-4191-8e57-57623c04c5ed"
+migrations_dir = "migrations"
