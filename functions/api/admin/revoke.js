@@ -48,7 +48,7 @@ export async function onRequest({ request, env }) {
 
   await db.prepare(
     `UPDATE terminals
-     SET status = 'REVOKED', hardware_fingerprint = NULL
+     SET status = 'revoked', hardware_fingerprint = NULL, updated_at = CURRENT_TIMESTAMP
      WHERE license_key = ?`
   ).bind(license_key).run();
 

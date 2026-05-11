@@ -25,15 +25,16 @@ export async function onRequest({ request, env, params }) {
   }
 
   const { store_ref } = params;
+  const db = env.KINDPOS_DB;
 
-  await env.KINDPOS_DB.prepare(`
-    UPDATE terminals SET status = 'REVOKED', hardware_fingerprint = NULL
-    WHERE store_ref = ?
-  `).bind(store_ref).run();
-
-  await env.KINDPOS_DB.prepare(`
-    DELETE FROM customers WHERE store_ref = ?
-  `).bind(store_ref).run();
+  // FK order: terminals + provisioning_events both reference customers(store_ref)
+  // (no ON DELETE CASCADE), so child rows must be deleted before the parent.
+  // Batched for atomicity — if any statement fails, none commit.
+  await db.batch([
+    db.prepare('DELETE FROM provisioning_events WHERE store_ref = ?').bind(store_ref),
+    db.prepare('DELETE FROM terminals WHERE store_ref = ?').bind(store_ref),
+    db.prepare('DELETE FROM customers WHERE store_ref = ?').bind(store_ref),
+  ]);
 
   return json({ deleted: store_ref });
 }
