@@ -693,13 +693,15 @@
   </style>
 </head>
 <body>
-  <!-- PASSWORD GATE -->
-  <div id="passwordGate" class="password-gate">
+  <!-- LOGIN GATE -->
+  <div id="loginGate" class="password-gate">
     <div class="gate-card">
       <h1>KINDpos Admin</h1>
-      <p>Enter admin secret to continue</p>
-      <input type="password" id="adminSecretInput" class="gate-input" placeholder="ADMIN_SECRET" />
-      <button id="gateSubmitBtn" class="gate-button">Unlock</button>
+      <p>Sign in to continue</p>
+      <input type="email" id="loginEmailInput" class="gate-input" placeholder="email" autocomplete="username" />
+      <input type="password" id="loginPasswordInput" class="gate-input" placeholder="password" autocomplete="current-password" style="margin-top: 8px;" />
+      <button id="loginSubmitBtn" class="gate-button">Sign in</button>
+      <div id="loginError" style="color: #d04848; font-size: 13px; margin-top: 12px; min-height: 18px;"></div>
     </div>
   </div>
 
@@ -849,51 +851,109 @@
     // ═══════════════════════════════════════════════════
     // STATE MANAGEMENT
     // ═══════════════════════════════════════════════════
-    let adminSecret = null;
+    let currentUser = null;        // { user_id, email, role, ... } once logged in
     let currentCustomerId = null;
     let customers = [];
+    let listenersWired = false;    // setupEventListeners is idempotent
 
     // ═══════════════════════════════════════════════════
-    // INITIALIZATION
+    // AUTH FLOW
     // ═══════════════════════════════════════════════════
-    function init() {
-      // Check session storage for admin secret
-      adminSecret = sessionStorage.getItem('adminSecret');
-      if (adminSecret) {
-        showMainApp();
-      } else {
-        setupPasswordGate();
+    // Probe the session on load. The server is the source of truth for
+    // auth state — we deliberately do NOT cache anything client-side
+    // (no localStorage, no sessionStorage). The HttpOnly cookie is the
+    // only credential, and the browser handles it via `credentials: 'include'`.
+    async function init() {
+      setupLoginGate();
+      try {
+        const resp = await fetch('/api/admin/auth/me', {
+          method: 'GET',
+          credentials: 'include',
+        });
+        if (resp.ok) {
+          currentUser = await resp.json();
+          showMainApp();
+        } else {
+          showLoginGate();
+        }
+      } catch (e) {
+        showLoginGate();
       }
     }
 
-    function setupPasswordGate() {
-      const input = document.getElementById('adminSecretInput');
-      const btn = document.getElementById('gateSubmitBtn');
+    function setupLoginGate() {
+      const emailInput = document.getElementById('loginEmailInput');
+      const passwordInput = document.getElementById('loginPasswordInput');
+      const submitBtn = document.getElementById('loginSubmitBtn');
 
-      btn.addEventListener('click', () => {
-        adminSecret = input.value.trim();
-        if (adminSecret) {
-          sessionStorage.setItem('adminSecret', adminSecret);
-          showMainApp();
-        }
-      });
-
-      input.addEventListener('keypress', (e) => {
-        if (e.key === 'Enter') btn.click();
+      submitBtn.addEventListener('click', submitLogin);
+      [emailInput, passwordInput].forEach((el) => {
+        el.addEventListener('keypress', (e) => {
+          if (e.key === 'Enter') submitLogin();
+        });
       });
     }
 
+    async function submitLogin() {
+      const email = document.getElementById('loginEmailInput').value.trim();
+      const password = document.getElementById('loginPasswordInput').value;
+      const errorEl = document.getElementById('loginError');
+      errorEl.textContent = '';
+      if (!email || !password) {
+        errorEl.textContent = 'Email and password required';
+        return;
+      }
+      try {
+        const resp = await fetch('/api/admin/auth/login', {
+          method: 'POST',
+          credentials: 'include',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ email, password }),
+        });
+        if (resp.ok) {
+          currentUser = await resp.json();
+          document.getElementById('loginPasswordInput').value = '';
+          showMainApp();
+          return;
+        }
+        if (resp.status === 429) {
+          const retryAfter = resp.headers.get('Retry-After');
+          errorEl.textContent = retryAfter
+            ? `Too many attempts — try again in ${retryAfter}s`
+            : 'Too many attempts — try again later';
+          return;
+        }
+        if (resp.status === 423) {
+          errorEl.textContent = 'Account disabled';
+          return;
+        }
+        // 401 and anything else fall through to the generic message — we
+        // never want to leak whether the email exists.
+        errorEl.textContent = 'Invalid credentials';
+      } catch (e) {
+        errorEl.textContent = 'Network error — try again';
+      }
+    }
+
+    function showLoginGate() {
+      currentUser = null;
+      document.getElementById('loginGate').classList.remove('hidden');
+      document.getElementById('mainApp').style.display = 'none';
+    }
+
     function showMainApp() {
-      document.getElementById('passwordGate').classList.add('hidden');
+      document.getElementById('loginGate').classList.add('hidden');
       document.getElementById('mainApp').style.display = 'flex';
 
-      // Load customers from localStorage
+      // Load customers from localStorage (UI is still localStorage-driven
+      // pending the customers API endpoint — separate prompt).
       loadCustomers();
 
-      // Setup event listeners
-      setupEventListeners();
+      if (!listenersWired) {
+        setupEventListeners();
+        listenersWired = true;
+      }
 
-      // Render UI
       renderCustomerList();
       updateStats();
       selectFirstCustomer();
@@ -1121,12 +1181,10 @@
       }
 
       try {
-        const response = await fetch('https://kindpos.com/api/admin/generate', {
+        const response = await fetch('/api/admin/generate', {
           method: 'POST',
-          headers: {
-            'Authorization': `Bearer ${adminSecret}`,
-            'Content-Type': 'application/json'
-          },
+          credentials: 'include',
+          headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
             prefix: customer.prefix,
             node_number: nodeNum,
@@ -1135,6 +1193,10 @@
           })
         });
 
+        if (response.status === 401) {
+          showLoginGate();
+          return;
+        }
         if (!response.ok) throw new Error('API error');
 
         const data = await response.json();
@@ -1172,9 +1234,17 @@
       renderCustomerList();
     }
 
-    function logout() {
-      sessionStorage.removeItem('adminSecret');
-      location.reload();
+    async function logout() {
+      try {
+        await fetch('/api/admin/auth/logout', {
+          method: 'POST',
+          credentials: 'include',
+        });
+      } catch (e) {
+        // Network failure is fine — the server-side session will expire on
+        // its own and the cookie is invalidated client-side regardless.
+      }
+      showLoginGate();
     }
 
     function copyToClipboard(text) {

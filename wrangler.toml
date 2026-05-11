@@ -1,0 +1,15 @@
+# KINDpos-site — Cloudflare Workers / Pages configuration.
+#
+# This file bootstraps the D1 binding used by migrations and (later) by the
+# admin and phone-home endpoints in K2/K3. The `database_id` is a placeholder
+# — replace with the value from `wrangler d1 create kindpos-site` before the
+# first `--remote` apply. Local applies (`--local`) ignore the id.
+
+name = "kindpos-site"
+compatibility_date = "2026-05-10"
+
+[[d1_databases]]
+binding = "KINDPOS_DB"
+database_name = "kindpos-site"
+database_id = "REPLACE_WITH_WRANGLER_D1_CREATE_OUTPUT"
+migrations_dir = "migrations"
