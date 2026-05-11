@@ -51,60 +51,41 @@ async function parseBody(request) {
 }
 
 export async function onRequestPost({ request, env }) {
-  const body = await parseBody(request);
-  const email = typeof body?.email === "string" ? body.email : "";
-  const password = typeof body?.password === "string" ? body.password : "";
-  if (!email || !password) {
-    return jsonResponse(400, { error: "email and password required" });
-  }
-
-  const ip = extractIp(request);
-
-  const limit = await checkAdminLoginRateLimit(env.KINDPOS_DB, { email, ip });
-  if (!limit.ok) {
-    return jsonResponse(
-      429,
-      { error: "too many attempts" },
-      { "Retry-After": String(limit.retryAfter ?? 300) },
+  try {
+    const body = await parseBody(request);
+    const email = typeof body?.email === "string" ? body.email : "";
+    const password = typeof body?.password === "string" ? body.password : "";
+    if (!email || !password) {
+      return jsonResponse(400, { error: "email and password required" });
+    }
+    const ip = extractIp(request);
+    const limit = await checkAdminLoginRateLimit(env.KINDPOS_DB, { email, ip });
+    if (!limit.ok) {
+      return jsonResponse(429, { error: "too many attempts" }, { "Retry-After": String(limit.retryAfter ?? 300) });
+    }
+    const user = await getAdminUserByEmail(env.KINDPOS_DB, email);
+    if (!user) {
+      await recordAdminLoginFailure(env.KINDPOS_DB, { email, ip });
+      return jsonResponse(401, { error: "invalid credentials" });
+    }
+    if (!user.is_active) {
+      return jsonResponse(423, { error: "account disabled" });
+    }
+    const ok = await verifyAdminUserPassword(env.KINDPOS_DB, user.id, password);
+    if (!ok) {
+      await recordAdminLoginFailure(env.KINDPOS_DB, { email, ip });
+      return jsonResponse(401, { error: "invalid credentials" });
+    }
+    await clearAdminLoginFailures(env.KINDPOS_DB, email);
+    await markAdminUserLogin(env.KINDPOS_DB, user.id);
+    const { sessionId, expiresAt } = await createAdminSession(env.KINDPOS_DB, {
+      adminUserId: user.id, ip, userAgent: request.headers.get("user-agent"),
+    });
+    return jsonResponse(200,
+      { user_id: user.id, email: user.email, role: user.role, must_change_password: user.must_change_password, expires_at: expiresAt },
+      { "set-cookie": buildSessionCookie(sessionId, expiresAt) }
     );
+  } catch (err) {
+    return jsonResponse(500, { error: String(err), stack: err?.stack, name: err?.name });
   }
-
-  const user = await getAdminUserByEmail(env.KINDPOS_DB, email);
-  if (!user) {
-    await recordAdminLoginFailure(env.KINDPOS_DB, { email, ip });
-    return jsonResponse(401, { error: "invalid credentials" });
-  }
-
-  if (!user.is_active) {
-    // Distinct status code per the spec — credentials may be legitimate;
-    // the account is simply disabled.
-    return jsonResponse(423, { error: "account disabled" });
-  }
-
-  const ok = await verifyAdminUserPassword(env.KINDPOS_DB, user.id, password);
-  if (!ok) {
-    await recordAdminLoginFailure(env.KINDPOS_DB, { email, ip });
-    return jsonResponse(401, { error: "invalid credentials" });
-  }
-
-  await clearAdminLoginFailures(env.KINDPOS_DB, email);
-  await markAdminUserLogin(env.KINDPOS_DB, user.id);
-
-  const { sessionId, expiresAt } = await createAdminSession(env.KINDPOS_DB, {
-    adminUserId: user.id,
-    ip,
-    userAgent: request.headers.get("user-agent"),
-  });
-
-  return jsonResponse(
-    200,
-    {
-      user_id: user.id,
-      email: user.email,
-      role: user.role,
-      must_change_password: user.must_change_password,
-      expires_at: expiresAt,
-    },
-    { "set-cookie": buildSessionCookie(sessionId, expiresAt) },
-  );
 }
