@@ -1,3 +1,5 @@
+import { requireAdminAuth } from '../../lib/auth/middleware.js';
+
 const CORS = {
   'Access-Control-Allow-Origin': 'https://kindpos.com',
   'Access-Control-Allow-Methods': 'GET, POST, OPTIONS',
@@ -9,19 +11,15 @@ function json(data, status = 200) {
   return new Response(JSON.stringify(data), { status, headers: CORS });
 }
 
-function requireAdmin(request, env) {
-  const auth = request.headers.get('Authorization') || '';
-  const token = auth.replace(/^Bearer\s+/i, '');
-  return token === env.ADMIN_SECRET;
-}
-
 export async function onRequest({ request, env }) {
   if (request.method === 'OPTIONS') {
     return new Response(null, { status: 204, headers: CORS });
   }
-  if (!requireAdmin(request, env)) {
-    return json({ error: 'Unauthorized' }, 401);
-  }
+  const user = await requireAdminAuth(request, env);
+  if (!user) return new Response(JSON.stringify({ error: 'unauthorized' }), {
+    status: 401,
+    headers: { 'Content-Type': 'application/json' },
+  });
   if (request.method !== 'POST') {
     return json({ error: 'Method not allowed' }, 405);
   }
