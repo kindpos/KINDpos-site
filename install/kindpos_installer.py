@@ -5,6 +5,12 @@ import sys, os, re, tkinter as tk
 import hashlib, uuid, subprocess, threading
 from tkinter import filedialog
 
+try:
+    from PIL import Image, ImageTk
+    _PIL_AVAILABLE = True
+except ImportError:
+    _PIL_AVAILABLE = False
+
 # ── Tokens ──────────────────────────────────────────
 T = {
     'bg':          '#383c42',
@@ -25,6 +31,52 @@ T = {
 }
 FONT = 'Courier'
 STEPS = ['Welcome', 'Directory', 'Activation', 'Install', 'Shortcuts', 'Finish']
+
+
+def _logo_path():
+    """Return absolute path to app_logo.png bundled with installer."""
+    if getattr(sys, 'frozen', False):
+        base = sys._MEIPASS
+    else:
+        base = os.path.dirname(os.path.abspath(__file__))
+    return os.path.join(base, 'app_logo.png')
+
+
+def _make_ico(dest_dir):
+    """
+    Convert app_logo.png to app_logo.ico in dest_dir.
+    Returns the .ico path on success, None on failure.
+    Required for Windows shortcut IconLocation.
+    """
+    if not _PIL_AVAILABLE:
+        return None
+    try:
+        src = _logo_path()
+        if not os.path.exists(src):
+            return None
+        ico_path = os.path.join(dest_dir, 'app_logo.ico')
+        img = Image.open(src).convert('RGBA')
+        # Windows shortcut icon: include common sizes
+        img.save(ico_path, format='ICO',
+                 sizes=[(256,256),(128,128),(64,64),(48,48),(32,32),(16,16)])
+        return ico_path
+    except Exception:
+        return None
+
+
+def _set_window_icon(win):
+    """Set the app_logo.png as the window icon. Silent on failure."""
+    if not _PIL_AVAILABLE:
+        return
+    try:
+        src = _logo_path()
+        if not os.path.exists(src):
+            return
+        img = ImageTk.PhotoImage(Image.open(src).resize((32, 32)))
+        win.iconphoto(True, img)
+        win._icon_ref = img  # prevent GC
+    except Exception:
+        pass
 
 
 def default_install_dir():
@@ -70,12 +122,15 @@ def _get_hardware_fingerprint():
     return digest
 
 
-def _create_shortcut(target_py, pythonw, dest_lnk):
-    import subprocess
+def _create_shortcut(target_py, pythonw, dest_lnk, ico_path=None):
+    icon_line = ''
+    if ico_path and os.path.exists(ico_path):
+        icon_line = f'$s.IconLocation="{ico_path},0";'
     ps = (
         f'$s=(New-Object -COM WScript.Shell).CreateShortcut("{dest_lnk}");'
         f'$s.TargetPath="{pythonw}";'
         f'$s.Arguments=\'"{target_py}"\';'
+        f'{icon_line}'
         f'$s.Save()'
     )
     subprocess.run(['powershell', '-Command', ps], capture_output=True)
@@ -83,10 +138,18 @@ def _create_shortcut(target_py, pythonw, dest_lnk):
 
 _LAUNCHER_CONTENT = '''#!/usr/bin/env python3
 """KINDpos Launcher — v2.0"""
+import sys
+import os
 import tkinter as tk
 import webbrowser
 import threading
 import socket
+
+try:
+    from PIL import Image, ImageTk
+    _PIL_AVAILABLE = True
+except ImportError:
+    _PIL_AVAILABLE = False
 
 T = {
     "bg":       "#383c42",
@@ -102,6 +165,30 @@ T = {
 FONT = "Courier"
 
 
+def _logo_path():
+    """Return absolute path to app_logo.png next to this launcher."""
+    if getattr(sys, "frozen", False):
+        base = sys._MEIPASS
+    else:
+        base = os.path.dirname(os.path.abspath(__file__))
+    return os.path.join(base, "app_logo.png")
+
+
+def _set_window_icon(win):
+    """Set the app_logo.png as the window icon. Silent on failure."""
+    if not _PIL_AVAILABLE:
+        return
+    try:
+        src = _logo_path()
+        if not os.path.exists(src):
+            return
+        img = ImageTk.PhotoImage(Image.open(src).resize((32, 32)))
+        win.iconphoto(True, img)
+        win._icon_ref = img  # prevent GC
+    except Exception:
+        pass
+
+
 class KINDposLauncher(tk.Tk):
     def __init__(self):
         super().__init__()
@@ -109,6 +196,7 @@ class KINDposLauncher(tk.Tk):
         self.geometry("340x200")
         self.resizable(False, False)
         self.configure(bg=T["well"])
+        _set_window_icon(self)
         self._build()
         self._check_status()
 
@@ -212,6 +300,8 @@ class KINDposSetup(tk.Tk):
         outer = tk.Frame(self, bg=T['bg'])
         outer.pack(fill=tk.BOTH, expand=True)
         self._outer = outer
+
+        _set_window_icon(self)
 
         self._build_left()
         self._build_right()
@@ -906,11 +996,12 @@ class KINDposSetup(tk.Tk):
             do_startmenu  = want_startmenu.get()  if want_startmenu  else True
             do_desktop    = want_desktop.get()    if want_desktop    else True
             do_autostart  = want_autostart.get()  if want_autostart  else True
+            ico = _make_ico(self.install_dir.get())
             if os.path.exists(pw_exe):
                 if do_startmenu:
-                    _create_shortcut(launcher_py, pw_exe, start_lnk)
+                    _create_shortcut(launcher_py, pw_exe, start_lnk, ico_path=ico)
                 if do_desktop:
-                    _create_shortcut(launcher_py, pw_exe, desktop)
+                    _create_shortcut(launcher_py, pw_exe, desktop, ico_path=ico)
                 if do_autostart:
                     subprocess.run([
                         'schtasks', '/Create', '/F',
