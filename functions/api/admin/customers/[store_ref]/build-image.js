@@ -43,6 +43,12 @@ function loadSql() {
     if (typeof self.location === 'undefined') {
       self.location = { href: 'https://kindpos.com/' }
     }
+    if (typeof globalThis.__dirname === 'undefined') {
+      globalThis.__dirname = '/'
+    }
+    if (typeof globalThis.__filename === 'undefined') {
+      globalThis.__filename = '/index.js'
+    }
     SQL_PROMISE = initSqlJs({
       locateFile: () => 'sql-wasm.wasm',   // prevents import.meta.url crash
       instantiateWasm(imports, receive) {
