@@ -40,6 +40,10 @@ function json(data, status = 200) {
 let SQL_PROMISE = null;
 function loadSql() {
   if (!SQL_PROMISE) {
+    // sql.js emscripten init reads self.location.href as a script-directory
+    // probe. workerd doesn't define `location`, so this throws TypeError
+    // before our locateFile callback gets a chance to run.
+    globalThis.location ??= { href: 'https://kindpos.local/' };
     SQL_PROMISE = initSqlJs({
       locateFile: () => 'sql-wasm.wasm',   // prevents import.meta.url crash
       instantiateWasm(imports, receive) {
