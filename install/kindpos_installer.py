@@ -141,7 +141,8 @@ def _create_shortcut(target_py, pythonw, dest_lnk, ico_path=None):
     subprocess.run(['powershell', '-Command', ps], capture_output=True)
 
 
-_LAUNCHER_CONTENT = '''#!/usr/bin/env python3
+_LAUNCHER_CONTENT = '''# -*- coding: utf-8 -*-
+#!/usr/bin/env python3
 """KINDpos Launcher — v2.0"""
 import sys
 import os
@@ -905,7 +906,7 @@ class KINDposSetup(tk.Tk):
             ui(self._set_step, 5)
             ui(self._log, 'Writing launcher and shortcuts…', 'info')
             launcher_py = os.path.join(idir, 'kindpos_launcher.py')
-            open(launcher_py, 'w').write(_LAUNCHER_CONTENT)
+            open(launcher_py, 'w', encoding='utf-8').write(_LAUNCHER_CONTENT)
             ui(self._set_progress, 93, 'Launcher written.')
 
             desktop   = os.path.join(os.path.expanduser('~'), 'Desktop', 'KINDpos.lnk')
