@@ -559,6 +559,7 @@ class KINDposSetup(tk.Tk):
             'Download Python 3.11 embeddable',
             'Extract Python runtime',
             'Clone KINDpos repository',
+            'Bootstrap pip',
             'Install dependencies',
             'Create shortcuts & autostart',
         ]
@@ -876,8 +877,22 @@ class KINDposSetup(tk.Tk):
                 ui(self._log, 'Repository downloaded via zip.', 'ok')
             ui(self._set_progress, 60, 'Repository ready.')
 
-            # ── Step 4: Install dependencies ─────────────────────
+            # ── Step 4: Bootstrap pip ────────────────────────────
             ui(self._set_step, 4)
+            ui(self._log, 'Bootstrapping pip into embeddable Python…', 'info')
+            # Bootstrap pip into embeddable Python
+            import urllib.request
+            get_pip_path = os.path.join(idir, 'get-pip.py')
+            urllib.request.urlretrieve(
+                'https://bootstrap.pypa.io/get-pip.py', get_pip_path)
+            subprocess.run(
+                [py_exe, get_pip_path, '--no-warn-script-location'],
+                check=True, cwd=idir)
+            os.remove(get_pip_path)
+            ui(self._log, 'pip bootstrapped.', 'ok')
+
+            # ── Step 5: Install dependencies ─────────────────────
+            ui(self._set_step, 5)
             ui(self._log, 'Installing Python dependencies…', 'info')
             req_file = os.path.join(app_dir, 'backend', 'requirements.txt')
             cmd = [py_exe, '-m', 'pip', 'install', '-r', req_file, '--upgrade']
@@ -902,8 +917,8 @@ class KINDposSetup(tk.Tk):
             ui(self._log, 'Dependencies installed.', 'ok')
             ui(self._set_progress, 90, 'Dependencies ready.')
 
-            # ── Step 5: Launcher + shortcuts ─────────────────────
-            ui(self._set_step, 5)
+            # ── Step 6: Launcher + shortcuts ─────────────────────
+            ui(self._set_step, 6)
             ui(self._log, 'Writing launcher and shortcuts…', 'info')
             launcher_py = os.path.join(idir, 'kindpos_launcher.py')
             open(launcher_py, 'w', encoding='utf-8').write(_LAUNCHER_CONTENT)
