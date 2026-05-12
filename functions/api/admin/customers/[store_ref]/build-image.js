@@ -41,6 +41,7 @@ let SQL_PROMISE = null;
 function loadSql() {
   if (!SQL_PROMISE) {
     SQL_PROMISE = initSqlJs({
+      locateFile: () => 'sql-wasm.wasm',   // prevents import.meta.url crash
       instantiateWasm(imports, receive) {
         WebAssembly.instantiate(sqlWasm, imports).then(instance => {
           receive(instance, sqlWasm);
