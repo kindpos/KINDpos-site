@@ -499,8 +499,8 @@ class KINDposSetup(tk.Tk):
         field_row.pack(fill=tk.X)
         tk.Entry(field_row, textvariable=self.install_dir, bg=T['well'], fg=T['green'],
                  insertbackground=T['green'], relief=tk.FLAT, bd=0, font=(FONT, 10),
-                 highlightbackground=T['border'], highlightthickness=1,
-                 ipady=7).pack(side=tk.LEFT, fill=tk.X, expand=True)
+                 highlightbackground=T['border'], highlightthickness=1
+                 ).pack(side=tk.LEFT, fill=tk.X, expand=True, ipady=7)
         tk.Button(field_row, text='Browse', bg=T['card'], fg=T['green'],
                   relief=tk.FLAT, padx=12, cursor='hand2',
                   command=self._browse).pack(side=tk.LEFT, padx=(6, 0))
@@ -850,6 +850,10 @@ class KINDposSetup(tk.Tk):
             ui(self._set_step, 3)
             ui(self._log, 'Cloning KINDpos repository…', 'info')
             ui(self._set_progress, 35, 'Cloning…')
+            import shutil
+            app_dir = os.path.join(self._install_dir, 'app')
+            if os.path.exists(app_dir):
+                shutil.rmtree(app_dir)
             try:
                 subprocess.run(
                     ['git', 'clone', 'https://github.com/kindpos/Vz2.0', app_dir],
