@@ -12,49 +12,53 @@
     <meta property="og:type" content="website">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Chakra+Petch:wght@700&family=B612:ital,wght@0,400;0,700;1,400;1,700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;700;800&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
     <style>
-        /* ── COLOR TOKENS ─────────────────────────────────── */
+        /* ── TOKENS ── */
         :root {
-            --gold:        #fbb03b;
-            --mint:        #87f79c;
-            --vermillion:  #ff4422;
-            --bg-dark:     #333333;
-            --chart-well:  #1a1a1a;
-            --bevel-light: #5a5a5a;
-            --bevel-dark:  #151515;
-            --text:        #e0e0e0;
-            --sage:        #6bc987;
-            --palm-width:  277px;
-            --font-display: 'Chakra Petch', sans-serif;
-            --font-body:    'B612', sans-serif;
+            --bg:         #1e2124;
+            --shell:      #252830;
+            --card:       #2a2e35;
+            --well:       #181b1f;
+            --bevel-lt:   #2e3238;
+            --bevel-dk:   #17191c;
+            --green:      #86efac;
+            --greenWarm:  #4ade80;
+            --greenDk:    #1a5c2e;
+            --gold:       #e8c84e;
+            --goldDk:     #7a5c00;
+            --elec:       #22d3ee;
+            --elecDk:     #0e6b7a;
+            --verm:       #e8472a;
+            --vermDk:     #6b1a0e;
+            --moon:       #7e8896;
+            --text:       #e8eaed;
+            --textMuted:  #9ca3af;
+            --border:     #5a5f66;
+            --palm-width: 277px;
+            --fh: 'Outfit', sans-serif;
+            --fb: 'JetBrains Mono', monospace;
         }
 
-        /* ── RESET ────────────────────────────────────────── */
-        *, *::before, *::after {
-            box-sizing: border-box;
-            margin: 0;
-            padding: 0;
-            border-radius: 0 !important;
-        }
-
+        /* ── RESET ── */
+        *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
         body {
-            background: var(--bg-dark);
+            background: var(--bg);
             color: var(--text);
-            font-family: var(--font-body);
+            font-family: var(--fb);
+            font-size: 16px;
             line-height: 1.6;
             overflow-x: hidden;
         }
 
-        /* ── NAVIGATION ───────────────────────────────────── */
+        /* ── NAV ── */
         nav {
             position: sticky;
             top: 0;
-            background: var(--chart-well);
-            border-bottom: 2px solid var(--mint);
+            background: var(--shell);
+            border-bottom: 2px solid var(--green);
             z-index: 1000;
         }
-
         .nav-container {
             display: flex;
             justify-content: center;
@@ -65,33 +69,39 @@
             scrollbar-width: none;
         }
         .nav-container::-webkit-scrollbar { display: none; }
-
+        .nav-logo-wrap {
+            display: flex;
+            align-items: center;
+            padding: 6px 16px 6px 0;
+            border-right: 1px solid rgba(90,95,102,0.3);
+            margin-right: 8px;
+        }
+        .nav-logo-wrap img { height: 36px; width: auto; display: block; }
         .nav-link {
-            font-family: var(--font-display);
-            color: var(--gold);
+            font-family: var(--fb);
+            font-weight: 500;
+            color: var(--textMuted);
             text-decoration: none;
             text-transform: uppercase;
-            padding: 0.85rem 1rem;
-            font-size: 0.68rem;
-            letter-spacing: 1.5px;
+            padding: 0 16px;
+            font-size: 16px;
+            letter-spacing: 1px;
             cursor: pointer;
             border-bottom: 3px solid transparent;
             transition: color 0.15s, border-color 0.15s;
-            display: inline-block;
+            display: inline-flex;
+            align-items: center;
+            height: 52px;
         }
-        .nav-link:hover { color: var(--mint); }
-        .nav-link.active {
-            color: var(--mint);
-            border-bottom: 3px solid var(--mint);
-        }
+        .nav-link:hover { color: var(--text); }
+        .nav-link.active { color: var(--green); border-bottom-color: var(--green); }
 
-        /* ── LAYOUT ───────────────────────────────────────── */
+        /* ── LAYOUT ── */
         .page-container {
             display: flex;
-            min-height: calc(100vh - 55px);
+            min-height: calc(100vh - 54px);
             position: relative;
         }
-
         .palm-sidebar {
             width: var(--palm-width);
             height: 100vh;
@@ -104,394 +114,298 @@
             background-repeat: no-repeat;
             background-position: center center;
             display: none;
+            opacity: 0.85;
         }
-
-        .content-area {
-            flex-grow: 1;
-            padding: 40px 60px;
-            width: 100%;
-        }
-
-        .home-tab .palm-sidebar { display: none !important; }
-        .home-tab .content-area { padding: 0; margin-left: 0 !important; }
-
+        .content-area { flex-grow: 1; padding: 48px 60px; width: 100%; }
+        .home-tab .palm-sidebar  { display: none !important; }
+        .home-tab .content-area  { padding: 0; margin-left: 0 !important; }
         .other-tab .palm-sidebar { display: block; }
         .other-tab .content-area { margin-left: var(--palm-width); padding-left: 50px; }
 
-        /* ── TYPOGRAPHY ───────────────────────────────────── */
-        h1, h2, h3 {
-            font-family: var(--font-display);
-            text-transform: uppercase;
-        }
-        h1 { font-size: 2.1rem; letter-spacing: 2px; }
-        h2 { font-size: 1.35rem; letter-spacing: 2px; margin-bottom: 1.5rem; }
-        h3 { font-size: 0.85rem; letter-spacing: 2px; margin-bottom: 0.75rem; }
+        /* ── TYPOGRAPHY ── */
+        h1, h2, h3 { font-family: var(--fh); }
+        h1 { font-size: 2rem; font-weight: 700; }
+        h2 { font-size: 1.5rem; font-weight: 700; margin-bottom: 1.5rem; }
+        h3 { font-size: 1.1rem; font-weight: 700; margin-bottom: 0.75rem; }
         p  { margin-bottom: 1rem; }
 
-        .gold       { color: var(--gold); }
-        .mint       { color: var(--mint); }
-        .sage       { color: var(--sage); }
-        .vermillion { color: var(--vermillion); }
-
-        /* ── STYLE D BUTTON ───────────────────────────────── */
-        .btn {
+        /* ── BUTTONS ── */
+        .btn-primary {
             display: inline-block;
-            font-family: var(--font-display);
+            font-family: var(--fh);
+            font-size: 16px;
             font-weight: 700;
-            font-size: 0.72rem;
-            letter-spacing: 2px;
-            text-transform: uppercase;
+            color: var(--well);
+            background: var(--green);
             border: none;
+            border-radius: 999px;
+            padding: 12px 28px;
+            box-shadow: 0 3px 0 var(--greenDk);
             cursor: pointer;
-            padding: 0.9rem 2rem;
-            background: var(--gold);
-            color: var(--chart-well);
             text-decoration: none;
-            clip-path: polygon(8px 0%, calc(100% - 8px) 0%, 100% 8px, 100% calc(100% - 8px), calc(100% - 8px) 100%, 8px 100%, 0% calc(100% - 8px), 0% 8px);
-            filter: drop-shadow(3px 4px 0px rgba(251,176,59,0.7));
-            transition: filter 0.1s, transform 0.1s;
+            transition: filter 0.1s, transform 0.1s, box-shadow 0.1s;
+            letter-spacing: 0.3px;
         }
-        .btn:hover  { filter: drop-shadow(3px 4px 0px rgba(251,176,59,1)) brightness(1.06); }
-        .btn:active { filter: none; transform: translate(3px, 4px); }
+        .btn-primary:hover  { filter: brightness(1.06); }
+        .btn-primary:active { transform: translateY(2px); box-shadow: none; }
 
-        .btn-mint {
-            background: var(--mint);
-            color: var(--chart-well);
-            filter: drop-shadow(3px 4px 0px rgba(135,247,156,0.55));
+        .btn-ghost {
+            display: inline-block;
+            font-family: var(--fb);
+            font-size: 16px;
+            font-weight: 500;
+            color: var(--textMuted);
+            background: transparent;
+            border: 1px solid var(--border);
+            border-radius: 999px;
+            padding: 11px 28px;
+            cursor: pointer;
+            text-decoration: none;
+            transition: color 0.15s, border-color 0.15s;
         }
-        .btn-mint:hover { filter: drop-shadow(3px 4px 0px rgba(135,247,156,0.9)) brightness(1.05); }
+        .btn-ghost:hover { color: var(--text); border-color: var(--text); }
 
-        /* ── CARDS — clock-in bevel border style ─────────── */
-        /* lightenHex(mint,0.2)=#9ff9b0  darkenHex(mint,0.3)=#5fad6d */
-        .card {
-            background: var(--bg-dark);
-            border-top:    7px solid #9ff9b0;
-            border-left:   7px solid #9ff9b0;
-            border-bottom: 7px solid #5fad6d;
-            border-right:  7px solid #5fad6d;
-            clip-path: polygon(10px 0%, calc(100% - 10px) 0%, 100% 10px, 100% calc(100% - 10px), calc(100% - 10px) 100%, 10px 100%, 0% calc(100% - 10px), 0% 10px);
-            margin-bottom: 2rem;
-            filter: drop-shadow(3px 4px 0px rgba(0,0,0,0.6)) drop-shadow(0 0 16px rgba(135,247,156,0.15));
+        /* ── TIER 0 CARD ── */
+        .card-t0 {
+            background: var(--card);
+            border-radius: 10px;
+            border-left: 4px solid var(--green);
+            box-shadow: 0 4px 16px rgba(0,0,0,0.35);
+            padding: 20px 24px;
+            margin-bottom: 16px;
         }
-        /* lightenHex(gold,0.2)=#fcc062  darkenHex(gold,0.3)=#b07b29 */
-        .card-gold {
-            border-top-color:    #fcc062;
-            border-left-color:   #fcc062;
-            border-bottom-color: #b07b29;
-            border-right-color:  #b07b29;
-            filter: drop-shadow(3px 4px 0px rgba(0,0,0,0.6)) drop-shadow(0 0 16px rgba(251,176,59,0.15));
-        }
+        .card-t0.gold  { border-left-color: var(--gold); }
+        .card-t0.elec  { border-left-color: var(--elec); }
+        .card-t0.verm  { border-left-color: var(--verm); }
 
-        .card-hdr {
-            font-family: var(--font-display);
-            font-size: 0.6rem;
-            font-weight: 700;
-            letter-spacing: 3px;
-            padding: 10px 16px 8px;
-            text-transform: uppercase;
-            color: var(--mint);
-            border-bottom: 1px solid rgba(135,247,156,0.25);
-        }
-        .card-gold .card-hdr {
-            color: var(--gold);
-            border-bottom-color: rgba(251,176,59,0.25);
-        }
-
-        .card-bdy { padding: 1.25rem 1.5rem; }
-        .card-bdy h3 { color: var(--gold); }
-
-        /* ── FORMS ────────────────────────────────────────── */
-        .form {
-            display: flex;
-            flex-direction: column;
-            gap: 1.2rem;
-            max-width: 580px;
-        }
-        .form-group {
-            display: flex;
-            flex-direction: column;
-            gap: 0.4rem;
-        }
-        label {
-            font-family: var(--font-body);
-            color: var(--sage);
-            font-size: 0.72rem;
-            letter-spacing: 1px;
-            text-transform: uppercase;
-        }
-        input, textarea, select {
-            background: var(--chart-well);
-            border: 1px solid var(--bevel-light);
-            padding: 0.75rem;
-            color: var(--text);
-            font-family: var(--font-body);
-            font-size: 0.88rem;
-        }
-        input:focus, textarea:focus, select:focus {
-            outline: none;
-            border-color: var(--mint);
-            box-shadow: 0 0 0 1px var(--mint);
-        }
-        textarea { resize: vertical; }
-        select option { background: var(--chart-well); }
-
-        /* ── DIVIDERS ─────────────────────────────────────── */
-        .section-divider {
-            border: none;
-            border-top: 1px solid var(--bevel-light);
-            margin: 3rem 0;
-        }
-        .mint-divider {
-            border: none;
-            border-top: 2px solid var(--mint);
-            margin: 2rem 0;
-        }
-
-        /* ── HERO ─────────────────────────────────────────── */
-        #hero {
-            height: calc(100vh - 55px);
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            align-items: center;
-            text-align: center;
+        /* ── TIER 1 CARD ── */
+        .card-t1 {
+            background: var(--well);
+            border-radius: 12px;
+            border-top:    5px solid var(--bevel-lt);
+            border-left:   5px solid var(--bevel-lt);
+            border-right:  5px solid var(--bevel-dk);
+            border-bottom: 5px solid var(--bevel-dk);
+            box-shadow: inset 0 1px 0 rgba(255,255,255,0.06), 3px 5px 0 rgba(0,0,0,0.55);
             position: relative;
             overflow: hidden;
+            margin-bottom: 16px;
         }
-        #hero::after {
-            content: '';
+        .card-t1-accent {
             position: absolute;
-            inset: 0;
-            background: repeating-linear-gradient(
-                0deg,
-                transparent, transparent 2px,
-                rgba(0,0,0,0.07) 2px, rgba(0,0,0,0.07) 4px
-            );
-            pointer-events: none;
+            left: 0; top: 14px; bottom: 14px;
+            width: 4px;
+            border-radius: 0 2px 2px 0;
+            background: var(--green);
+            box-shadow: 0 0 10px rgba(134,239,172,0.5);
         }
-
-        /* ── UPDATES TIMELINE ─────────────────────────────── */
-        .update-item {
-            display: flex;
-            gap: 1.5rem;
-            align-items: flex-start;
-            padding: 0.85rem 0;
-            border-bottom: 1px solid var(--bevel-light);
-        }
-        .update-item:last-child { border-bottom: none; }
-        .update-date {
-            font-family: var(--font-display);
-            font-size: 0.6rem;
-            color: var(--mint);
+        .card-t1-accent.gold  { background: var(--gold);  box-shadow: 0 0 10px rgba(232,200,78,0.5); }
+        .card-t1-accent.elec  { background: var(--elec);  box-shadow: 0 0 10px rgba(34,211,238,0.5); }
+        .card-t1-accent.verm  { background: var(--verm);  box-shadow: 0 0 10px rgba(232,71,42,0.5); }
+        .card-t1-hdr {
+            font-family: var(--fb);
+            font-size: 16px;
+            font-weight: 700;
             letter-spacing: 1px;
-            white-space: nowrap;
-            padding-top: 3px;
-            min-width: 75px;
-        }
-
-        /* ── COMPARISON TABLE ─────────────────────────────── */
-        .comparison-table {
-            width: 100%;
-            border-collapse: collapse;
-            background: var(--chart-well);
-            border: 2px solid var(--bevel-light);
-            margin-bottom: 1rem;
-        }
-        .comparison-table th {
-            background: var(--mint);
-            color: var(--chart-well);
-            font-family: var(--font-display);
-            font-size: 0.65rem;
-            letter-spacing: 2px;
-            padding: 0.75rem 1.5rem;
-            text-align: center;
             text-transform: uppercase;
-            border-right: 2px solid var(--bg-dark);
+            color: var(--green);
+            padding: 12px 16px 10px 22px;
+            border-bottom: 1px solid rgba(90,95,102,0.4);
+            background: rgba(134,239,172,0.04);
         }
-        .comparison-table th:last-child { border-right: none; }
-        .comparison-table th.col-kindpos { background: var(--gold); }
-        .comparison-table td {
-            padding: 1.5rem;
-            text-align: center;
-            vertical-align: top;
-            border-right: 2px solid var(--bg-dark);
-        }
-        .comparison-table td:last-child { border-right: none; }
-        .price-big {
-            font-family: var(--font-display);
-            font-size: 1.8rem;
-            font-weight: 700;
-            display: block;
-            margin-bottom: 0.5rem;
-        }
+        .card-t1-hdr.gold { color: var(--gold); background: rgba(232,200,78,0.04); }
+        .card-t1-hdr.elec { color: var(--elec); background: rgba(34,211,238,0.04); }
+        .card-t1-body { padding: 16px 18px 16px 22px; }
 
-        /* ── PILOT STEPS ──────────────────────────────────── */
-        .pilot-step {
-            display: flex;
-            gap: 1.5rem;
-            margin-bottom: 2rem;
-            align-items: flex-start;
-        }
-        .step-number {
-            font-family: var(--font-display);
-            font-size: 2.4rem;
-            font-weight: 900;
-            color: var(--gold);
-            line-height: 1;
-            min-width: 48px;
-        }
-        .step-content h3 { color: var(--mint); }
-        .step-content p  { font-size: 0.9rem; margin: 0; }
-
-        /* ── SOLUTION PILLARS ─────────────────────────────── */
-        .pillar {
-            background: var(--bg-dark);
-            border-top:    7px solid #9ff9b0;
-            border-left:   7px solid #9ff9b0;
-            border-bottom: 7px solid #5fad6d;
-            border-right:  7px solid #5fad6d;
-            clip-path: polygon(10px 0%, calc(100% - 10px) 0%, 100% 10px, 100% calc(100% - 10px), calc(100% - 10px) 100%, 10px 100%, 0% calc(100% - 10px), 0% 10px);
-            margin-bottom: 1.5rem;
-            filter: drop-shadow(3px 4px 0px rgba(0,0,0,0.6)) drop-shadow(0 0 16px rgba(135,247,156,0.15));
-        }
-        .pillar-label {
-            font-family: var(--font-display);
-            font-size: 0.68rem;
-            font-weight: 700;
-            letter-spacing: 4px;
-            padding: 8px 16px;
-            text-transform: uppercase;
-            color: var(--mint);
-            border-bottom: 1px solid rgba(135,247,156,0.25);
-        }
-        .pillar-body {
-            padding: 1.25rem 1.5rem;
-        }
-        .pillar-body p { margin: 0; }
-
-        /* ── FEATURE LIST ─────────────────────────────────── */
-        .feature-list { list-style: none; padding: 0; }
+        /* ── FEATURE LIST ── */
+        .feature-list { list-style: none; }
         .feature-list li {
-            padding: 0.6rem 0;
-            border-bottom: 1px solid var(--bevel-light);
-            display: flex;
-            gap: 1rem;
-            align-items: flex-start;
-            font-size: 0.9rem;
+            display: flex; align-items: flex-start; gap: 10px;
+            padding: 8px 0;
+            font-size: 16px; color: var(--text);
+            border-bottom: 1px solid rgba(90,95,102,0.2);
+            line-height: 1.4;
         }
         .feature-list li:last-child { border-bottom: none; }
-        .feature-list li::before {
-            content: '▸';
-            color: var(--mint);
-            flex-shrink: 0;
-            margin-top: 2px;
-        }
+        .feature-list li::before { content: '▸'; color: var(--green); flex-shrink: 0; font-size: 13px; margin-top: 2px; }
+        .feature-list.gold li::before { color: var(--gold); }
+        .feature-list.elec li::before { color: var(--elec); }
 
-        /* ── STAT CALLOUT ─────────────────────────────────── */
+        /* ── DIVIDERS ── */
+        .divider      { height: 1px; background: var(--border); opacity: 0.4; margin: 40px 0; }
+        .divider-green { height: 2px; background: var(--green); opacity: 0.4; margin: 40px 0; }
+
+        /* ── STAT CALLOUT ── */
         .stat-callout {
-            background: var(--chart-well);
+            background: var(--card);
             border-left: 4px solid var(--gold);
-            padding: 1.5rem;
+            border-radius: 10px;
+            padding: 20px 24px;
             margin: 2rem 0;
+            box-shadow: 0 4px 16px rgba(0,0,0,0.35);
         }
-        .stat-callout .big-number {
-            font-family: var(--font-display);
-            font-size: 2.2rem;
+        .stat-big {
+            font-family: var(--fh);
+            font-size: 2rem;
             color: var(--gold);
             font-weight: 700;
+            text-shadow: 0 0 16px rgba(232,200,78,0.3);
             display: block;
             line-height: 1.1;
         }
-        .stat-callout .stat-label {
-            font-size: 0.78rem;
-            color: var(--sage);
-            letter-spacing: 1px;
-            margin-top: 0.4rem;
-            display: block;
-        }
+        .stat-label { font-size: 16px; color: var(--text); margin-top: 6px; display: block; }
 
-        /* ── PATH CARDS ───────────────────────────────────── */
-        .path-cards {
-            display: flex;
-            gap: 2rem;
-            flex-wrap: wrap;
-            justify-content: center;
-            margin-top: 2.5rem;
-        }
-        .path-card {
-            flex: 1;
-            min-width: 280px;
-            max-width: 420px;
-        }
-        .path-link {
-            color: var(--mint);
-            text-decoration: none;
-            font-size: 0.82rem;
-            cursor: pointer;
-            font-family: var(--font-body);
-            display: inline-block;
-            margin-top: 0.75rem;
-            transition: color 0.15s;
-        }
-        .path-link:hover { color: var(--gold); }
-
-        /* ── INFO BOX ─────────────────────────────────────── */
+        /* ── INFO BOX ── */
         .info-box {
-            background: var(--chart-well);
-            border-left: 4px solid var(--mint);
-            padding: 1.25rem 1.5rem;
+            background: var(--card);
+            border-left: 4px solid var(--green);
+            border-radius: 10px;
+            padding: 20px 24px;
             margin: 2rem 0;
         }
-        .info-box h3 { color: var(--mint); margin-bottom: 0.5rem; }
-        .info-box p  { font-size: 0.88rem; color: var(--sage); margin: 0; }
+        .info-box h3 { color: var(--green); margin-bottom: 6px; }
+        .info-box p  { color: var(--text); margin: 0; }
 
-        /* ── TAGLINE DISPLAY ──────────────────────────────── */
+        /* ── TAGLINE ── */
         .tagline-display {
-            font-family: var(--font-display);
+            font-family: var(--fb);
+            font-style: italic;
             font-size: 1.1rem;
+            font-weight: 700;
             letter-spacing: 4px;
             text-align: center;
-            color: var(--mint);
-            background: var(--chart-well);
-            border-left: 4px solid var(--mint);
-            padding: 1.25rem 2rem;
+            color: var(--green);
+            text-shadow: 0 0 20px rgba(134,239,172,0.3);
+            background: var(--well);
+            border-left: 4px solid var(--green);
+            border-radius: 0 10px 10px 0;
+            padding: 20px 32px;
             margin: 3rem 0;
             text-transform: uppercase;
         }
 
-        /* ── TABS ─────────────────────────────────────────── */
+        /* ── PILOT STEPS ── */
+        .pilot-step { display: flex; gap: 20px; margin-bottom: 24px; align-items: flex-start; padding-bottom: 24px; border-bottom: 1px solid rgba(90,95,102,0.2); }
+        .pilot-step:last-child { border-bottom: none; }
+        .step-num { font-family: var(--fh); font-size: 2.5rem; font-weight: 700; color: var(--gold); text-shadow: 0 0 16px rgba(232,200,78,0.2); line-height: 1; min-width: 52px; }
+        .step-title { font-family: var(--fh); font-size: 18px; font-weight: 700; color: var(--green); margin-bottom: 4px; }
+        .step-desc  { font-size: 16px; color: var(--text); margin: 0; }
+
+        /* ── PATH CARDS ── */
+        .path-cards { display: flex; gap: 20px; flex-wrap: wrap; justify-content: center; margin-top: 2.5rem; }
+        .path-card  { flex: 1; min-width: 280px; max-width: 420px; }
+        .path-link  { color: var(--green); text-decoration: none; font-size: 16px; cursor: pointer; display: inline-block; margin-top: 12px; transition: color 0.15s; }
+        .path-link:hover { color: var(--gold); }
+
+        /* ── UPDATE TIMELINE ── */
+        .update-item { display: flex; gap: 1.5rem; align-items: flex-start; padding: 14px 0; border-bottom: 1px solid rgba(90,95,102,0.2); }
+        .update-item:last-child { border-bottom: none; }
+        .update-date { font-family: var(--fb); font-size: 16px; font-weight: 700; color: var(--green); white-space: nowrap; min-width: 80px; padding-top: 2px; }
+
+        /* ── PILLAR CARDS ── */
+        .pillar {
+            background: var(--well);
+            border-radius: 12px;
+            border-top:    5px solid var(--bevel-lt);
+            border-left:   5px solid var(--bevel-lt);
+            border-right:  5px solid var(--bevel-dk);
+            border-bottom: 5px solid var(--bevel-dk);
+            box-shadow: inset 0 1px 0 rgba(255,255,255,0.06), 3px 5px 0 rgba(0,0,0,0.55);
+            position: relative;
+            overflow: hidden;
+            margin-bottom: 16px;
+        }
+        .pillar-accent {
+            position: absolute;
+            left: 0; top: 14px; bottom: 14px;
+            width: 4px;
+            border-radius: 0 2px 2px 0;
+            background: var(--green);
+            box-shadow: 0 0 10px rgba(134,239,172,0.5);
+        }
+        .pillar-label {
+            font-family: var(--fb);
+            font-size: 16px; font-weight: 700; letter-spacing: 1px; text-transform: uppercase;
+            color: var(--green);
+            padding: 12px 16px 10px 22px;
+            border-bottom: 1px solid rgba(90,95,102,0.4);
+            background: rgba(134,239,172,0.04);
+        }
+        .pillar-body { padding: 16px 18px 16px 22px; color: var(--text); }
+        .pillar-body p { margin: 0; }
+
+        /* ── FORMS ── */
+        .form { display: flex; flex-direction: column; gap: 1.2rem; max-width: 560px; }
+        .form-group { display: flex; flex-direction: column; gap: 6px; }
+        .field-label {
+            font-family: var(--fb); font-size: 16px; font-weight: 700;
+            letter-spacing: 1px; text-transform: uppercase; color: var(--text);
+        }
+        .field-input {
+            background: var(--well); border: 1px solid var(--border); border-radius: 6px;
+            padding: 10px 14px; font-family: var(--fb); font-size: 16px;
+            color: var(--text); outline: none; transition: border-color 0.15s, box-shadow 0.15s;
+            width: 100%; appearance: none; -webkit-appearance: none;
+        }
+        .field-input::placeholder { color: rgba(156,163,175,0.6); font-style: italic; }
+        .field-input:focus { border-color: var(--green); box-shadow: 0 0 0 2px rgba(134,239,172,0.15); }
+        select.field-input {
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%239ca3af' stroke-width='1.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E");
+            background-repeat: no-repeat; background-position: right 14px center;
+            background-color: var(--well); padding-right: 36px; cursor: pointer;
+        }
+        select.field-input option { background: var(--card); }
+        textarea.field-input { resize: vertical; min-height: 120px; line-height: 1.5; }
+
+        /* ── TABS ── */
         .tab-content { display: none; }
         .tab-content.active { display: block; }
 
-        /* ── FOOTER ───────────────────────────────────────── */
-        footer {
-            background: var(--chart-well);
-            border-top: 2px solid var(--mint);
-            padding: 1.5rem 2rem;
-            text-align: center;
+        /* ── HERO ── */
+        #hero {
+            height: calc(100vh - 54px);
+            display: flex; flex-direction: column;
+            justify-content: center; align-items: center;
+            text-align: center; position: relative; overflow: hidden;
+            background: var(--bg);
         }
-        footer p {
-            font-family: var(--font-display);
-            font-size: 0.58rem;
-            color: var(--sage);
-            letter-spacing: 2px;
-            text-transform: uppercase;
-            margin: 0;
+        #hero::after {
+            content: '';
+            position: absolute; inset: 0;
+            background: repeating-linear-gradient(0deg, transparent, transparent 2px, rgba(0,0,0,0.06) 2px, rgba(0,0,0,0.06) 4px);
+            pointer-events: none;
+        }
+        .hero-eyebrow {
+            font-family: var(--fb); font-size: 13px; font-weight: 700;
+            letter-spacing: 3px; text-transform: uppercase;
+            color: var(--green); margin-bottom: 20px;
+            position: relative; z-index: 1;
+        }
+        .hero-tagline {
+            font-family: var(--fb); font-size: 16px; font-weight: 500;
+            font-style: italic;
+            color: var(--gold); letter-spacing: 4px; text-transform: uppercase;
+            margin: 1.2rem 0 2.5rem; position: relative; z-index: 1;
+            text-shadow: 0 0 16px rgba(232,200,78,0.3);
         }
 
-        /* ── MOBILE ───────────────────────────────────────── */
+        /* ── FOOTER ── */
+        footer {
+            background: var(--shell);
+            border-top: 1px solid rgba(90,95,102,0.3);
+            padding: 20px 32px; text-align: center;
+        }
+        footer p { font-family: var(--fb); font-size: 16px; color: var(--textMuted); }
+
+        /* ── MOBILE ── */
         @media (max-width: 768px) {
             .other-tab .palm-sidebar { display: none !important; }
-            .other-tab .content-area { margin-left: 0 !important; padding: 30px 20px; }
-            .content-area { padding: 30px 20px; }
-            h1 { font-size: 1.45rem !important; }
-            h2 { font-size: 1.1rem; }
-            #hero img { max-width: 260px !important; }
-            .nav-link { font-size: 0.58rem; padding: 0.85rem 0.5rem; letter-spacing: 1px; }
-            .comparison-table th, .comparison-table td { padding: 0.75rem 0.5rem; }
-            .price-big { font-size: 1.3rem; }
+            .other-tab .content-area { margin-left: 0 !important; padding: 32px 20px; }
+            .content-area { padding: 32px 20px; }
+            h1 { font-size: 1.5rem; }
             .path-cards { flex-direction: column; }
-            .stat-callout .big-number { font-size: 1.6rem; }
+            .comparison-table th, .comparison-table td { padding: 12px 8px; }
+            .price-big { font-size: 1.4rem; }
         }
     </style>
 </head>
@@ -499,6 +413,9 @@
 
     <nav>
         <div class="nav-container">
+            <div class="nav-logo-wrap">
+                <img src="logo.jpg" alt="KINDpos">
+            </div>
             <a class="nav-link active" onclick="showTab('home')">Home</a>
             <a class="nav-link" onclick="showTab('story')">Story</a>
             <a class="nav-link" onclick="showTab('solution')">Solution</a>
@@ -512,23 +429,21 @@
         <div class="palm-sidebar"></div>
         <div class="content-area">
 
+
             <!-- ═══════════════ HOME ═══════════════ -->
             <div id="home" class="tab-content active">
 
-                <!-- Hero -->
                 <section id="hero">
+                    <div class="hero-eyebrow">Local-first · Event-sourced · Offline-resilient</div>
                     <img src="logo.jpg" alt="KINDpos Logo"
-                         style="max-width: 480px; width: 88%; margin-bottom: 2.5rem; position: relative; z-index: 1;">
-                    <h1 class="mint"
-                        style="max-width: 700px; padding: 0 20px; position: relative; z-index: 1; line-height: 1.35;">
-                        Restaurants are chaotic.<br>Your POS shouldn't be.
+                         style="max-width: 480px; width: 88%; margin-bottom: 2rem; position: relative; z-index: 1;">
+                    <h1 style="max-width: 700px; padding: 0 20px; position: relative; z-index: 1;
+                                line-height: 1.3; color: var(--text);">
+                        Restaurants are chaotic.<br>
+                        <span style="color: var(--green);">Your POS shouldn't be.</span>
                     </h1>
-                    <p style="font-family: var(--font-display); color: var(--gold); font-size: 0.85rem;
-                               letter-spacing: 4px; margin: 1.2rem 0 2.5rem; text-transform: uppercase;
-                               position: relative; z-index: 1;">
-                        Nice &mdash; Dependable &mdash; Yours
-                    </p>
-                    <button class="btn"
+                    <p class="hero-tagline">Nice &mdash; Dependable &mdash; Yours</p>
+                    <button class="btn-primary"
                             onclick="document.getElementById('what-is-kindpos').scrollIntoView({ behavior: 'smooth' })"
                             style="position: relative; z-index: 1;">
                         See What We're Building
@@ -537,8 +452,8 @@
 
                 <!-- What is KINDpos -->
                 <section id="what-is-kindpos"
-                         style="background: var(--chart-well); padding: 80px 20px; text-align: center;
-                                border-top: 2px solid var(--mint); border-bottom: 2px solid var(--mint);">
+                         style="background: var(--shell); padding: 80px 20px; text-align: center;
+                                border-top: 2px solid var(--green); border-bottom: 1px solid rgba(90,95,102,0.3);">
                     <div style="max-width: 720px; margin: 0 auto;">
                         <p style="font-size: 1.05rem; line-height: 1.85; color: var(--text);">
                             KINDpos is a point-of-sale system built for the real world of restaurants —
@@ -547,59 +462,103 @@
                             permanently, and keeps working no matter what. Built by industry veterans
                             who got tired of blaming the system.
                         </p>
-                        <div class="stat-callout"
-                             style="text-align: left; max-width: 420px; margin: 3rem auto 0; display: inline-block;">
-                            <span class="big-number">$40,000+</span>
-                            <span class="stat-label">Saved vs Toast or Square over 3 years, per 5-terminal restaurant</span>
+                        <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 12px; margin-top: 3rem; text-align: left;">
+                            <div class="stat-callout" style="margin: 0;">
+                                <span class="stat-big">$15,466</span>
+                                <span class="stat-label">Saved vs Toast — 2 terminals, $500K/yr</span>
+                            </div>
+                            <div class="stat-callout" style="margin: 0;">
+                                <span class="stat-big">$27,859</span>
+                                <span class="stat-label">Saved vs Toast — 5 terminals, $1M/yr</span>
+                            </div>
+                            <div class="stat-callout" style="margin: 0;">
+                                <span class="stat-big">$52,017</span>
+                                <span class="stat-label">Saved vs Toast — 8 terminals, $2M/yr</span>
+                            </div>
+                        </div>
+                        <div class="info-box" style="max-width: 720px; margin: 1.5rem auto 0; text-align: left;">
+                            <h3>Toast is eating half your profit</h3>
+                            <p>A typical full-service restaurant doing $1M/yr pays Toast 3.1–3.4% of total revenue. On a 7% operating margin, that's nearly half of every dollar of profit going to a POS vendor. Toast charges 2.99% on every card transaction and locks you into their processor — that lock-in alone costs $25,000 over 3 years before you pay a dollar of software.</p>
                         </div>
                     </div>
                 </section>
 
                 <!-- Updates -->
                 <section style="padding: 70px 20px; max-width: 740px; margin: 0 auto;">
-                    <h2 class="gold">Updates &amp; Announcements</h2>
+                    <h2 style="color: var(--gold);">Build Progress</h2>
+
+                    <div class="update-item">
+                        <span class="update-date">May 2026</span>
+                        <span>All modules compile clean — full debug build verified across shared, server, hardware, and Android terminal with zero errors</span>
+                    </div>
+                    <div class="update-item">
+                        <span class="update-date">May 2026</span>
+                        <span>Item splitting, seat moves, tip adjustment, and payment detail scenes verified end-to-end with automated smoke tests — 10/10 passing</span>
+                    </div>
+                    <div class="update-item">
+                        <span class="update-date">May 2026</span>
+                        <span>Android terminal UI complete — Login, Manager Landing, Server Landing, Order Entry, Check Overview, Checkout, Payment, and Close Day scenes all wired</span>
+                    </div>
+                    <div class="update-item">
+                        <span class="update-date">Apr 2026</span>
+                        <span>Overseer back office complete — 13 wired scenes covering menu, staff, roles, reporting, payroll, hardware, and receipts</span>
+                    </div>
+                    <div class="update-item">
+                        <span class="update-date">Apr 2026</span>
+                        <span>Payment pipeline complete — card processing, cash, tip adjust, batch settlement, void, and refund all wired to the event ledger</span>
+                    </div>
+                    <div class="update-item">
+                        <span class="update-date">Mar 2026</span>
+                        <span>Print pipeline complete — kitchen tickets, guest receipts, server checkout receipts, and recap tickets all rendering to hardware</span>
+                    </div>
+                    <div class="update-item">
+                        <span class="update-date">Mar 2026</span>
+                        <span>Real-time satellite sync complete — WebSocket hub broadcast, auto-discovery via mDNS, and auto-reconnect on disconnect</span>
+                    </div>
                     <div class="update-item">
                         <span class="update-date">Feb 2026</span>
                         <span>Pilot partnership confirmed with Limoncello Naples</span>
                     </div>
                     <div class="update-item">
                         <span class="update-date">Feb 2026</span>
-                        <span>200+ backend tests passing — payment and print pipeline complete</span>
+                        <span>All server routes complete and auth-migrated — 20 order handlers, 8 payment handlers, full reporting suite, role and staff management</span>
                     </div>
                     <div class="update-item">
                         <span class="update-date">Jan 2026</span>
-                        <span>Printer integration complete — kitchen and receipt</span>
+                        <span>Security foundation complete — PBKDF2-SHA256 PIN hashing, JWT Overseer auth, manager PIN gates, 15-permission role model</span>
                     </div>
                     <div class="update-item">
                         <span class="update-date">Dec 2025</span>
-                        <span>Event ledger and hash-chaining implemented — immutable by design</span>
+                        <span>Event ledger complete — append-only SQLite log with hash-chaining, immutable by design, every action permanently recorded</span>
+                    </div>
+                    <div class="update-item">
+                        <span class="update-date">Nov 2025</span>
+                        <span>Shared core complete — 45 files covering all events, projections, models, and cent-based money arithmetic</span>
                     </div>
                 </section>
 
                 <!-- Find Your Path -->
                 <section style="padding: 0 20px 80px; max-width: 940px; margin: 0 auto;">
-                    <h2 class="gold" style="text-align: center; margin-bottom: 0;">Where do you fit?</h2>
+                    <h2 style="color: var(--gold); text-align: center; margin-bottom: 0;">Where do you fit?</h2>
                     <div class="path-cards">
                         <div class="path-card">
-                            <div class="card">
-                                <div class="card-hdr">Restaurant Operator</div>
-                                <div class="card-bdy">
-                                    <h3>Tired of your POS letting you down?</h3>
-                                    <p style="font-size: 0.88rem; color: var(--sage); margin-bottom: 0.5rem;">
-                                        You've been blamed for a system failure one too many times. There's a better way.
-                                    </p>
+                            <div class="card-t1">
+                                <div class="card-t1-accent"></div>
+                                <div class="card-t1-hdr">Restaurant Operator</div>
+                                <div class="card-t1-body">
+                                    <h3 style="color: var(--gold);">Tired of your POS letting you down?</h3>
+                                    <p style="color: var(--text);">You've been blamed for a system failure one too many times. There's a better way.</p>
                                     <a onclick="showTab('story')" class="path-link">→ Read Our Story</a>
                                 </div>
                             </div>
                         </div>
                         <div class="path-card">
-                            <div class="card card-gold">
-                                <div class="card-hdr">Investor</div>
-                                <div class="card-bdy">
-                                    <h3 style="color: var(--mint);">$25B market. Fundamentally better approach.</h3>
-                                    <p style="font-size: 0.88rem; color: var(--sage); margin-bottom: 0.5rem;">
-                                        A local-first architecture that cloud POS systems cannot replicate without rebuilding from scratch.
-                                    </p>
+                            <div class="card-t1">
+                                <div class="card-t1-accent gold"></div>
+                                <div class="card-t1-hdr gold">Investor</div>
+                                <div class="card-t1-body">
+                                    <h3 style="color: var(--green);">$25B market. Fundamentally better approach.</h3>
+                                    <p style="color: var(--text);">A local-first architecture that cloud POS systems cannot replicate without rebuilding from scratch.</p>
                                     <a onclick="showTab('solution')" class="path-link">→ See the Solution</a>
                                 </div>
                             </div>
@@ -614,41 +573,32 @@
             <div id="story" class="tab-content">
                 <section style="max-width: 720px;">
 
-                    <h2 class="gold">The system is broken. Everyone knows it.</h2>
-
+                    <h2 style="color: var(--gold);">The system is broken. Everyone knows it.</h2>
                     <p>Internet goes down. Sales stop. The room panics.</p>
                     <p>Ghost orders appear. Double charges hit customers. Staff get blamed.</p>
                     <p>You call support. They tell you to restart the device.</p>
                     <p>The moment has passed. The evidence is gone. The system has moved on.</p>
-                    <p style="color: var(--mint); font-family: var(--font-display); font-size: 0.78rem;
-                               letter-spacing: 1.5px; text-transform: uppercase;">
-                        This isn't a bug. It's how these systems are designed.
-                    </p>
 
-                    <hr class="section-divider">
+                    <div class="info-box">
+                        <h3>This isn't a bug. It's how these systems are designed.</h3>
+                        <p>Cloud-first POS systems put their uptime before your uptime. KINDpos doesn't.</p>
+                    </div>
 
-                    <h2 class="gold">15 years on the floor.</h2>
-
+                    <div class="divider"></div>
+                    <h2 style="color: var(--gold);">15 years on the floor.</h2>
                     <p>Worked every role from server to director of implementation.</p>
                     <p>Saw the same failures repeat across every system, every venue.</p>
                     <p>Spent years implementing POS systems and watching them fail operators.</p>
                     <p>The founding moment: decided to build the system that should have existed.</p>
 
-                    <hr class="section-divider">
-
-                    <h2 class="gold">So we built it differently.</h2>
-
+                    <div class="divider"></div>
+                    <h2 style="color: var(--gold);">So we built it differently.</h2>
                     <p>Local-first. Event-sourced. Offline-resilient. Transparent by design.</p>
-                    <p>
-                        Every action recorded as a permanent, verifiable fact — nothing overwritten, nothing lost.
-                        A system that behaves like a good coworker: consistent, honest, and there when you need it.
-                    </p>
+                    <p>Every action recorded as a permanent, verifiable fact — nothing overwritten, nothing lost. A system that behaves like a good coworker: consistent, honest, and there when you need it.</p>
 
-                    <div class="tagline-display">
-                        Nice &mdash; Dependable &mdash; Yours
-                    </div>
+                    <div class="tagline-display">Nice &mdash; Dependable &mdash; Yours</div>
 
-                    <button class="btn" onclick="showTab('solution')">See the Solution →</button>
+                    <button class="btn-primary" onclick="showTab('solution')">See the Solution →</button>
 
                 </section>
             </div><!-- /story -->
@@ -658,11 +608,10 @@
             <div id="solution" class="tab-content">
                 <section style="max-width: 720px;">
 
-                    <h2 class="gold" style="font-size: 1.7rem; margin-bottom: 2.5rem;">
-                        Nice. Dependable. Yours.
-                    </h2>
+                    <h2 style="color: var(--gold); font-size: 1.8rem; margin-bottom: 2.5rem; font-family: var(--fb); font-style: italic;">Nice. Dependable. Yours.</h2>
 
                     <div class="pillar">
+                        <div class="pillar-accent"></div>
                         <div class="pillar-label">Nice</div>
                         <div class="pillar-body">
                             <p>The system should feel calm and predictable, even during a Saturday dinner rush. KINDpos is designed to reduce stress, not amplify it. Failures surface clearly. Behavior is consistent. A POS should behave like a good coworker.</p>
@@ -670,6 +619,7 @@
                     </div>
 
                     <div class="pillar">
+                        <div class="pillar-accent"></div>
                         <div class="pillar-label">Dependable</div>
                         <div class="pillar-body">
                             <p>When the internet goes down, your system keeps running. Orders still fire. Printers still work. Every action is recorded permanently in an immutable ledger that cannot be altered or lost. Connectivity enhances the system — it does not control it.</p>
@@ -677,74 +627,61 @@
                     </div>
 
                     <div class="pillar">
+                        <div class="pillar-accent"></div>
                         <div class="pillar-label">Yours</div>
                         <div class="pillar-body">
                             <p>Your data belongs to you. Your hardware is not locked to a vendor. Your workflows reflect how your restaurant actually operates — not how a software company thinks it should. KINDpos adapts to the restaurant, not the other way around.</p>
                         </div>
                     </div>
 
-                    <hr class="section-divider">
-                    <h2 class="gold">Built for how restaurants actually work.</h2>
+                    <div class="divider"></div>
+                    <h2 style="color: var(--gold);">Built for how restaurants actually work.</h2>
 
-                    <ul class="feature-list" style="margin-bottom: 3rem;">
-                        <li>
-                            <div><strong style="color: var(--text);">Local-first</strong> —
-                            Runs on hardware in your restaurant. Cloud is optional, never required.</div>
-                        </li>
-                        <li>
-                            <div><strong style="color: var(--text);">Event-sourced</strong> —
-                            Every action is recorded as a permanent fact. Nothing is overwritten.
-                            Ghost orders and double charges become impossible.</div>
-                        </li>
-                        <li>
-                            <div><strong style="color: var(--text);">Offline-resilient</strong> —
-                            Designed to operate through failure, not collapse because of it.</div>
-                        </li>
-                        <li>
-                            <div><strong style="color: var(--text);">Show your work</strong> —
-                            Every calculation is transparent. Plain English. No black boxes.</div>
-                        </li>
-                        <li>
-                            <div><strong style="color: var(--text);">One-time purchase</strong> —
-                            Not an ongoing subscription rental. You own the software, forever.</div>
-                        </li>
-                    </ul>
-
-                    <hr class="section-divider">
-                    <h2 class="gold">The math is simple.</h2>
-
-                    <div style="overflow-x: auto; margin-bottom: 1rem;">
-                        <table class="comparison-table">
-                            <thead>
-                                <tr>
-                                    <th class="col-kindpos">KINDpos</th>
-                                    <th>Toast</th>
-                                    <th>Square</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                <tr>
-                                    <td>
-                                        <span class="price-big gold">$1,500</span>
-                                        <span style="font-size: 0.78rem; color: var(--sage);">One-time.<br>Yours forever.</span>
-                                    </td>
-                                    <td>
-                                        <span class="price-big vermillion">$9,837+</span>
-                                        <span style="font-size: 0.78rem; color: var(--sage);">Monthly fees<br>+ integrations</span>
-                                    </td>
-                                    <td>
-                                        <span class="price-big vermillion">$8,500+</span>
-                                        <span style="font-size: 0.78rem; color: var(--sage);">Monthly fees<br>+ transaction %</span>
-                                    </td>
-                                </tr>
-                            </tbody>
-                        </table>
+                    <div class="card-t1" style="margin-bottom: 3rem;">
+                        <div class="card-t1-accent"></div>
+                        <div class="card-t1-body" style="padding-top: 12px;">
+                            <ul class="feature-list">
+                                <li><div><strong>Local-first</strong> — Runs on hardware in your restaurant. Cloud is optional, never required.</div></li>
+                                <li><div><strong>Event-sourced</strong> — Every action is a permanent fact. Ghost orders and double charges become impossible.</div></li>
+                                <li><div><strong>Offline-resilient</strong> — Designed to operate through failure, not collapse because of it.</div></li>
+                                <li><div><strong>Show your work</strong> — Every calculation is transparent. Plain English. No black boxes.</div></li>
+                                <li><div><strong>One-time purchase</strong> — Not an ongoing subscription rental. You own the software, forever.</div></li>
+                            </ul>
+                        </div>
                     </div>
-                    <p style="font-size: 0.78rem; color: var(--sage); font-style: italic; margin-bottom: 3rem;">
-                        Per terminal, 3-year total cost. 5-terminal restaurant saves $40,000+ with KINDpos.
-                    </p>
 
-                    <button class="btn" onclick="showTab('pilot')">Apply for Pilot →</button>
+                    <div class="divider"></div>
+                    <h2 style="color: var(--gold);">The math is simple.</h2>
+
+                    <div class="card-t1" style="margin-bottom: 12px;">
+                        <div class="card-t1-accent gold"></div>
+                        <div class="card-t1-hdr gold">The Toast Tax</div>
+                        <div class="card-t1-body">
+                            <p style="font-size: 1.05rem; line-height: 1.8;">Toast charges 2.99% on every card transaction — and locks you into their processor. You can't use anyone else. On $1M in annual revenue, that lock-in costs <strong style="color: var(--gold);">$25,000 over 3 years</strong> before you pay a dollar of software.</p>
+                            <p style="margin-bottom: 0;">A typical full-service restaurant doing $1M/yr pays Toast <strong style="color: var(--verm);">3.1–3.4% of total revenue</strong> annually. On a 7% operating margin, that's nearly half of every dollar of profit going to a POS vendor.</p>
+                        </div>
+                    </div>
+
+                    <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 12px; margin-bottom: 12px;">
+                        <div class="card-t0 gold">
+                            <span style="font-family: var(--fh); font-size: 1.6rem; font-weight: 700; color: var(--gold); text-shadow: 0 0 16px rgba(232,200,78,0.3); display: block; margin-bottom: 4px;">$15,466</span>
+                            <span style="font-size: 16px; color: var(--text); display: block; margin-bottom: 2px;">Small restaurant</span>
+                            <span style="font-size: 16px; color: var(--textMuted);">2 terminals · $500K/yr</span>
+                        </div>
+                        <div class="card-t0 gold">
+                            <span style="font-family: var(--fh); font-size: 1.6rem; font-weight: 700; color: var(--gold); text-shadow: 0 0 16px rgba(232,200,78,0.3); display: block; margin-bottom: 4px;">$27,859</span>
+                            <span style="font-size: 16px; color: var(--text); display: block; margin-bottom: 2px;">Mid restaurant</span>
+                            <span style="font-size: 16px; color: var(--textMuted);">5 terminals · $1M/yr</span>
+                        </div>
+                        <div class="card-t0 gold">
+                            <span style="font-family: var(--fh); font-size: 1.6rem; font-weight: 700; color: var(--gold); text-shadow: 0 0 16px rgba(232,200,78,0.3); display: block; margin-bottom: 4px;">$52,017</span>
+                            <span style="font-size: 16px; color: var(--text); display: block; margin-bottom: 2px;">Large restaurant</span>
+                            <span style="font-size: 16px; color: var(--textMuted);">8 terminals · $2M/yr</span>
+                        </div>
+                    </div>
+                    <div style="text-align: center; margin-top: 32px;">
+                        <button class="btn-primary" onclick="showTab('pilot')">Apply for Pilot →</button>
+                    </div>
 
                 </section>
             </div><!-- /solution -->
@@ -754,39 +691,31 @@
             <div id="feedback" class="tab-content">
                 <section style="max-width: 680px;">
 
-                    <h2 class="gold">You've lived it. We want to hear it.</h2>
-                    <p>
-                        We built KINDpos because we got tired of the same failures happening to good
-                        restaurants with good teams. Tell us what your current system gets wrong. Tell us
-                        what you wish it could do. Every submission is read personally by the founder.
-                        Nothing goes into a ticket queue.
-                    </p>
+                    <h2 style="color: var(--gold);">You've lived it. We want to hear it.</h2>
+                    <p>We built KINDpos because we got tired of the same failures happening to good restaurants with good teams. Tell us what your current system gets wrong. Tell us what you wish it could do. Every submission is read personally by the founder. Nothing goes into a ticket queue.</p>
 
-                    <hr class="mint-divider">
+                    <div class="divider-green"></div>
 
                     <form class="form" action="https://formspree.io/f/xdalrqgv" method="POST">
                         <div class="form-group">
-                            <label for="feedback-name">Name (Optional)</label>
-                            <input type="text" id="feedback-name" name="name" placeholder="Your name">
+                            <label class="field-label" for="feedback-name">Name (Optional)</label>
+                            <input class="field-input" type="text" id="feedback-name" name="name" placeholder="Your name">
                         </div>
                         <div class="form-group">
-                            <label for="restaurant-name">Restaurant Name (Optional)</label>
-                            <input type="text" id="restaurant-name" name="restaurant" placeholder="Your restaurant">
+                            <label class="field-label" for="restaurant-name">Restaurant Name (Optional)</label>
+                            <input class="field-input" type="text" id="restaurant-name" name="restaurant" placeholder="Your restaurant">
                         </div>
                         <div class="form-group">
-                            <label for="feedback-story">Horror Story or Feature Request *</label>
-                            <p style="font-size: 0.75rem; color: var(--sage); margin-bottom: 0.5rem;">
-                                Worst POS moment? Feature you wish existed? We've heard some things — nothing surprises us anymore.
-                            </p>
-                            <textarea id="feedback-story" name="message" required
-                                      style="min-height: 140px;" placeholder="Tell us everything."></textarea>
+                            <label class="field-label" for="feedback-story">Horror Story or Feature Request <span style="color:#e8472a;">*</span></label>
+                            <p style="font-size: 16px; color: var(--textMuted); margin-bottom: 6px;">Worst POS moment? Feature you wish existed? We've heard some things — nothing surprises us anymore.</p>
+                            <textarea class="field-input" id="feedback-story" name="message" required placeholder="Tell us everything."></textarea>
                         </div>
                         <div class="form-group">
-                            <label for="feedback-email">Email (Optional — only if you'd like a response)</label>
-                            <input type="email" id="feedback-email" name="email" placeholder="you@restaurant.com">
+                            <label class="field-label" for="feedback-email">Email (Optional — only if you'd like a response)</label>
+                            <input class="field-input" type="email" id="feedback-email" name="email" placeholder="you@restaurant.com">
                         </div>
                         <div>
-                            <button type="submit" class="btn">Send It</button>
+                            <button type="submit" class="btn-primary">Send It</button>
                         </div>
                     </form>
 
@@ -803,16 +732,13 @@
             <div id="joinus" class="tab-content">
                 <section style="max-width: 680px;">
 
-                    <h2 class="gold">A front row seat.</h2>
-                    <p>
-                        KINDpos is being built in the open. No hype, no vaporware — just real progress
-                        on a system that restaurants actually need. Leave your email and we'll keep you
-                        in the loop.
-                    </p>
+                    <h2 style="color: var(--gold);">A front row seat.</h2>
+                    <p>KINDpos is being built in the open. No hype, no vaporware — just real progress on a system that restaurants actually need. Leave your email and we'll keep you in the loop.</p>
 
-                    <div class="card" style="margin: 2rem 0;">
-                        <div class="card-hdr">What you'll hear about</div>
-                        <div class="card-bdy">
+                    <div class="card-t1" style="margin: 2rem 0;">
+                        <div class="card-t1-accent"></div>
+                        <div class="card-t1-hdr">What you'll hear about</div>
+                        <div class="card-t1-body">
                             <ul class="feature-list">
                                 <li>Development milestones and release updates</li>
                                 <li>Pilot program openings</li>
@@ -822,20 +748,20 @@
                         </div>
                     </div>
 
-                    <hr class="mint-divider">
+                    <div class="divider-green"></div>
 
                     <form class="form" action="https://formspree.io/f/mzdalngz" method="POST">
                         <div class="form-group">
-                            <label for="join-name">Name *</label>
-                            <input type="text" id="join-name" name="name" required placeholder="Your name">
+                            <label class="field-label" for="join-name">Name <span style="color:#e8472a;">*</span></label>
+                            <input class="field-input" type="text" id="join-name" name="name" required placeholder="Your name">
                         </div>
                         <div class="form-group">
-                            <label for="join-email">Email *</label>
-                            <input type="email" id="join-email" name="email" required placeholder="you@example.com">
+                            <label class="field-label" for="join-email">Email <span style="color:#e8472a;">*</span></label>
+                            <input class="field-input" type="email" id="join-email" name="email" required placeholder="you@example.com">
                         </div>
                         <div class="form-group">
-                            <label for="join-role">I am a...</label>
-                            <select id="join-role" name="role">
+                            <label class="field-label" for="join-role">I am a...</label>
+                            <select class="field-input" id="join-role" name="role">
                                 <option value="" disabled selected>Select an option (Optional)</option>
                                 <option value="Operator">Restaurant Operator</option>
                                 <option value="Investor">Investor</option>
@@ -844,12 +770,13 @@
                             </select>
                         </div>
                         <div>
-                            <button type="submit" class="btn">Count Me In</button>
+                            <button type="submit" class="btn-primary">Count Me In</button>
                         </div>
                     </form>
 
-                    <p style="margin-top: 2.5rem; color: var(--mint); font-family: var(--font-display);
-                               font-size: 0.65rem; letter-spacing: 3px; text-align: center; text-transform: uppercase;">
+                    <p style="margin-top: 2.5rem; color: var(--green); font-family: var(--fb);
+                               font-size: 16px; letter-spacing: 2px; text-align: center; text-transform: uppercase;
+                               text-shadow: 0 0 16px rgba(134,239,172,0.3);">
                         No spam. No noise. Just progress.
                     </p>
 
@@ -859,95 +786,190 @@
 
             <!-- ═══════════════ PILOT ═══════════════ -->
             <div id="pilot" class="tab-content">
-                <section style="max-width: 720px;">
+                <section style="max-width: 860px;">
 
-                    <h2 class="gold">Be part of building something real.</h2>
-                    <p>
-                        KINDpos is currently selecting a small number of pilot partner restaurants.
+                    <h2 style="color: var(--gold);">Be part of building something real.</h2>
+                    <p style="max-width: 680px;">
+                        KINDpos is selecting a small number of pilot partner restaurants.
                         You get a fully functional, locally-run POS system and hands-on support from
                         the team that built it. We get real-world feedback that shapes the final product.
                         This is a genuine partnership — not a beta test.
                     </p>
 
                     <div class="stat-callout">
-                        <span class="big-number">Preferred Pricing</span>
-                        <span class="stat-label">
-                            Exclusive rates for early partners — not available after general availability.
-                            Discussed personally. Every situation is a little different and we want to get it right.
-                        </span>
+                        <span class="stat-big">Preferred Pricing</span>
+                        <span class="stat-label">Exclusive rates for early partners — not available after general availability. Discussed personally. Every situation is a little different and we want to get it right.</span>
                     </div>
 
-                    <hr class="section-divider">
-                    <h2 class="gold">Here's how it works.</h2>
+                    <!-- THREE FEATURE CARDS -->
+                    <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 12px; margin-bottom: 40px;">
 
-                    <div style="margin-bottom: 3rem;">
+                        <div class="card-t1">
+                            <div class="card-t1-accent"></div>
+                            <div class="card-t1-hdr">Service &amp; Payments</div>
+                            <div class="card-t1-body" style="padding-top: 4px; padding-bottom: 8px;">
+                                <ul class="feature-list">
+                                    <li>Multi-seat checks &amp; item splitting</li>
+                                    <li>Card + cash payments</li>
+                                    <li>Tip management &amp; batch settlement</li>
+                                    <li>Tip pools — by hours or even split</li>
+                                    <li>Server checkout &amp; shift close</li>
+                                </ul>
+                            </div>
+                        </div>
+
+                        <div class="card-t1">
+                            <div class="card-t1-accent gold"></div>
+                            <div class="card-t1-hdr gold">Kitchen &amp; Menu</div>
+                            <div class="card-t1-body" style="padding-top: 4px; padding-bottom: 8px;">
+                                <ul class="feature-list gold">
+                                    <li>Multi-station kitchen routing</li>
+                                    <li>Modifier pricing &amp; prep groups</li>
+                                    <li>86 items without deleting them</li>
+                                    <li>Discounts, comps &amp; auto-gratuity</li>
+                                    <li>Browser-based back office</li>
+                                </ul>
+                            </div>
+                        </div>
+
+                        <div class="card-t1">
+                            <div class="card-t1-accent elec"></div>
+                            <div class="card-t1-hdr elec">Operations</div>
+                            <div class="card-t1-body" style="padding-top: 4px; padding-bottom: 8px;">
+                                <ul class="feature-list elec">
+                                    <li>Timeclock &amp; labor tracking</li>
+                                    <li>Sales, tips &amp; transaction reports</li>
+                                    <li>Runs on any browser — even old Toast hardware</li>
+                                    <li>Works offline — no internet required</li>
+                                    <li>No per-transaction software fees</li>
+                                </ul>
+                            </div>
+                        </div>
+
+                    </div>
+
+                    <div class="divider"></div>
+                    <h2 style="color: var(--gold); font-size: 1.35rem; margin-bottom: 24px;">Here's how it works.</h2>
+
+                    <div style="margin-bottom: 40px;">
                         <div class="pilot-step">
-                            <div class="step-number">1</div>
-                            <div class="step-content">
-                                <h3>Apply below</h3>
-                                <p>Fill out the interest form. Tell us about your restaurant — type, size, setup, and what's been frustrating you.</p>
+                            <div class="step-num">1</div>
+                            <div>
+                                <div class="step-title">Apply</div>
+                                <p class="step-desc">Submit the interest form with details about your restaurant — type, size, current setup, and what's not working.</p>
                             </div>
                         </div>
                         <div class="pilot-step">
-                            <div class="step-number">2</div>
-                            <div class="step-content">
-                                <h3>Personal follow-up</h3>
-                                <p>Alex follows up directly — not a sales rep, not a CRM sequence — to learn more about your setup and answer questions.</p>
+                            <div class="step-num">2</div>
+                            <div>
+                                <div class="step-title">We follow up</div>
+                                <p class="step-desc">A member of the KINDpos team reaches out directly to learn more about your operation and answer any questions.</p>
                             </div>
                         </div>
                         <div class="pilot-step">
-                            <div class="step-number">3</div>
-                            <div class="step-content">
-                                <h3>Agree on terms</h3>
-                                <p>We agree on pricing, timeline, and what feedback looks like during the pilot. Every situation is a little different and we want to get it right.</p>
+                            <div class="step-num">3</div>
+                            <div>
+                                <div class="step-title">Agree on terms</div>
+                                <p class="step-desc">We align on pricing, timeline, and what the pilot feedback process looks like. Every situation is different and we want to get it right.</p>
                             </div>
                         </div>
                         <div class="pilot-step">
-                            <div class="step-number">4</div>
-                            <div class="step-content">
-                                <h3>Install &amp; support</h3>
-                                <p>Installation, onboarding, and ongoing support from the team that built it — not a support ticket queue.</p>
+                            <div class="step-num">4</div>
+                            <div>
+                                <div class="step-title">Install &amp; support</div>
+                                <p class="step-desc">Hands-on installation, onboarding, and ongoing support from the team that built the system.</p>
                             </div>
                         </div>
                     </div>
 
-                    <hr class="mint-divider">
+                    <div class="divider-green"></div>
 
-                    <form class="form" action="https://formspree.io/f/mgoljgyk" method="POST">
-                        <div class="form-group">
-                            <label for="pilot-contact">Contact Name *</label>
-                            <input type="text" id="pilot-contact" name="contact_name" required placeholder="Your name">
+                    <div id="pilot-form-wrap">
+                        <div class="card-t1" style="max-width: 680px;">
+                            <div class="card-t1-accent"></div>
+                            <div class="card-t1-hdr">Request Pilot Information</div>
+                            <div class="card-t1-body">
+                                <p style="color: var(--text); margin-bottom: 24px;">Tell us about your operation and we'll reach out within 48 hours.</p>
+
+                                <form id="pilot-form" action="https://formspree.io/f/mgoljgyk" method="POST">
+                                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
+
+                                        <div class="form-group">
+                                            <label class="field-label" for="pilot-contact">Contact Name <span style="color:#e8472a;">*</span></label>
+                                            <input class="field-input" type="text" id="pilot-contact" name="contact_name" required placeholder="Your name">
+                                        </div>
+                                        <div class="form-group">
+                                            <label class="field-label" for="pilot-restaurant">Restaurant Name <span style="color:#e8472a;">*</span></label>
+                                            <input class="field-input" type="text" id="pilot-restaurant" name="restaurant_name" required placeholder="Your restaurant">
+                                        </div>
+                                        <div class="form-group">
+                                            <label class="field-label" for="pilot-email">Email <span style="color:#e8472a;">*</span></label>
+                                            <input class="field-input" type="email" id="pilot-email" name="email" required placeholder="you@restaurant.com">
+                                        </div>
+                                        <div class="form-group">
+                                            <label class="field-label" for="pilot-phone">Phone</label>
+                                            <input class="field-input" type="tel" id="pilot-phone" name="phone" placeholder="(555) 000-0000">
+                                        </div>
+                                        <div class="form-group">
+                                            <label class="field-label" for="pilot-type">Restaurant Type <span style="color:#e8472a;">*</span></label>
+                                            <select class="field-input" id="pilot-type" name="type" required>
+                                                <option value="" disabled selected>Select type…</option>
+                                                <option>Full Service</option>
+                                                <option>Quick Service / Counter</option>
+                                                <option>Bar / Nightclub</option>
+                                                <option>Café / Coffee Shop</option>
+                                                <option>Fast Casual</option>
+                                                <option>Food Truck</option>
+                                                <option>Other</option>
+                                            </select>
+                                        </div>
+                                        <div class="form-group">
+                                            <label class="field-label" for="pilot-locations">Number of Locations</label>
+                                            <select class="field-input" id="pilot-locations" name="locations">
+                                                <option value="" disabled selected>Select…</option>
+                                                <option>1</option>
+                                                <option>2–3</option>
+                                                <option>4–10</option>
+                                                <option>10+</option>
+                                            </select>
+                                        </div>
+                                        <div class="form-group">
+                                            <label class="field-label" for="pilot-terminals">Terminals Needed</label>
+                                            <select class="field-input" id="pilot-terminals" name="terminals">
+                                                <option value="" disabled selected>Select…</option>
+                                                <option>1–2</option>
+                                                <option>3–5</option>
+                                                <option>6–10</option>
+                                                <option>10+</option>
+                                            </select>
+                                        </div>
+                                        <div class="form-group">
+                                            <label class="field-label" for="pilot-pos">Current POS System</label>
+                                            <input class="field-input" type="text" id="pilot-pos" name="current_pos" placeholder="Toast, Square, Aloha…">
+                                        </div>
+                                        <div class="form-group" style="grid-column: 1 / -1;">
+                                            <label class="field-label" for="pilot-pain">Biggest pain point with your current system <span style="color:#e8472a;">*</span></label>
+                                            <textarea class="field-input" id="pilot-pain" name="pain_points" required placeholder="Fees, outages, missing features, bad support — tell us everything."></textarea>
+                                        </div>
+                                        <div class="form-group" style="grid-column: 1 / -1;">
+                                            <label class="field-label" for="pilot-extra">Anything else?</label>
+                                            <textarea class="field-input" id="pilot-extra" name="extra" style="min-height: 72px;" placeholder="Timeline, questions, setup details…"></textarea>
+                                        </div>
+                                        <div style="grid-column: 1 / -1; display: flex; justify-content: center;">
+                                            <button type="submit" class="btn-primary" id="submit-btn">Request Pilot Information</button>
+                                        </div>
+
+                                    </div>
+                                </form>
+                            </div>
                         </div>
-                        <div class="form-group">
-                            <label for="pilot-restaurant">Restaurant Name *</label>
-                            <input type="text" id="pilot-restaurant" name="restaurant_name" required placeholder="Your restaurant">
-                        </div>
-                        <div class="form-group">
-                            <label for="pilot-location">Location *</label>
-                            <input type="text" id="pilot-location" name="location" required placeholder="City, State">
-                        </div>
-                        <div class="form-group">
-                            <label for="pilot-type">Restaurant Type *</label>
-                            <input type="text" id="pilot-type" name="type" required
-                                   placeholder="e.g. Full service, bar, café, food truck">
-                        </div>
-                        <div class="form-group">
-                            <label for="pilot-seats">Approximate Seat Count (Optional)</label>
-                            <input type="text" id="pilot-seats" name="seat_count" placeholder="e.g. 60">
-                        </div>
-                        <div class="form-group">
-                            <label for="pilot-email">Email *</label>
-                            <input type="email" id="pilot-email" name="email" required placeholder="you@restaurant.com">
-                        </div>
-                        <div class="form-group">
-                            <label for="pilot-extra">Anything else?</label>
-                            <textarea id="pilot-extra" name="extra" style="min-height: 90px;"
-                                      placeholder="Current system, biggest pain points, timeline, questions..."></textarea>
-                        </div>
-                        <div>
-                            <button type="submit" class="btn">I'm Interested</button>
-                        </div>
-                    </form>
+                    </div>
+
+                    <div style="display: none; text-align: center; padding: 48px 24px;" id="pilot-success">
+                        <div style="width:64px;height:64px;border-radius:50%;background:rgba(74,222,128,0.1);border:2px solid var(--greenWarm);display:flex;align-items:center;justify-content:center;margin:0 auto 20px;font-size:28px;color:var(--greenWarm);">✓</div>
+                        <div style="font-family:var(--fh);font-size:24px;font-weight:700;color:var(--greenWarm);text-shadow:0 0 16px rgba(74,222,128,0.3);margin-bottom:10px;">You're on the list.</div>
+                        <p style="font-size:16px;color:var(--text);line-height:1.7;">A member of the KINDpos team will reach out within 48 hours.</p>
+                    </div>
 
                 </section>
             </div><!-- /pilot -->
@@ -956,7 +978,7 @@
     </div><!-- /page-container -->
 
     <footer>
-        <p>KINDpos // KIND Technologies LLC // Nice. Dependable. Yours.</p>
+        <p>KINDpos &mdash; KIND Technologies LLC &mdash; <span style="font-style: italic;">Nice. Dependable. Yours.</span></p>
     </footer>
 
     <script>
@@ -976,6 +998,32 @@
                 document.body.classList.add('other-tab');
             }
             window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        const pilotForm = document.getElementById('pilot-form');
+        if (pilotForm) {
+            const submitBtn = document.getElementById('submit-btn');
+            pilotForm.addEventListener('submit', async (e) => {
+                e.preventDefault();
+                submitBtn.disabled = true;
+                submitBtn.textContent = 'Submitting…';
+                try {
+                    const res = await fetch(pilotForm.action, {
+                        method: 'POST',
+                        headers: { 'Accept': 'application/json' },
+                        body: new FormData(pilotForm)
+                    });
+                    if (res.ok) {
+                        document.getElementById('pilot-form-wrap').style.display = 'none';
+                        document.getElementById('pilot-success').style.display = 'block';
+                        window.scrollTo({ top: 0, behavior: 'smooth' });
+                    } else { throw new Error(); }
+                } catch {
+                    submitBtn.disabled = false;
+                    submitBtn.textContent = 'Request Pilot Information';
+                    alert('Something went wrong — please try again or email us at hello@kindpos.com');
+                }
+            });
         }
     </script>
 
