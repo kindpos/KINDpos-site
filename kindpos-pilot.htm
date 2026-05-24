@@ -1,0 +1,614 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>KINDpos — Pilot Program</title>
+    <meta name="description" content="Apply to become a KINDpos pilot partner restaurant. Local-first POS built by industry veterans.">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;700&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg:        #1e2124;
+            --shell:     #252830;
+            --card:      #2a2e35;
+            --well:      #181b1f;
+            --bevel-lt:  #2e3238;
+            --bevel-dk:  #17191c;
+            --green:     #86efac;
+            --greenWarm: #4ade80;
+            --greenDk:   #1a5c2e;
+            --gold:      #e8c84e;
+            --goldDk:    #7a5c00;
+            --elec:      #22d3ee;
+            --verm:      #e8472a;
+            --vermDk:    #6b1a0e;
+            --moon:      #7e8896;
+            --text:      #e8eaed;
+            --textMuted: #9ca3af;
+            --border:    #5a5f66;
+            --fh: 'Outfit', sans-serif;
+            --fb: 'JetBrains Mono', monospace;
+        }
+
+        *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+        body {
+            background: var(--bg);
+            color: var(--text);
+            font-family: var(--fb);
+            font-size: 16px;
+            line-height: 1.6;
+            min-height: 100vh;
+        }
+
+        /* ── NAV ── */
+        nav {
+            position: sticky;
+            top: 0;
+            height: 56px;
+            background: var(--shell);
+            border-bottom: 1px solid rgba(90,95,102,0.3);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 32px;
+            z-index: 100;
+        }
+        .nav-logo img {
+            height: 38px;
+            width: auto;
+            display: block;
+            
+        }
+        .nav-back {
+            font-family: var(--fb);
+            font-size: 16px;
+            font-weight: 500;
+            color: var(--textMuted);
+            text-decoration: none;
+            border: 1px solid var(--border);
+            border-radius: 999px;
+            padding: 6px 16px;
+            transition: color 0.15s, border-color 0.15s;
+        }
+        .nav-back:hover { color: var(--text); border-color: var(--text); }
+
+        /* ── LAYOUT ── */
+        .page {
+            max-width: 900px;
+            margin: 0 auto;
+            padding: 48px 32px 80px;
+        }
+
+        /* ── SECTION HEADING ── */
+        .section-heading {
+            font-family: var(--fh);
+            font-size: 28px;
+            font-weight: 700;
+            color: var(--text);
+            margin-bottom: 12px;
+        }
+        .section-sub {
+            font-size: 16px;
+            color: var(--text);
+            margin-bottom: 32px;
+            line-height: 1.7;
+            max-width: 680px;
+        }
+
+        /* ── STAT CALLOUT — Tier 0 style ── */
+        .stat-card {
+            background: var(--card);
+            border-radius: 10px;
+            border-left: 4px solid var(--gold);
+            box-shadow: 0 4px 16px rgba(0,0,0,0.35);
+            padding: 20px 24px;
+            margin-bottom: 32px;
+        }
+        .stat-card-value {
+            font-family: var(--fh);
+            font-size: 22px;
+            font-weight: 700;
+            color: var(--gold);
+            text-shadow: 0 0 16px rgba(232,200,78,0.3);
+            display: block;
+            margin-bottom: 4px;
+        }
+        .stat-card-label {
+            font-size: 16px;
+            color: var(--text);
+            line-height: 1.5;
+        }
+
+        /* ── FEATURE CARDS — three Tier 1 style ── */
+        .feature-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr;
+            gap: 12px;
+            margin-bottom: 40px;
+        }
+        .feature-card {
+            background: var(--well);
+            border-radius: 12px;
+            border-top:    5px solid var(--bevel-lt);
+            border-left:   5px solid var(--bevel-lt);
+            border-right:  5px solid var(--bevel-dk);
+            border-bottom: 5px solid var(--bevel-dk);
+            box-shadow:
+                inset 0 1px 0 rgba(255,255,255,0.06),
+                3px 5px 0 rgba(0,0,0,0.55);
+            position: relative;
+            overflow: hidden;
+        }
+        .feature-card-accent {
+            position: absolute;
+            left: 0; top: 14px; bottom: 14px;
+            width: 4px;
+            border-radius: 0 2px 2px 0;
+        }
+        .feature-card.green .feature-card-accent  { background: var(--green); box-shadow: 0 0 10px rgba(134,239,172,0.5); }
+        .feature-card.gold  .feature-card-accent  { background: var(--gold);  box-shadow: 0 0 10px rgba(232,200,78,0.5);  }
+        .feature-card.elec  .feature-card-accent  { background: var(--elec);  box-shadow: 0 0 10px rgba(34,211,238,0.5);  }
+
+        .feature-card-hdr {
+            font-family: var(--fb);
+            font-size: 16px;
+            font-weight: 700;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+            padding: 14px 16px 10px 22px;
+            border-bottom: 1px solid rgba(90,95,102,0.4);
+        }
+        .feature-card.green .feature-card-hdr { color: var(--green);  background: rgba(134,239,172,0.06); }
+        .feature-card.gold  .feature-card-hdr { color: var(--gold);   background: rgba(232,200,78,0.06);  }
+        .feature-card.elec  .feature-card-hdr { color: var(--elec);   background: rgba(34,211,238,0.06);  }
+
+        .feature-card-body { padding: 4px 0 8px; }
+        .feature-list { list-style: none; }
+        .feature-list li {
+            display: flex;
+            align-items: flex-start;
+            gap: 10px;
+            padding: 9px 16px 9px 22px;
+            font-size: 16px;
+            color: var(--text);
+            border-bottom: 1px solid rgba(90,95,102,0.25);
+            line-height: 1.4;
+        }
+        .feature-list li:last-child { border-bottom: none; }
+        .feature-card.green .feature-list li::before { content: '▸'; color: var(--green); flex-shrink: 0; font-size: 13px; margin-top: 2px; }
+        .feature-card.gold  .feature-list li::before { content: '▸'; color: var(--gold);  flex-shrink: 0; font-size: 13px; margin-top: 2px; }
+        .feature-card.elec  .feature-list li::before { content: '▸'; color: var(--elec);  flex-shrink: 0; font-size: 13px; margin-top: 2px; }
+
+        /* ── DIVIDER ── */
+        .divider {
+            height: 1px;
+            background: var(--border);
+            opacity: 0.4;
+            margin: 40px 0;
+        }
+
+        /* ── PILOT STEPS ── */
+        .steps { margin-bottom: 40px; }
+        .step {
+            display: flex;
+            gap: 20px;
+            align-items: flex-start;
+            padding: 20px 0;
+            border-bottom: 1px solid rgba(90,95,102,0.2);
+        }
+        .step:last-child { border-bottom: none; }
+        .step-num {
+            font-family: var(--fh);
+            font-size: 36px;
+            font-weight: 700;
+            color: var(--gold);
+            text-shadow: 0 0 16px rgba(232,200,78,0.2);
+            line-height: 1;
+            min-width: 48px;
+        }
+        .step-title {
+            font-family: var(--fh);
+            font-size: 18px;
+            font-weight: 700;
+            color: var(--green);
+            margin-bottom: 4px;
+        }
+        .step-desc { font-size: 16px; color: var(--text); margin: 0; }
+
+        /* ── FORM CARD — Tier 1 container ── */
+        .form-card {
+            background: var(--well);
+            border-radius: 12px;
+            border-top:    5px solid var(--bevel-lt);
+            border-left:   5px solid var(--bevel-lt);
+            border-right:  5px solid var(--bevel-dk);
+            border-bottom: 5px solid var(--bevel-dk);
+            box-shadow:
+                inset 0 1px 0 rgba(255,255,255,0.06),
+                3px 5px 0 rgba(0,0,0,0.55);
+            padding: 32px;
+        }
+        .form-card-title {
+            font-family: var(--fh);
+            font-size: 22px;
+            font-weight: 700;
+            color: var(--text);
+            margin-bottom: 6px;
+        }
+        .form-card-sub {
+            font-size: 16px;
+            color: var(--text);
+            margin-bottom: 28px;
+        }
+
+        /* ── FORM FIELDS ── */
+        .form-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+        }
+        .form-group { display: flex; flex-direction: column; gap: 6px; }
+        .form-group.full { grid-column: 1 / -1; }
+
+        .field-label {
+            font-family: var(--fb);
+            font-size: 16px;
+            font-weight: 700;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+            color: var(--text);
+        }
+        .field-input {
+            width: 100%;
+            background: var(--bg);
+            border: 1px solid var(--border);
+            border-radius: 6px;
+            padding: 10px 14px;
+            font-family: var(--fb);
+            font-size: 16px;
+            font-weight: 400;
+            color: var(--text);
+            outline: none;
+            transition: border-color 0.15s, box-shadow 0.15s;
+            appearance: none;
+            -webkit-appearance: none;
+        }
+        .field-input::placeholder { color: rgba(156,163,175,0.75); font-style: italic; }
+        .field-input:focus {
+            border-color: var(--green);
+            box-shadow: 0 0 0 2px rgba(134,239,172,0.15);
+        }
+        select.field-input {
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%239ca3af' stroke-width='1.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E");
+            background-repeat: no-repeat;
+            background-position: right 14px center;
+            background-color: var(--bg);
+            padding-right: 36px;
+            cursor: pointer;
+        }
+        select.field-input option { background: var(--card); }
+        textarea.field-input { resize: vertical; min-height: 100px; line-height: 1.5; }
+
+        /* ── SUBMIT BUTTON — Primary style ── */
+        .btn-primary {
+            font-family: var(--fh);
+            font-size: 16px;
+            font-weight: 700;
+            color: var(--well);
+            background: var(--green);
+            border: none;
+            border-radius: 999px;
+            padding: 12px 32px;
+            box-shadow: 0 3px 0 var(--greenDk);
+            cursor: pointer;
+            transition: filter 0.1s, transform 0.1s, box-shadow 0.1s;
+            letter-spacing: 0.3px;
+        }
+        .btn-primary:hover { filter: brightness(1.06); }
+        .btn-primary:active { transform: translateY(2px); box-shadow: none; }
+        .btn-primary:disabled {
+            background: var(--moon);
+            box-shadow: none;
+            cursor: default;
+            filter: none;
+        }
+
+        /* ── SUCCESS ── */
+        .success-state { display: none; text-align: center; padding: 48px 24px; }
+        .success-state.visible { display: block; }
+        .success-badge {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 64px;
+            height: 64px;
+            border-radius: 50%;
+            background: rgba(74,222,128,0.1);
+            border: 2px solid var(--greenWarm);
+            font-size: 28px;
+            color: var(--greenWarm);
+            margin-bottom: 20px;
+        }
+        .success-title {
+            font-family: var(--fh);
+            font-size: 24px;
+            font-weight: 700;
+            color: var(--greenWarm);
+            text-shadow: 0 0 16px rgba(74,222,128,0.3);
+            margin-bottom: 10px;
+        }
+        .success-sub { font-size: 16px; color: var(--textMuted); line-height: 1.7; }
+        .success-sub a { color: var(--gold); text-decoration: none; }
+        .success-sub a:hover { text-decoration: underline; }
+
+        /* ── FOOTER ── */
+        footer {
+            background: var(--shell);
+            border-top: 1px solid rgba(90,95,102,0.3);
+            padding: 20px 32px;
+            text-align: center;
+        }
+        footer p {
+            font-family: var(--fb);
+            font-size: 16px;
+            color: var(--textMuted);
+            letter-spacing: 0.5px;
+        }
+
+        /* ── MOBILE ── */
+        @media (max-width: 680px) {
+            .page { padding: 32px 20px 60px; }
+            nav { padding: 0 20px; }
+            .feature-grid { grid-template-columns: 1fr; }
+            .form-grid { grid-template-columns: 1fr; }
+            .form-group.full { grid-column: 1; }
+            .form-card { padding: 24px 20px; }
+        }
+    </style>
+</head>
+<body>
+
+<nav>
+    <a class="nav-logo" href="https://kindpos.com"><img src="logo.png" alt="KINDpos"></a>
+    <a class="nav-back" href="https://kindpos.com">← Back to Site</a>
+</nav>
+
+<div class="page">
+
+    <h1 class="section-heading">Be part of building something real.</h1>
+    <p class="section-sub">
+        KINDpos is selecting a small number of pilot partner restaurants.
+        You get a fully functional, locally-run POS system and hands-on support from
+        the team that built it. We get real-world feedback that shapes the final product.
+        This is a genuine partnership — not a beta test.
+    </p>
+
+    <!-- PREFERRED PRICING CALLOUT -->
+    <div class="stat-card">
+        <span class="stat-card-value">Preferred Pricing</span>
+        <span class="stat-card-label">Exclusive rates for early partners — not available after general availability. Discussed personally. Every situation is a little different and we want to get it right.</span>
+    </div>
+
+    <!-- THREE FEATURE CARDS -->
+    <div class="feature-grid">
+
+        <div class="feature-card green">
+            <div class="feature-card-accent"></div>
+            <div class="feature-card-hdr">Service &amp; Payments</div>
+            <div class="feature-card-body">
+                <ul class="feature-list">
+                    <li>Multi-seat checks &amp; item splitting</li>
+                    <li>Card + cash payments</li>
+                    <li>Tip management &amp; batch settlement</li>
+                    <li>Tip pools — by hours or even split</li>
+                    <li>Server checkout &amp; shift close</li>
+                </ul>
+            </div>
+        </div>
+
+        <div class="feature-card gold">
+            <div class="feature-card-accent"></div>
+            <div class="feature-card-hdr">Kitchen &amp; Menu</div>
+            <div class="feature-card-body">
+                <ul class="feature-list">
+                    <li>Multi-station kitchen routing</li>
+                    <li>Modifier pricing &amp; prep groups</li>
+                    <li>86 items without deleting them</li>
+                    <li>Discounts, comps &amp; auto-gratuity</li>
+                    <li>Browser-based back office</li>
+                </ul>
+            </div>
+        </div>
+
+        <div class="feature-card elec">
+            <div class="feature-card-accent"></div>
+            <div class="feature-card-hdr">Operations</div>
+            <div class="feature-card-body">
+                <ul class="feature-list">
+                    <li>Timeclock &amp; labor tracking</li>
+                    <li>Sales, tips &amp; transaction reports</li>
+                    <li>Runs on any browser — even old Toast hardware</li>
+                    <li>Works offline — no internet required</li>
+                    <li>No per-transaction software fees</li>
+                </ul>
+            </div>
+        </div>
+
+    </div>
+
+    <div class="divider"></div>
+
+    <!-- HOW IT WORKS -->
+    <h2 class="section-heading" style="font-size: 22px; margin-bottom: 24px;">Here's how it works.</h2>
+    <div class="steps">
+        <div class="step">
+            <div class="step-num">1</div>
+            <div>
+                <div class="step-title">Apply</div>
+                <p class="step-desc">Submit the interest form with details about your restaurant — type, size, current setup, and what's not working.</p>
+            </div>
+        </div>
+        <div class="step">
+            <div class="step-num">2</div>
+            <div>
+                <div class="step-title">We follow up</div>
+                <p class="step-desc">A member of the KINDpos team reaches out directly to learn more about your operation and answer any questions.</p>
+            </div>
+        </div>
+        <div class="step">
+            <div class="step-num">3</div>
+            <div>
+                <div class="step-title">Agree on terms</div>
+                <p class="step-desc">We align on pricing, timeline, and what the pilot feedback process looks like. Every situation is different and we want to get it right.</p>
+            </div>
+        </div>
+        <div class="step">
+            <div class="step-num">4</div>
+            <div>
+                <div class="step-title">Install &amp; support</div>
+                <p class="step-desc">Hands-on installation, onboarding, and ongoing support from the team that built the system.</p>
+            </div>
+        </div>
+    </div>
+
+    <div class="divider"></div>
+
+    <!-- FORM -->
+    <div id="form-wrap">
+        <div class="form-card">
+            <div class="form-card-title">Request Pilot Information</div>
+            <div class="form-card-sub">Tell us about your operation and we'll reach out within 48 hours.</div>
+
+            <form id="pilot-form" action="https://formspree.io/f/mgoljgyk" method="POST">
+                <div class="form-grid">
+
+                    <div class="form-group">
+                        <label class="field-label" for="pilot-contact">Contact Name <span style="color:#e8472a;">*</span></label>
+                        <input class="field-input" type="text" id="pilot-contact" name="contact_name" required placeholder="Your name">
+                    </div>
+                    <div class="form-group">
+                        <label class="field-label" for="pilot-restaurant">Restaurant Name <span style="color:#e8472a;">*</span></label>
+                        <input class="field-input" type="text" id="pilot-restaurant" name="restaurant_name" required placeholder="Your restaurant">
+                    </div>
+
+                    <div class="form-group">
+                        <label class="field-label" for="pilot-email">Email <span style="color:#e8472a;">*</span></label>
+                        <input class="field-input" type="email" id="pilot-email" name="email" required placeholder="you@restaurant.com">
+                    </div>
+                    <div class="form-group">
+                        <label class="field-label" for="pilot-phone">Phone</label>
+                        <input class="field-input" type="tel" id="pilot-phone" name="phone" placeholder="(555) 000-0000">
+                    </div>
+
+                    <div class="form-group">
+                        <label class="field-label" for="pilot-type">Restaurant Type <span style="color:#e8472a;">*</span></label>
+                        <select class="field-input" id="pilot-type" name="type" required>
+                            <option value="" disabled selected>Select type…</option>
+                            <option>Full Service</option>
+                            <option>Quick Service / Counter</option>
+                            <option>Bar / Nightclub</option>
+                            <option>Café / Coffee Shop</option>
+                            <option>Fast Casual</option>
+                            <option>Food Truck</option>
+                            <option>Other</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label class="field-label" for="pilot-locations">Number of Locations</label>
+                        <select class="field-input" id="pilot-locations" name="locations">
+                            <option value="" disabled selected>Select…</option>
+                            <option>1</option>
+                            <option>2–3</option>
+                            <option>4–10</option>
+                            <option>10+</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="field-label" for="pilot-terminals">Terminals Needed</label>
+                        <select class="field-input" id="pilot-terminals" name="terminals">
+                            <option value="" disabled selected>Select…</option>
+                            <option>1–2</option>
+                            <option>3–5</option>
+                            <option>6–10</option>
+                            <option>10+</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label class="field-label" for="pilot-pos">Current POS System</label>
+                        <input class="field-input" type="text" id="pilot-pos" name="current_pos" placeholder="Toast, Square, Aloha…">
+                    </div>
+
+                    <div class="form-group full">
+                        <label class="field-label" for="pilot-pain">Biggest pain point with your current system <span style="color:#e8472a;">*</span></label>
+                        <textarea class="field-input" id="pilot-pain" name="pain_points" required
+                                  placeholder="Fees, outages, missing features, bad support — tell us everything."></textarea>
+                    </div>
+
+                    <div class="form-group full">
+                        <label class="field-label" for="pilot-extra">Anything else?</label>
+                        <textarea class="field-input" id="pilot-extra" name="extra" style="min-height: 72px;"
+                                  placeholder="Timeline, questions, setup details…"></textarea>
+                    </div>
+
+                    <div class="form-group full" style="align-items: center;">
+                        <button type="submit" class="btn-primary" id="submit-btn">Request Pilot Information</button>
+                    </div>
+
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- SUCCESS STATE -->
+    <div class="success-state" id="success-state">
+        <div class="success-badge">✓</div>
+        <div class="success-title">You're on the list.</div>
+        <p class="success-sub">
+            A member of the KINDpos team will reach out within 48 hours.<br>
+            In the meantime, learn more at <a href="https://kindpos.com">kindpos.com</a>.
+        </p>
+    </div>
+
+</div>
+
+<footer>
+    <p>KINDpos &mdash; KIND Technologies LLC &mdash; Nice. Dependable. Yours.</p>
+</footer>
+
+<script>
+    const form = document.getElementById('pilot-form');
+    const submitBtn = document.getElementById('submit-btn');
+    const formWrap = document.getElementById('form-wrap');
+    const successState = document.getElementById('success-state');
+
+    form.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        submitBtn.disabled = true;
+        submitBtn.textContent = 'Submitting…';
+        try {
+            const res = await fetch(form.action, {
+                method: 'POST',
+                headers: { 'Accept': 'application/json' },
+                body: new FormData(form)
+            });
+            if (res.ok) {
+                formWrap.style.display = 'none';
+                successState.classList.add('visible');
+                window.scrollTo({ top: 0, behavior: 'smooth' });
+            } else {
+                throw new Error();
+            }
+        } catch {
+            submitBtn.disabled = false;
+            submitBtn.textContent = 'Request Pilot Information';
+            alert('Something went wrong — please try again or email us at hello@kindpos.com');
+        }
+    });
+</script>
+
+</body>
+</html>
