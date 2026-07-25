@@ -408,6 +408,26 @@
             .comparison-table th, .comparison-table td { padding: 12px 8px; }
             .price-big { font-size: 1.4rem; }
         }
+
+        /* ── NAV DROPDOWN ── */
+        .nav-drop { position: relative; display: inline-flex; }
+        .nav-drop-menu {
+            display: none; position: absolute; top: 52px; left: 0; min-width: 250px;
+            background: var(--card); border: 1px solid var(--border); border-top: none;
+            border-radius: 0 0 10px 10px; box-shadow: 0 8px 24px rgba(0,0,0,0.5);
+            padding: 6px 0; z-index: 1001;
+        }
+        .nav-drop:hover .nav-drop-menu,
+        .nav-drop:focus-within .nav-drop-menu { display: block; }
+        .nav-drop-menu a {
+            display: block; padding: 9px 18px; font-family: var(--fb); font-size: 16px;
+            color: var(--textMuted); text-decoration: none; white-space: nowrap;
+            cursor: pointer; transition: color 0.15s, background 0.15s;
+        }
+        .nav-drop-menu a:hover { color: var(--green); background: rgba(134,239,172,0.06); }
+        .nav-drop-menu .drop-sep { height: 1px; background: rgba(90,95,102,0.35); margin: 6px 0; }
+        .nav-drop-menu .drop-sub { padding-left: 30px; font-size: 15px; color: rgba(156,163,175,0.75); }
+        @media (max-width: 768px) { .nav-drop-menu { display: none !important; } }
     </style>
 </head>
 <body class="home-tab">
@@ -419,7 +439,18 @@
             </div>
             <a class="nav-link active" onclick="showTab('home')">Home</a>
             <a class="nav-link" onclick="showTab('story')">Story</a>
-            <a class="nav-link" onclick="showTab('solution')">Solution</a>
+            <div class="nav-drop">
+                <a class="nav-link" onclick="showTab('solution')">Solution &#9662;</a>
+                <div class="nav-drop-menu">
+                    <a onclick="showTab('solution')">Overview</a>
+                    <a href="/ui-tour">UI Tour &mdash; all 17 screens</a>
+                    <div class="drop-sep"></div>
+                    <a class="drop-sub" href="/ui-tour#ch1">1 &middot; Build it once</a>
+                    <a class="drop-sub" href="/ui-tour#ch2">2 &middot; Open &amp; serve</a>
+                    <a class="drop-sub" href="/ui-tour#ch3">3 &middot; Cash out &amp; close</a>
+                    <a class="drop-sub" href="/ui-tour#ch4">4 &middot; Know your numbers</a>
+                </div>
+            </div>
             <a class="nav-link" onclick="showTab('feedback')">Feedback</a>
             <a class="nav-link" onclick="showTab('joinus')">Join Us</a>
             <a class="nav-link" onclick="showTab('pilot')">Pilot</a>
@@ -680,7 +711,8 @@
                             <span style="font-size: 16px; color: var(--textMuted);">8 terminals · $2M/yr</span>
                         </div>
                     </div>
-                    <div style="text-align: center; margin-top: 32px;">
+                    <div style="text-align: center; margin-top: 32px; display: flex; gap: 14px; justify-content: center; flex-wrap: wrap;">
+                        <a class="btn-ghost" href="/ui-tour">See the Interface →</a>
                         <button class="btn-primary" onclick="showTab('pilot')">Apply for Pilot →</button>
                     </div>
 
@@ -1026,6 +1058,17 @@
                 }
             });
         }
+
+        // deep-link support: /#solution, /#pilot, … (used by ui-tour.html)
+        (function () {
+            var valid = ['home', 'story', 'solution', 'feedback', 'joinus', 'pilot'];
+            function fromHash() {
+                var id = (location.hash || '').replace('#', '');
+                if (valid.indexOf(id) !== -1) showTab(id);
+            }
+            fromHash();
+            window.addEventListener('hashchange', fromHash);
+        })();
     </script>
 
 </body>
