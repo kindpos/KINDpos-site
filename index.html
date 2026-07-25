@@ -409,25 +409,6 @@
             .price-big { font-size: 1.4rem; }
         }
 
-        /* ── NAV DROPDOWN ── */
-        .nav-drop { position: relative; display: inline-flex; }
-        .nav-drop-menu {
-            display: none; position: absolute; top: 52px; left: 0; min-width: 250px;
-            background: var(--card); border: 1px solid var(--border); border-top: none;
-            border-radius: 0 0 10px 10px; box-shadow: 0 8px 24px rgba(0,0,0,0.5);
-            padding: 6px 0; z-index: 1001;
-        }
-        .nav-drop:hover .nav-drop-menu,
-        .nav-drop:focus-within .nav-drop-menu { display: block; }
-        .nav-drop-menu a {
-            display: block; padding: 9px 18px; font-family: var(--fb); font-size: 16px;
-            color: var(--textMuted); text-decoration: none; white-space: nowrap;
-            cursor: pointer; transition: color 0.15s, background 0.15s;
-        }
-        .nav-drop-menu a:hover { color: var(--green); background: rgba(134,239,172,0.06); }
-        .nav-drop-menu .drop-sep { height: 1px; background: rgba(90,95,102,0.35); margin: 6px 0; }
-        .nav-drop-menu .drop-sub { padding-left: 30px; font-size: 15px; color: rgba(156,163,175,0.75); }
-        @media (max-width: 768px) { .nav-drop-menu { display: none !important; } }
     </style>
 </head>
 <body class="home-tab">
@@ -439,18 +420,7 @@
             </div>
             <a class="nav-link active" onclick="showTab('home')">Home</a>
             <a class="nav-link" onclick="showTab('story')">Story</a>
-            <div class="nav-drop">
-                <a class="nav-link" onclick="showTab('solution')">Solution &#9662;</a>
-                <div class="nav-drop-menu">
-                    <a onclick="showTab('solution')">Overview</a>
-                    <a href="/ui-tour">UI Tour &mdash; all 17 screens</a>
-                    <div class="drop-sep"></div>
-                    <a class="drop-sub" href="/ui-tour#ch1">1 &middot; Build it once</a>
-                    <a class="drop-sub" href="/ui-tour#ch2">2 &middot; Open &amp; serve</a>
-                    <a class="drop-sub" href="/ui-tour#ch3">3 &middot; Cash out &amp; close</a>
-                    <a class="drop-sub" href="/ui-tour#ch4">4 &middot; Know your numbers</a>
-                </div>
-            </div>
+            <a class="nav-link" href="/solution">Solution</a>
             <a class="nav-link" onclick="showTab('feedback')">Feedback</a>
             <a class="nav-link" onclick="showTab('joinus')">Join Us</a>
             <a class="nav-link" onclick="showTab('pilot')">Pilot</a>
@@ -591,7 +561,7 @@
                                 <div class="card-t1-body">
                                     <h3 style="color: var(--green);">$25B market. Fundamentally better approach.</h3>
                                     <p style="color: var(--text);">A local-first architecture that cloud POS systems cannot replicate without rebuilding from scratch.</p>
-                                    <a onclick="showTab('solution')" class="path-link">→ See the Solution</a>
+                                    <a href="/solution" class="path-link">→ See the Solution</a>
                                 </div>
                             </div>
                         </div>
@@ -630,94 +600,12 @@
 
                     <div class="tagline-display">Nice &mdash; Dependable &mdash; Yours</div>
 
-                    <button class="btn-primary" onclick="showTab('solution')">See the Solution →</button>
+                    <a class="btn-primary" href="/solution">See the Solution →</a>
 
                 </section>
             </div><!-- /story -->
 
 
-            <!-- ═══════════════ SOLUTION ═══════════════ -->
-            <div id="solution" class="tab-content">
-                <section style="max-width: 720px;">
-
-                    <h2 style="color: var(--gold); font-size: 1.8rem; margin-bottom: 2.5rem; font-family: var(--fb); font-style: italic;">Nice. Dependable. Yours.</h2>
-
-                    <div class="pillar">
-                        <div class="pillar-accent"></div>
-                        <div class="pillar-label">Nice</div>
-                        <div class="pillar-body">
-                            <p>The system should feel calm and predictable, even during a Saturday dinner rush. KINDpos is designed to reduce stress, not amplify it. Failures surface clearly. Behavior is consistent. A POS should behave like a good coworker.</p>
-                        </div>
-                    </div>
-
-                    <div class="pillar">
-                        <div class="pillar-accent"></div>
-                        <div class="pillar-label">Dependable</div>
-                        <div class="pillar-body">
-                            <p>When the internet goes down, your system keeps running. Orders still fire. Printers still work. Every action is recorded permanently in an immutable ledger that cannot be altered or lost. Connectivity enhances the system — it does not control it.</p>
-                        </div>
-                    </div>
-
-                    <div class="pillar">
-                        <div class="pillar-accent"></div>
-                        <div class="pillar-label">Yours</div>
-                        <div class="pillar-body">
-                            <p>Your data belongs to you. Your hardware is not locked to a vendor. Your workflows reflect how your restaurant actually operates — not how a software company thinks it should. KINDpos adapts to the restaurant, not the other way around.</p>
-                        </div>
-                    </div>
-
-                    <div class="divider"></div>
-                    <h2 style="color: var(--gold);">Built for how restaurants actually work.</h2>
-
-                    <div class="card-t1" style="margin-bottom: 3rem;">
-                        <div class="card-t1-accent"></div>
-                        <div class="card-t1-body" style="padding-top: 12px;">
-                            <ul class="feature-list">
-                                <li><div><strong>Local-first</strong> — Runs on hardware in your restaurant. Cloud is optional, never required.</div></li>
-                                <li><div><strong>Event-sourced</strong> — Every action is a permanent fact. Ghost orders and double charges become impossible.</div></li>
-                                <li><div><strong>Offline-resilient</strong> — Designed to operate through failure, not collapse because of it.</div></li>
-                                <li><div><strong>Show your work</strong> — Every calculation is transparent. Plain English. No black boxes.</div></li>
-                                <li><div><strong>One-time purchase</strong> — Not an ongoing subscription rental. You own the software, forever.</div></li>
-                            </ul>
-                        </div>
-                    </div>
-
-                    <div class="divider"></div>
-                    <h2 style="color: var(--gold);">The math is simple.</h2>
-
-                    <div class="card-t1" style="margin-bottom: 12px;">
-                        <div class="card-t1-accent gold"></div>
-                        <div class="card-t1-hdr gold">The Toast Tax</div>
-                        <div class="card-t1-body">
-                            <p style="font-size: 1.05rem; line-height: 1.8;">Toast charges 2.99% on every card transaction — and locks you into their processor. You can't use anyone else. On $1M in annual revenue, that lock-in costs <strong style="color: var(--gold);">$25,000 over 3 years</strong> before you pay a dollar of software.</p>
-                            <p style="margin-bottom: 0;">A typical full-service restaurant doing $1M/yr pays Toast <strong style="color: var(--verm);">3.1–3.4% of total revenue</strong> annually. On a 7% operating margin, that's nearly half of every dollar of profit going to a POS vendor.</p>
-                        </div>
-                    </div>
-
-                    <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 12px; margin-bottom: 12px;">
-                        <div class="card-t0 gold">
-                            <span style="font-family: var(--fh); font-size: 1.6rem; font-weight: 700; color: var(--gold); text-shadow: 0 0 16px rgba(232,200,78,0.3); display: block; margin-bottom: 4px;">$15,466</span>
-                            <span style="font-size: 16px; color: var(--text); display: block; margin-bottom: 2px;">Small restaurant</span>
-                            <span style="font-size: 16px; color: var(--textMuted);">2 terminals · $500K/yr</span>
-                        </div>
-                        <div class="card-t0 gold">
-                            <span style="font-family: var(--fh); font-size: 1.6rem; font-weight: 700; color: var(--gold); text-shadow: 0 0 16px rgba(232,200,78,0.3); display: block; margin-bottom: 4px;">$27,859</span>
-                            <span style="font-size: 16px; color: var(--text); display: block; margin-bottom: 2px;">Mid restaurant</span>
-                            <span style="font-size: 16px; color: var(--textMuted);">5 terminals · $1M/yr</span>
-                        </div>
-                        <div class="card-t0 gold">
-                            <span style="font-family: var(--fh); font-size: 1.6rem; font-weight: 700; color: var(--gold); text-shadow: 0 0 16px rgba(232,200,78,0.3); display: block; margin-bottom: 4px;">$52,017</span>
-                            <span style="font-size: 16px; color: var(--text); display: block; margin-bottom: 2px;">Large restaurant</span>
-                            <span style="font-size: 16px; color: var(--textMuted);">8 terminals · $2M/yr</span>
-                        </div>
-                    </div>
-                    <div style="text-align: center; margin-top: 32px; display: flex; gap: 14px; justify-content: center; flex-wrap: wrap;">
-                        <a class="btn-ghost" href="/ui-tour">See the Interface →</a>
-                        <button class="btn-primary" onclick="showTab('pilot')">Apply for Pilot →</button>
-                    </div>
-
-                </section>
-            </div><!-- /solution -->
 
 
             <!-- ═══════════════ FEEDBACK ═══════════════ -->
@@ -1061,7 +949,7 @@
 
         // deep-link support: /#solution, /#pilot, … (used by ui-tour.html)
         (function () {
-            var valid = ['home', 'story', 'solution', 'feedback', 'joinus', 'pilot'];
+            var valid = ['home', 'story', 'feedback', 'joinus', 'pilot'];
             function fromHash() {
                 var id = (location.hash || '').replace('#', '');
                 if (valid.indexOf(id) !== -1) showTab(id);
