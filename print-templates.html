@@ -1,0 +1,1397 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>What Prints — A KINDpos Ticket Tour</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;700;800&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #101215;
+    --surface: #16191c;
+    --surface-2: #1b1e22;
+    --text: #e8eaed;
+    --text-muted: #9aa0a6;
+    --text-faint: #6b7075;
+    --line: #262a2f;
+    --green: #86efac;
+    --gold: #f5a623;
+    --cyan: #22d3ee;
+    --purple: #b48efa;
+    --warmgreen: #4ade80;
+    --accent: var(--gold);
+    --accent-ink: #17140f;
+    --tab-1: var(--green);
+    --tab-2: var(--gold);
+    --tab-3: var(--cyan);
+    --tab-4: var(--purple);
+    --tab-5: var(--warmgreen);
+    --paper: #f8f4e7;
+    --paper-edge: #e7e0cb;
+    --paper-ink: #17140f;
+    --paper-shadow: rgba(0, 0, 0, 0.55);
+    --code-bg: #1b1e22;
+    --code-text: #c2c4b7;
+    --nav-bg: rgba(16, 18, 21, 0.92);
+  }
+
+  * { box-sizing: border-box; }
+  html { scroll-behavior: smooth; }
+
+  body {
+    margin: 0;
+    background: var(--bg);
+    color: var(--text);
+    font-family: "Outfit", -apple-system, "Segoe UI", "Helvetica Neue", Arial, sans-serif;
+    line-height: 1.5;
+    padding: 0 24px 80px;
+  }
+
+  .page { max-width: 1180px; margin: 0 auto; }
+
+  .jumpnav {
+    position: sticky;
+    top: 0;
+    z-index: 20;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    flex-wrap: wrap;
+    padding: 14px 0;
+    margin: 0 -24px;
+    padding-left: 24px;
+    padding-right: 24px;
+    background: var(--nav-bg);
+    backdrop-filter: blur(6px);
+    border-bottom: 1px solid var(--line);
+  }
+
+  .jumpnav .brand {
+    font-family: "JetBrains Mono", "Consolas", monospace;
+    font-size: 12px;
+    font-weight: 700;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--green);
+    margin-right: 8px;
+    white-space: nowrap;
+  }
+
+  .navchip {
+    display: inline-flex;
+    align-items: center;
+    font-family: "JetBrains Mono", "Consolas", monospace;
+    font-size: 11.5px;
+    font-weight: 600;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    color: var(--text-muted);
+    text-decoration: none;
+    padding: 7px 13px;
+    border-radius: 999px;
+    border: 1px solid var(--line);
+    background: var(--surface);
+    white-space: nowrap;
+    transition: color 0.15s, border-color 0.15s, background 0.15s;
+  }
+  .navchip:hover { color: var(--accent-ink); border-color: var(--gold); background: var(--gold); }
+
+  header.page-hero { max-width: 760px; margin: 48px 0 8px; }
+
+  .eyebrow {
+    font-size: 12px;
+    font-weight: 700;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--green);
+    margin: 0 0 10px;
+    font-family: "JetBrains Mono", "Consolas", monospace;
+  }
+
+  .tagline {
+    font-style: italic;
+    color: var(--gold);
+    font-weight: 600;
+    font-size: 15px;
+    letter-spacing: 0.02em;
+    margin: 22px 0 0;
+  }
+
+  h1 {
+    font-size: clamp(30px, 3.8vw, 44px);
+    font-weight: 800;
+    letter-spacing: -0.01em;
+    margin: 0 0 14px;
+    text-wrap: balance;
+  }
+
+  h2 {
+    font-size: clamp(24px, 3vw, 32px);
+    font-weight: 800;
+    letter-spacing: -0.01em;
+    margin: 0 0 14px;
+    text-wrap: balance;
+  }
+
+  .lede { font-size: 16px; color: var(--text-muted); max-width: 640px; margin: 0; }
+  header.page-hero .lede { max-width: 680px; font-size: 17.5px; }
+
+  section.tpl {
+    padding: 56px 0 8px;
+    border-top: 1px solid var(--line);
+  }
+  section.tpl:first-of-type { border-top: none; }
+
+  header.section-hero { max-width: 700px; margin-bottom: 28px; }
+  header.section-hero h2 { scroll-margin-top: var(--sticky-offset, 110px); }
+
+  .lang-bar {
+    position: sticky;
+    z-index: 19;
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 12px;
+    padding: 12px 24px;
+    margin: 0 -24px;
+    background: var(--nav-bg);
+    backdrop-filter: blur(6px);
+    border-bottom: 1px solid var(--line);
+  }
+  .lang-toggle-label {
+    font-family: "JetBrains Mono", "Consolas", monospace;
+    font-size: 11.5px;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--text-faint);
+  }
+  .lang-pills { display: flex; flex-wrap: wrap; gap: 8px; }
+  .lang-pill {
+    font-family: "JetBrains Mono", "Consolas", monospace;
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--text-muted);
+    background: var(--surface);
+    border: 1px solid var(--line);
+    border-radius: 999px;
+    padding: 6px 12px;
+    cursor: pointer;
+    transition: color 0.15s, border-color 0.15s, background 0.15s;
+  }
+  .lang-pill:hover { border-color: var(--gold); color: var(--text); }
+  .lang-pill.active { background: var(--gold); border-color: var(--gold); color: #17140f; }
+  .lang-bar-scope {
+    font-size: 11.5px;
+    color: var(--text-faint);
+    margin-left: auto;
+    white-space: nowrap;
+  }
+  .lang-caveat {
+    font-size: 12.5px;
+    color: var(--text-faint);
+    max-width: 640px;
+    margin: 0 0 28px;
+    line-height: 1.5;
+  }
+
+  .stage {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) 300px;
+    gap: 36px;
+    align-items: start;
+  }
+
+  .tickets { display: flex; gap: 26px; flex-wrap: wrap; justify-content: center; }
+
+  .ticket-col { display: flex; flex-direction: column; align-items: center; gap: 12px; position: relative; }
+
+  .station-label {
+    font-family: "JetBrains Mono", "Consolas", monospace;
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--green);
+    text-align: center;
+  }
+
+  .paper-wrap { position: relative; padding-left: 34px; max-width: 100%; overflow: visible; }
+
+  .tab {
+    position: absolute;
+    left: 0;
+    width: 26px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 26px;
+    border-radius: 50%;
+    color: #10120f;
+    font-family: "Consolas", "SFMono-Regular", Menlo, monospace;
+    font-size: 12px;
+    font-weight: 700;
+    box-shadow: 0 2px 6px var(--paper-shadow);
+    transform: translateX(-6px);
+    z-index: 2;
+  }
+
+  .tab-1 { background: var(--tab-1); }
+  .tab-2 { background: var(--tab-2); }
+  .tab-3 { background: var(--tab-3); }
+  .tab-4 { background: var(--tab-4); }
+  .tab-5 { background: var(--tab-5); }
+
+  .paper {
+    width: calc(42ch + 32px);
+    max-width: calc(100vw - 90px);
+    background: var(--paper);
+    color: var(--paper-ink);
+    padding: 22px 16px 26px;
+    box-shadow: 0 14px 30px var(--paper-shadow), 0 2px 0 var(--paper-edge);
+    font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace;
+    font-size: 12.6px;
+    font-variant-ligatures: none;
+    clip-path: polygon(
+      0% 0%, 100% 0%, 100% 100%,
+      95% 97%, 90% 100%, 85% 97%, 80% 100%, 75% 97%, 70% 100%,
+      65% 97%, 60% 100%, 55% 97%, 50% 100%, 45% 97%, 40% 100%,
+      35% 97%, 30% 100%, 25% 97%, 20% 100%, 15% 97%, 10% 100%, 5% 97%, 0% 100%
+    );
+  }
+
+  #kitchen-ticket-wrap .paper { width: calc(33ch + 32px); }
+
+  .ln { white-space: pre-wrap; overflow-wrap: break-word; }
+  .ln-money {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    gap: 10px;
+    white-space: normal;
+  }
+  .ln-money .lm-label { white-space: normal; overflow-wrap: break-word; }
+  .ln-money .lm-value { white-space: nowrap; text-align: right; flex: 0 0 auto; }
+  .b { font-weight: 700; }
+  .c { text-align: center; }
+  .dw { font-size: 1.28em; letter-spacing: 0.02em; }
+  .dh { line-height: 2; }
+  .fb { font-size: 10.5px; letter-spacing: 0.05em; }
+  .mod { color: #3a362b; padding-left: 2px; }
+  .hl { background: rgba(179, 69, 42, 0.16); }
+  .rule { border: none; border-top: 1px dashed var(--paper-edge); margin: 6px 0; }
+  .rule.solid { border-top: 1px solid #b7ac8b; }
+  .rule.eq { border-top: 2px solid #8a7d54; }
+  .lm-box { border-top: 1px solid #b7ac8b; border-bottom: 1px solid #b7ac8b; padding: 4px 0; margin: 6px 0; }
+
+  pre.box {
+    margin: 2px 0 4px;
+    font-family: inherit;
+    font-size: inherit;
+    line-height: 1.32;
+    white-space: pre;
+  }
+  pre.box.box-condensed {
+    font-size: 77%;
+  }
+
+  .feed { height: 14px; }
+  .feed-2 { height: 28px; }
+  .feed-3 { height: 42px; }
+  .feed-5 { height: 70px; }
+
+  .legend {
+    position: sticky;
+    top: 80px;
+    background: var(--surface);
+    border: 1px solid var(--line);
+    border-radius: 12px;
+    padding: 22px;
+    border-left: 3px solid var(--tab-1);
+  }
+
+  .legend h3.legend-title {
+    font-family: "JetBrains Mono", "Consolas", monospace;
+    font-size: 12px;
+    font-weight: 700;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--text-faint);
+    margin: 0 0 16px;
+  }
+
+  .legend-item { display: flex; gap: 12px; padding: 12px 0; border-top: 1px solid var(--line); }
+  .legend-item:first-of-type { border-top: none; padding-top: 0; }
+
+  .legend-badge {
+    flex: 0 0 auto;
+    width: 22px;
+    height: 22px;
+    border-radius: 50%;
+    color: #10120f;
+    font-family: "JetBrains Mono", "Consolas", monospace;
+    font-size: 11px;
+    font-weight: 700;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-top: 1px;
+  }
+
+  .legend-item h4 { margin: 0 0 4px; font-size: 14px; font-weight: 700; color: var(--text); }
+  .legend-item p { margin: 0; font-size: 13.5px; color: var(--text-muted); line-height: 1.55; }
+
+  @media (max-width: 900px) {
+    .stage { grid-template-columns: 1fr; }
+    .legend { position: static; }
+    .lang-bar-scope { display: none; }
+  }
+
+  .chapter-strip {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+    gap: 20px;
+    margin: 56px 0 0;
+    padding-top: 40px;
+    border-top: 1px solid var(--line);
+  }
+  .chapter-strip a {
+    display: block;
+    text-decoration: none;
+    padding-top: 12px;
+    border-top: 3px solid var(--chap-color, var(--green));
+  }
+  .chapter-strip .chapter-label {
+    font-family: "JetBrains Mono", "Consolas", monospace;
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--chap-color, var(--green));
+    margin-bottom: 6px;
+  }
+  .chapter-strip .chapter-name {
+    font-size: 16px;
+    font-weight: 700;
+    color: var(--text);
+  }
+
+  footer.page-footer {
+    margin-top: 60px;
+    padding: 28px 0 40px;
+    border-top: 1px solid var(--line);
+    font-size: 13px;
+    color: var(--text-faint);
+    text-align: center;
+  }
+  footer.page-footer strong { color: var(--text-muted); }
+</style>
+</head>
+<body>
+<div class="page">
+
+  <nav class="jumpnav">
+    <span class="brand">KINDpos</span>
+    <a class="navchip" href="#kitchen-ticket">Kitchen Ticket</a>
+    <a class="navchip" href="#guest-receipt">Guest Receipt</a>
+    <a class="navchip" href="#gift-card-balance">Gift Card Balance</a>
+    <a class="navchip" href="#delivery-receipt">Delivery Receipt</a>
+    <a class="navchip" href="#employee-checkout">Employee Checkout</a>
+    <a class="navchip" href="#shift-summary">Shift Summary</a>
+  </nav>
+
+  <div class="lang-bar" role="group" aria-label="Switch ticket language">
+    <span class="lang-toggle-label">Ticket labels in:</span>
+    <div class="lang-pills" id="lang-pills"></div>
+    <span class="lang-bar-scope">Applies to every ticket below except Shift Summary</span>
+  </div>
+
+  <header class="page-hero">
+    <p class="eyebrow">What Actually Prints — A Guided Walk Through The Paper</p>
+    <h1>Six tickets. One system. No surprises.</h1>
+    <p class="lede">
+      Every ticket KINDpos can print, shown exactly as it comes off the
+      printer — kitchen ticket, guest receipt, gift card balance, delivery
+      receipt, employee checkout, and shift summary. Same example order,
+      same example store, so you can compare them side by side.
+    </p>
+    <p class="tagline">NICE — DEPENDABLE — YOURS</p>
+  </header>
+
+  <!-- ============ KITCHEN TICKET ============ -->
+  <section class="tpl" id="kitchen-ticket-wrap" style="--tab-1:var(--green);--tab-2:var(--gold);--tab-3:var(--cyan);--tab-4:var(--purple);--tab-5:var(--warmgreen);">
+  <header class="section-hero">
+    <p class="eyebrow">Kitchen</p>
+    <h2 id="kitchen-ticket">The right items land on the right station</h2>
+    <p class="lede">
+      Every order routes to the station that needs it. KINDpos splits the
+      check by menu category — hot-line items print on the hot line,
+      pizza items print at the oven — sharing one header, seat-grouped
+      items, and a station/ticket-count footer so a multi-station order
+      stays traceable across every stub it produces.
+    </p>
+  </header>
+
+  <div class="stage">
+    <div class="tickets">
+
+      <div class="ticket-col">
+        <span class="station-label">Ticket 1 of 2 — Hot Line</span>
+        <div class="paper-wrap">
+          <div class="tab tab-1" style="top:8px;">1</div>
+          <div class="tab tab-2" style="top:118px;">2</div>
+          <div class="tab tab-4" style="bottom:34px;">4</div>
+          <div class="paper">
+            <div class="ln b dw dh c">42</div>
+            <div class="ln b dw c">6:45 PM</div>
+            <div class="ln c">Dorothy</div>
+            <hr class="rule solid" />
+
+            <hr class="rule solid" />
+            <div class="ln b dw dh">S1</div>
+            <hr class="rule solid" />
+            <div class="ln b dw">1x Cheeseburger</div>
+            <div class="ln mod">   &#9500;&#9472; [NO] Onion</div>
+            <div class="ln mod">   &#9492;&#9472; [Extra] Cheese</div>
+            <div class="ln b dw">1x Caesar Salad</div>
+            <hr class="rule solid" />
+            <div class="ln b dw dh">S2</div>
+            <hr class="rule solid" />
+            <div class="ln b dw">1x Coke</div>
+
+            <div class="feed"></div>
+            <hr class="rule solid" />
+            <div class="ln fb b c">HOT LINE</div>
+            <div class="ln fb b c">1/2</div>
+            <div class="ln fb b c" id="kt-original-1">ORIGINAL</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="ticket-col">
+        <span class="station-label">Ticket 2 of 2 — Pizza Oven</span>
+        <div class="paper-wrap">
+          <div class="tab tab-1" style="top:8px;">1</div>
+          <div class="tab tab-2" style="top:118px;">2</div>
+          <div class="tab tab-3" style="top:186px;">3</div>
+          <div class="tab tab-4" style="bottom:34px;">4</div>
+          <div class="paper">
+            <div class="ln b dw dh c">42</div>
+            <div class="ln b dw c">6:45 PM</div>
+            <div class="ln c">Dorothy</div>
+            <hr class="rule solid" />
+
+            <hr class="rule solid" />
+            <div class="ln b dw dh">S2</div>
+            <hr class="rule solid" />
+            <div class="ln b dw">1x Pizza Builder</div>
+            <pre class="box box-condensed">+--------------------+--------------------+
+|        1ST         |        2ND         |
++--------------------+--------------------+
+| Extra Mozzarella   | Caramelized Onions |
++--------------------+--------------------+</pre>
+
+            <div class="feed"></div>
+            <hr class="rule solid" />
+            <div class="ln fb b c">PIZZA OVEN</div>
+            <div class="ln fb b c">2/2</div>
+            <div class="ln fb b c" id="kt-original-2">ORIGINAL</div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+
+    <aside class="legend">
+      <h3 class="legend-title">What each part does</h3>
+
+      <div class="legend-item">
+        <span class="legend-badge tab-1">1</span>
+        <div>
+          <h4>Header</h4>
+          <p>Check number, fire time, and server name — on every ticket
+          for this order, at every station.</p>
+        </div>
+      </div>
+
+      <div class="legend-item">
+        <span class="legend-badge tab-2">2</span>
+        <div>
+          <h4>Seats</h4>
+          <p>Items group by seat, so the line can fire and plate a whole
+          table together.</p>
+        </div>
+      </div>
+
+      <div class="legend-item">
+        <span class="legend-badge tab-3">3</span>
+        <div>
+          <h4>Half &amp; half, no guesswork</h4>
+          <p>A half-and-half pizza gets its own diagram — what's on the
+          whole pie, and what's only on side 1 or side 2. Long topping
+          names automatically print in a condensed font so they always
+          fit, even on the kitchen ticket's narrower paper.</p>
+        </div>
+      </div>
+
+      <div class="legend-item">
+        <span class="legend-badge tab-4">4</span>
+        <div>
+          <h4>Footer</h4>
+          <p>Station name and a ticket count (1/2, 2/2 …) so nothing gets
+          lost when one order fires across multiple stations.</p>
+        </div>
+      </div>
+    </aside>
+  </div>
+  </section>
+
+  <!-- ============ GUEST RECEIPT ============ -->
+  <section class="tpl" id="guest-receipt-wrap" style="--tab-1:var(--gold);--tab-2:var(--cyan);--tab-3:var(--purple);--tab-4:var(--warmgreen);--tab-5:var(--green);">
+  <header class="section-hero">
+    <p class="eyebrow">Front of House</p>
+    <h2 id="guest-receipt">A receipt guests can actually read</h2>
+    <p class="lede">
+      Laid out in fixed zones — venue header, seat-grouped line items,
+      a totals block, and a payment/signature footer — with column widths
+      and modifier indentation computed against the printer's character
+      width, so the same template holds up across paper sizes and prints
+      one copy per configured language.
+    </p>
+  </header>
+
+  <p class="lang-caveat" id="lang-caveat"></p>
+
+  <div class="stage">
+    <div class="tickets">
+
+      <div class="ticket-col">
+        <span class="station-label">Customer Copy</span>
+        <div class="paper-wrap">
+          <div class="tab tab-1" style="top:12px;">1</div>
+          <div class="tab tab-2" style="top:194px;">2</div>
+          <div class="tab tab-3" style="top:327px;">3</div>
+          <div class="tab tab-4" style="top:492px;">4</div>
+          <div class="tab tab-5" style="top:843px;">5</div>
+          <div class="paper">
+            <div class="ln b dw c">Your Restaurant</div>
+            <div class="ln c fb">123 Main St, Anytown, ST</div>
+            <div class="ln c fb">(555) 123-4567</div>
+            <div class="feed"></div>
+            <div class="ln b c" id="gr-copytype">** CUSTOMER COPY **</div>
+            <div class="feed"></div>
+            <div class="ln b" id="gr-check">Check: 42</div>
+            <div class="ln" id="gr-tableserver">Table: 12 | Server: Dorothy</div>
+            <div class="ln" id="gr-date">Date: 08/09/2026 6:52 PM</div>
+            <hr class="rule solid" />
+
+            <div class="ln b c" id="gr-seat1">--- Seat 1 ---</div>
+            <div class="ln b">1 Cheeseburger                     $ 14.49</div>
+            <div class="ln">   [NO] Onion</div>
+            <div class="ln">   [Extra] Cheese                $  1.50</div>
+            <div class="ln b">1 Caesar Salad                      $ 9.50</div>
+            <div class="ln b c" id="gr-seat2">--- Seat 2 ---</div>
+            <div class="ln b">1 Pizza Builder                    $ 17.50</div>
+            <pre class="box">+---------------------------------------+
+|                 Whole                 |
++---------------------------------------+
+| [Extra] Cheese                 $  1.50|
++-------------------+-------------------+
+|        1ST        |        2ND        |
++-------------------+-------------------+
+| Extra Mozzarella  | Caramelized Onions|
++-------------------+-------------------+</pre>
+            <div class="ln b">1 Coke                              $ 3.00</div>
+            <hr class="rule solid" />
+
+            <div class="ln-money" id="gr-subtotal"><span class="lm-label">SUBTOTAL:</span><span class="lm-value">$44.49</span></div>
+            <div class="ln-money" id="gr-tax"><span class="lm-label">Sales Tax:</span><span class="lm-value">$3.11</span></div>
+            <div class="ln-money b" id="gr-total"><span class="lm-label">TOTAL:</span><span class="lm-value">$47.60</span></div>
+
+            <div class="feed"></div>
+            <div class="ln b">Visa **** **** **** 4242</div>
+            <div class="ln">J. Alvarez</div>
+
+            <hr class="rule solid" />
+            <div class="ln b">TIP SUGGESTIONS:</div>
+            <div class="ln">  15%         $    6.67</div>
+            <div class="ln">  18%         $    8.01</div>
+            <div class="ln">  20%         $    8.90</div>
+            <div class="feed"></div>
+
+            <div class="feed"></div>
+            <div class="ln-money" id="gr-tip-blank"><span class="lm-label">TIP:</span><span class="lm-value">$____________</span></div>
+            <div class="feed"></div>
+            <div class="ln-money" id="gr-total-blank"><span class="lm-label">TOTAL:</span><span class="lm-value">$____________</span></div>
+            <div class="feed"></div>
+            <div class="ln-money" id="gr-signature"><span class="lm-label">SIGNATURE:</span><span class="lm-value">________________________</span></div>
+            <hr class="rule solid" />
+
+            <div class="feed-2"></div>
+            <div class="ln c">Thank you for dining with us!</div>
+            <div class="feed-3"></div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+
+    <aside class="legend">
+      <h3 class="legend-title">What each part does</h3>
+
+      <div class="legend-item">
+        <span class="legend-badge tab-1">1</span>
+        <div>
+          <h4>Venue header</h4>
+          <p>Your store name, address, and phone number — pulled straight
+          from your settings.</p>
+        </div>
+      </div>
+
+      <div class="legend-item">
+        <span class="legend-badge tab-2">2</span>
+        <div>
+          <h4>Itemized by seat</h4>
+          <p>Every dish and every modifier, grouped by seat, so guests can
+          see exactly what they ordered.</p>
+        </div>
+      </div>
+
+      <div class="legend-item">
+        <span class="legend-badge tab-3">3</span>
+        <div>
+          <h4>Half &amp; half, no guesswork</h4>
+          <p>The same clear diagram from the kitchen ticket carries
+          through to the guest's receipt.</p>
+        </div>
+      </div>
+
+      <div class="legend-item">
+        <span class="legend-badge tab-4">4</span>
+        <div>
+          <h4>Totals &amp; tip</h4>
+          <p>Subtotal, tax, and total, plus suggested tip percentages
+          calculated automatically on card sales.</p>
+        </div>
+      </div>
+
+      <div class="legend-item">
+        <span class="legend-badge tab-5">5</span>
+        <div>
+          <h4>Your closing message</h4>
+          <p>A custom thank-you message on every guest receipt — set it
+          once, it prints every time.</p>
+        </div>
+      </div>
+    </aside>
+  </div>
+  </section>
+
+  <!-- ============ GIFT CARD BALANCE ============ -->
+  <section class="tpl" id="gift-card-balance-wrap" style="--tab-1:var(--cyan);--tab-2:var(--purple);--tab-3:var(--warmgreen);">
+  <header class="section-hero">
+    <p class="eyebrow">Gift Cards</p>
+    <h2 id="gift-card-balance">A balance check in one glance</h2>
+    <p class="lede">
+      A minimal three-zone layout — masked card number, a large centered
+      balance, and a timestamp/terminal footer. No seats or line items to
+      lay out, so it's a single-pass print to whichever receipt printer
+      the terminal is routed to.
+    </p>
+  </header>
+
+  <div class="stage">
+    <div class="tickets">
+
+      <div class="ticket-col">
+        <span class="station-label">Balance Slip</span>
+        <div class="paper-wrap">
+          <div class="tab tab-1" style="top:12px;">1</div>
+          <div class="tab tab-2" style="top:118px;">2</div>
+          <div class="tab tab-3" style="top:200px;">3</div>
+          <div class="paper">
+            <div class="ln b c">Your Restaurant</div>
+            <div class="ln b c" id="gc-title">GIFT CARD BALANCE</div>
+            <div class="feed"></div>
+            <div class="ln-money" id="gc-card"><span class="lm-label">Card</span><span class="lm-value">****4432</span></div>
+            <hr class="rule eq" />
+
+            <div class="ln b c" id="gc-balance">BALANCE</div>
+            <div class="ln b dw dh c">$1250.00</div>
+            <hr class="rule eq" />
+
+            <div class="ln-money fb" id="gc-printed"><span class="lm-label">Printed:</span><span class="lm-value">Sun, Aug 9  6:52 PM</span></div>
+            <div class="ln-money fb" id="gc-terminal"><span class="lm-label">Terminal:</span><span class="lm-value">KPOS-0002</span></div>
+            <div class="feed"></div>
+            <div class="ln c fb">Thank you for dining with us!</div>
+
+            <div class="feed-5"></div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+
+    <aside class="legend">
+      <h3 class="legend-title">What each part does</h3>
+
+      <div class="legend-item">
+        <span class="legend-badge tab-1">1</span>
+        <div>
+          <h4>Store &amp; card</h4>
+          <p>A masked card number, so the guest's full card number never
+          ends up on a printed slip.</p>
+        </div>
+      </div>
+
+      <div class="legend-item">
+        <span class="legend-badge tab-2">2</span>
+        <div>
+          <h4>Balance</h4>
+          <p>Big, bold, and centered — the one number this slip exists
+          for.</p>
+        </div>
+      </div>
+
+      <div class="legend-item">
+        <span class="legend-badge tab-3">3</span>
+        <div>
+          <h4>Printed &amp; terminal</h4>
+          <p>A timestamp and terminal name, plus your store's own
+          thank-you message.</p>
+        </div>
+      </div>
+    </aside>
+  </div>
+  </section>
+
+  <!-- ============ DELIVERY RECEIPT ============ -->
+  <section class="tpl" id="delivery-receipt-wrap" style="--tab-1:var(--purple);--tab-2:var(--warmgreen);--tab-3:var(--green);--tab-4:var(--gold);">
+  <header class="section-hero">
+    <p class="eyebrow">Delivery</p>
+    <h2 id="delivery-receipt">Everything a driver needs, before they walk out the door</h2>
+    <p class="lede">
+      Routes to the guest-facing printer with a status banner on top
+      (prepaid, cash, or card on delivery), delivery details in the
+      middle, and totals below — the amount-due line set in double-width
+      type so it's the first thing a driver's eye lands on.
+    </p>
+  </header>
+
+  <div class="stage">
+    <div class="tickets">
+
+      <div class="ticket-col">
+        <span class="station-label">Cash on Delivery</span>
+        <div class="paper-wrap">
+          <div class="tab tab-1" style="top:92px;">1</div>
+          <div class="tab tab-2" style="top:125px;">2</div>
+          <div class="tab tab-3" style="top:264px;">3</div>
+          <div class="tab tab-4" style="top:484px;">4</div>
+          <div class="paper">
+            <div class="ln b dw c">Your Restaurant</div>
+            <div class="ln c fb">123 Main St, Anytown, ST</div>
+            <div class="ln c fb">(555) 123-4567</div>
+            <div class="feed"></div>
+            <div class="ln b c" id="dr-status">CASH ON DELIVERY</div>
+            <div class="feed"></div>
+            <div class="ln b" id="dr-tag">DL-42 | DELIVERY</div>
+            <div class="ln" id="dr-date">Date: 8/9/2026 6:52 PM</div>
+            <hr class="rule solid" />
+
+            <div class="ln b">J. Alvarez</div>
+            <div class="ln">482 Willow Creek Dr, Apt 3B, Newport, RI</div>
+            <div class="ln">02840</div>
+            <div class="ln">(555) 887-2210</div>
+            <hr class="rule solid" />
+
+            <div class="ln b">1 Pizza Builder (Large)             $17.50</div>
+            <pre class="box">+---------------------------------------+
+|                 Whole                 |
++---------------------------------------+
+| [Extra] Cheese                 $  1.50|
++-------------------+-------------------+
+|        1ST        |        2ND        |
++-------------------+-------------------+
+| Extra Mozzarella  | Caramelized Onions|
++-------------------+-------------------+</pre>
+            <div class="ln b">1 Caesar Salad                       $9.50</div>
+            <div class="ln b">1 Coke                               $3.00</div>
+            <hr class="rule solid" />
+
+            <div class="ln-money" id="dr-subtotal"><span class="lm-label">SUBTOTAL:</span><span class="lm-value">$30.00</span></div>
+            <div class="ln-money" id="dr-fee"><span class="lm-label">DELIVERY FEE:</span><span class="lm-value">$4.99</span></div>
+            <div class="ln-money" id="dr-tax"><span class="lm-label">TAX:</span><span class="lm-value">$2.10</span></div>
+            <div class="ln-money b" id="dr-total"><span class="lm-label">TOTAL:</span><span class="lm-value">$37.09</span></div>
+
+            <div class="feed"></div>
+            <div class="ln b c" id="dr-amountdue">AMOUNT DUE</div>
+            <div class="ln b dw dh c">$37.09</div>
+
+            <div class="feed"></div>
+            <div class="ln c">Thank you for dining with us!</div>
+            <div class="feed-3"></div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+
+    <aside class="legend">
+      <h3 class="legend-title">What each part does</h3>
+
+      <div class="legend-item">
+        <span class="legend-badge tab-1">1</span>
+        <div>
+          <h4>Header &amp; status</h4>
+          <p>A clear status banner — Prepaid, Cash on Delivery, or Card on
+          Delivery — so drivers know what to expect before they even reach
+          the door.</p>
+        </div>
+      </div>
+
+      <div class="legend-item">
+        <span class="legend-badge tab-2">2</span>
+        <div>
+          <h4>Delivery details</h4>
+          <p>Customer name, address, and phone number, printed clearly for
+          the road.</p>
+        </div>
+      </div>
+
+      <div class="legend-item">
+        <span class="legend-badge tab-3">3</span>
+        <div>
+          <h4>The order</h4>
+          <p>Itemized, with the same half-and-half clarity as every other
+          ticket in the house.</p>
+        </div>
+      </div>
+
+      <div class="legend-item">
+        <span class="legend-badge tab-4">4</span>
+        <div>
+          <h4>What to collect</h4>
+          <p>Subtotal, delivery fee, tax, and total — with a bold
+          amount-due callout on cash orders your driver can't miss.</p>
+        </div>
+      </div>
+    </aside>
+  </div>
+  </section>
+
+  <!-- ============ EMPLOYEE CHECKOUT ============ -->
+  <section class="tpl" id="employee-checkout-wrap" style="--tab-1:var(--warmgreen);--tab-2:var(--green);--tab-3:var(--gold);--tab-4:var(--cyan);">
+  <header class="section-hero">
+    <p class="eyebrow">End of Shift</p>
+    <h2 id="employee-checkout">A shift, reconciled in one ticket</h2>
+    <p class="lede">
+      One template, two print paths: a SERVER checkout routes to the
+      terminal a server is standing at, while a DAILY RECAP pulls
+      store-wide totals from the manager's Overseer session. Both share
+      the same section order — sales, stats, payments, tips, tip-out —
+      with the recap adding revenue-center and per-server tables at the
+      bottom.
+    </p>
+  </header>
+
+  <div class="stage">
+    <div class="tickets">
+
+      <div class="ticket-col">
+        <span class="station-label">Server Checkout — Blanche's Shift</span>
+        <div class="paper-wrap">
+          <div class="tab tab-1" style="top:22px;">1</div>
+          <div class="tab tab-2" style="top:157px;">2</div>
+          <div class="tab tab-3" style="top:296px;">3</div>
+          <div class="tab tab-4" style="top:671px;">4</div>
+          <div class="paper">
+            <div class="ln b c">Your Restaurant</div>
+            <div class="ln c fb" id="co-title">SERVER CHECKOUT</div>
+            <div class="ln c fb">8/9/2026  4:00 PM - 9:15 PM</div>
+            <div class="feed"></div>
+            <div class="ln b dw dh c">Blanche</div>
+            <div class="ln c fb"><span id="co-terminal-label">Terminal:</span> Line 3</div>
+            <hr class="rule solid" />
+
+            <div class="ln b" id="co-sales-summary">SALES SUMMARY</div>
+            <div class="ln-money" id="co-gross"><span class="lm-label">Gross Sales</span><span class="lm-value">$612.40</span></div>
+            <div class="ln-money" id="co-voids"><span class="lm-label">Voids / Comps</span><span class="lm-value">-$23.50</span></div>
+            <hr class="rule" />
+            <div class="ln-money b" id="co-net"><span class="lm-label">Net Sales</span><span class="lm-value">$588.90</span></div>
+            <div class="ln-money" id="co-tax"><span class="lm-label">Tax</span><span class="lm-value">$39.20</span></div>
+            <div class="ln-money b" id="co-collected"><span class="lm-label">Total Collected</span><span class="lm-value">$612.40</span></div>
+            <hr class="rule solid" />
+
+            <div class="ln b" id="co-check-stats">CHECK STATS</div>
+            <div class="ln-money" id="co-checks"><span class="lm-label">Checks</span><span class="lm-value">14</span></div>
+            <div class="ln-money" id="co-avgcheck"><span class="lm-label">Avg Check</span><span class="lm-value">$42.06</span></div>
+            <div class="ln-money" id="co-covers"><span class="lm-label">Covers</span><span class="lm-value">22</span></div>
+            <hr class="rule solid" />
+
+            <div class="ln b" id="co-payment-breakdown">PAYMENT BREAKDOWN</div>
+            <div class="ln-money" id="co-cash"><span class="lm-label">Cash</span><span class="lm-value">$98.00</span></div>
+            <div class="ln-money" id="co-card"><span class="lm-label">Card</span><span class="lm-value">$514.40</span></div>
+            <hr class="rule" />
+            <div class="ln-money b" id="co-paytotal"><span class="lm-label">TOTAL</span><span class="lm-value">$612.40</span></div>
+            <hr class="rule solid" />
+
+            <div class="ln b" id="co-tips">TIPS</div>
+            <div class="ln-money" id="co-cardtips"><span class="lm-label">Card Tips</span><span class="lm-value">$82.00</span></div>
+            <hr class="rule" />
+            <div class="ln-money b" id="co-totaltips"><span class="lm-label">Total Tips</span><span class="lm-value">$82.00</span></div>
+            <hr class="rule solid" />
+
+            <div class="ln b" id="co-tipout">TIP-OUT</div>
+            <div class="ln-money"><span class="lm-label">BUSSER &nbsp;2% <span id="co-of1">of</span> Sales</span><span class="lm-value">$11.78</span></div>
+            <div class="ln-money"><span class="lm-label">BAR &nbsp;1% <span id="co-of2">of</span> Sales</span><span class="lm-value">$5.89</span></div>
+            <hr class="rule" />
+            <div class="ln-money b" id="co-totaltipout"><span class="lm-label">Total Tip-Out</span><span class="lm-value">$17.67</span></div>
+            <hr class="rule solid" />
+
+            <div class="lm-box">
+              <div class="ln-money" id="co-cashsales"><span class="lm-label">CASH SALES</span><span class="lm-value">$98.00</span></div>
+              <div class="ln-money" id="co-cctips"><span class="lm-label">CC TIPS:</span><span class="lm-value">-$82.00</span></div>
+            </div>
+            <hr class="rule solid" />
+            <div class="ln b c" id="co-cashexpected">CASH EXPECTED</div>
+            <div class="ln b dw dh c">$16.00</div>
+            <hr class="rule solid" />
+          </div>
+        </div>
+      </div>
+
+      <div class="ticket-col">
+        <span class="station-label">Sales Recap — Manager, End of Day</span>
+        <div class="paper-wrap">
+          <div class="tab tab-1" style="top:22px;">1</div>
+          <div class="tab tab-3" style="top:105px;">3</div>
+          <div class="tab tab-2" style="top:415px;">2</div>
+          <div class="paper">
+            <div class="ln b c">Your Restaurant</div>
+            <div class="ln c fb" id="cr-title">DAILY SALES RECAP</div>
+            <div class="ln c fb">8/9/2026</div>
+            <hr class="rule solid" />
+
+            <div class="ln b" id="cr-sales-summary">SALES SUMMARY</div>
+            <div class="ln-money" id="cr-gross"><span class="lm-label">Gross Sales</span><span class="lm-value">$4,812.65</span></div>
+            <div class="ln-money" id="cr-voids"><span class="lm-label">Voids / Comps</span><span class="lm-value">-$142.00</span></div>
+            <hr class="rule" />
+            <div class="ln-money b" id="cr-net"><span class="lm-label">Net Sales</span><span class="lm-value">$4,670.65</span></div>
+            <div class="ln-money" id="cr-tax"><span class="lm-label">Tax</span><span class="lm-value">$327.10</span></div>
+            <div class="ln-money b" id="cr-collected"><span class="lm-label">Total Collected</span><span class="lm-value">$4,997.75</span></div>
+            <hr class="rule solid" />
+
+            <div class="ln b" id="cr-check-stats">CHECK STATS</div>
+            <div class="ln-money" id="cr-checks"><span class="lm-label">Checks</span><span class="lm-value">96</span></div>
+            <div class="ln-money" id="cr-avgcheck"><span class="lm-label">Avg Check</span><span class="lm-value">$48.86</span></div>
+            <div class="ln-money" id="cr-covers"><span class="lm-label">Covers</span><span class="lm-value">168</span></div>
+            <hr class="rule solid" />
+
+            <div class="ln b" id="cr-payment-breakdown">PAYMENT BREAKDOWN</div>
+            <div class="ln-money" id="cr-cash"><span class="lm-label">Cash</span><span class="lm-value">$612.00</span></div>
+            <div class="ln-money" id="cr-totalcard"><span class="lm-label">Total Card</span><span class="lm-value">$4,385.75</span></div>
+            <hr class="rule" />
+            <div class="ln-money b" id="cr-paytotal"><span class="lm-label">TOTAL</span><span class="lm-value">$4,997.75</span></div>
+            <hr class="rule solid" />
+
+            <div class="ln b" id="cr-revenue-centers">REVENUE CENTERS</div>
+            <div class="ln-money fb"><span class="lm-label" id="cr-col-center">CENTER</span><span class="lm-value"><span id="cr-col-checks">CHECKS</span> / <span id="cr-col-netsales-1">NET SALES</span></span></div>
+            <div class="ln-money"><span class="lm-label">Dine-In</span><span class="lm-value">74 / $3,890.20</span></div>
+            <div class="ln-money"><span class="lm-label">Delivery</span><span class="lm-value">14 / $520.30</span></div>
+            <div class="ln-money"><span class="lm-label">Takeout</span><span class="lm-value">8 / $260.15</span></div>
+            <hr class="rule solid" />
+
+            <div class="ln b" id="cr-server-summary">SERVER SUMMARY</div>
+            <div class="ln-money fb"><span class="lm-label" id="cr-col-server">SERVER</span><span class="lm-value"><span id="cr-col-netsales-2">NET SALES</span> / <span id="cr-col-tips">TIPS</span> / <span id="cr-col-cash">CASH</span></span></div>
+            <div class="ln-money"><span class="lm-label">Dorothy</span><span class="lm-value">$1,240.10 / $172.40 / $180.00</span></div>
+            <div class="ln-money"><span class="lm-label">Blanche</span><span class="lm-value">$1,105.80 / $158.20 / $150.00</span></div>
+            <div class="ln-money"><span class="lm-label">Rose</span><span class="lm-value">$980.55 / $140.10 / $142.00</span></div>
+            <div class="ln-money"><span class="lm-label">Sophia</span><span class="lm-value">$1,344.20 / $187.80 / $140.00</span></div>
+            <hr class="rule solid" />
+          </div>
+        </div>
+      </div>
+
+    </div>
+
+    <aside class="legend">
+      <h3 class="legend-title">What each part does</h3>
+
+      <div class="legend-item">
+        <span class="legend-badge tab-1">1</span>
+        <div>
+          <h4>Shift header</h4>
+          <p>Server name and the exact clock-in / clock-out window for the
+          shift being reconciled.</p>
+        </div>
+      </div>
+
+      <div class="legend-item">
+        <span class="legend-badge tab-2">2</span>
+        <div>
+          <h4>Sales summary</h4>
+          <p>Gross sales, voids &amp; comps, net sales, tax, and total
+          collected — the whole shift in one glance.</p>
+        </div>
+      </div>
+
+      <div class="legend-item">
+        <span class="legend-badge tab-3">3</span>
+        <div>
+          <h4>Payment &amp; tips</h4>
+          <p>How the shift was tendered and what came in as tips, with any
+          tip-out obligations broken out by role.</p>
+        </div>
+      </div>
+
+      <div class="legend-item">
+        <span class="legend-badge tab-4">4</span>
+        <div>
+          <h4>Cash to turn in</h4>
+          <p>One clear number your team can count against the drawer,
+          every time.</p>
+        </div>
+      </div>
+    </aside>
+  </div>
+  </section>
+
+  <!-- ============ SHIFT SUMMARY ============ -->
+  <section class="tpl" id="shift-summary-wrap" style="--tab-1:var(--green);--tab-2:var(--gold);--tab-3:var(--cyan);--tab-4:var(--purple);">
+  <header class="section-hero">
+    <p class="eyebrow">Time Clock</p>
+    <h2 id="shift-summary">A time clock stub, on the spot</h2>
+    <p class="lede">
+      A short, single-pass stub triggered right at clock-out — current
+      shift and running weekly total pulled straight from the time clock,
+      no back-office report or separate query required.
+    </p>
+  </header>
+
+  <div class="stage">
+    <div class="tickets">
+
+      <div class="ticket-col">
+        <span class="station-label">Clock-Out Stub</span>
+        <div class="paper-wrap">
+          <div class="tab tab-1" style="top:22px;">1</div>
+          <div class="tab tab-2" style="top:163px;">2</div>
+          <div class="tab tab-3" style="top:265px;">3</div>
+          <div class="tab tab-4" style="top:377px;">4</div>
+          <div class="paper">
+            <div class="ln b c">Your Restaurant</div>
+            <div class="ln c fb">SHIFT SUMMARY</div>
+            <div class="ln c fb">Sun, Aug 9</div>
+            <div class="feed"></div>
+            <div class="ln b dw dh c">Rose</div>
+            <div class="ln c fb">Server</div>
+            <div class="ln c fb">Terminal: KPOS-0002</div>
+            <hr class="rule solid" />
+
+            <div class="ln b">THIS SHIFT</div>
+            <div class="ln">Clock In                           4:00 PM</div>
+            <div class="ln">Clock Out                          9:15 PM</div>
+            <hr class="rule" />
+            <div class="ln b">Shift Total                         5h 15m</div>
+            <hr class="rule solid" />
+
+            <div class="ln b">THIS WEEK</div>
+            <div class="ln fb">Aug 3 - Aug 9</div>
+            <hr class="rule" />
+            <div class="ln b">Period Total                       27h 10m</div>
+            <div class="ln b dw dh c">27.1 hrs</div>
+            <hr class="rule solid" />
+
+            <div class="ln c fb">Printed: 9:16 PM</div>
+            <div class="feed-5"></div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+
+    <aside class="legend">
+      <h3 class="legend-title">What each part does</h3>
+
+      <div class="legend-item">
+        <span class="legend-badge tab-1">1</span>
+        <div>
+          <h4>Who &amp; where</h4>
+          <p>Employee name, role, and terminal — so it's clear whose shift
+          this stub belongs to.</p>
+        </div>
+      </div>
+
+      <div class="legend-item">
+        <span class="legend-badge tab-2">2</span>
+        <div>
+          <h4>This shift</h4>
+          <p>Clock in, clock out, and total hours worked for the shift
+          that just ended.</p>
+        </div>
+      </div>
+
+      <div class="legend-item">
+        <span class="legend-badge tab-3">3</span>
+        <div>
+          <h4>This week</h4>
+          <p>A running weekly total, so a server always knows where they
+          stand before payday.</p>
+        </div>
+      </div>
+
+      <div class="legend-item">
+        <span class="legend-badge tab-4">4</span>
+        <div>
+          <h4>Printed at</h4>
+          <p>A quick timestamp confirming exactly when the stub was
+          pulled.</p>
+        </div>
+      </div>
+    </aside>
+  </div>
+  </section>
+
+  <div class="chapter-strip">
+    <a href="#kitchen-ticket" style="--chap-color:var(--green);">
+      <div class="chapter-label">Kitchen</div>
+      <div class="chapter-name">Kitchen Ticket</div>
+    </a>
+    <a href="#guest-receipt" style="--chap-color:var(--gold);">
+      <div class="chapter-label">Front of House</div>
+      <div class="chapter-name">Guest Receipt</div>
+    </a>
+    <a href="#gift-card-balance" style="--chap-color:var(--cyan);">
+      <div class="chapter-label">Gift Cards</div>
+      <div class="chapter-name">Balance Check</div>
+    </a>
+    <a href="#delivery-receipt" style="--chap-color:var(--purple);">
+      <div class="chapter-label">Delivery</div>
+      <div class="chapter-name">Delivery Receipt</div>
+    </a>
+    <a href="#employee-checkout" style="--chap-color:var(--warmgreen);">
+      <div class="chapter-label">End of Shift</div>
+      <div class="chapter-name">Employee Checkout</div>
+    </a>
+    <a href="#shift-summary" style="--chap-color:var(--green);">
+      <div class="chapter-label">Time Clock</div>
+      <div class="chapter-name">Shift Summary</div>
+    </a>
+  </div>
+
+  <footer class="page-footer">
+    <strong>KINDpos</strong> — Nice. Dependable. Yours.
+  </footer>
+
+</div>
+
+<script>
+(function () {
+  // Verified 1:1 against shared/src/main/kotlin/com/kindpos/shared/printing/LocaleStrings.kt.
+  // Only fields confirmed present in every language's table are wired here.
+  // "tip" is only defined for en/es in the real table — every other locale
+  // falls back to the English "TIP:", exactly as the product does.
+  var LANGS = [
+    { code: "en", name: "English" },
+    { code: "es", name: "Español" },
+    { code: "tl", name: "Tagalog" },
+    { code: "zh", name: "中文" },
+    { code: "it", name: "Italiano" },
+    { code: "pt", name: "Português" },
+    { code: "fr", name: "Français" },
+    { code: "vi", name: "Tiếng Việt" },
+    { code: "ar", name: "العربية" },
+    { code: "hi", name: "हिन्दी" }
+  ];
+
+  // Confirmed live in shared/printing/LocaleStrings.kt as of the last CC
+  // fix session: customer_copy/merchant_copy/itemized_summary (added, wired
+  // into GuestReceipt.kt's copyLabel block), tip (added to the 8 languages
+  // that previously fell back to English), the delivery-receipt keys
+  // (prepaid/cash_on_delivery/card_on_delivery/delivery_tag/tax/
+  // paid_thank_you, threaded into renderDeliveryReceipt + PrintRoutes.kt),
+  // and signature (added, wired into GuestReceipt.kt's renderTipSection —
+  // mechanically derived from each language's existing signature_line
+  // value rather than retyped, to avoid transcription risk). That process
+  // also confirmed the Hindi signature_line reads "हस्ताक्षर: ____" in the
+  // source file — the earlier "हस्ताक्ष" (missing र:) seen in an audit
+  // pass was a display artifact, not a real bug in the codebase.
+  // The cor_* checkout-receipt keys (35 total) were NOT newly added — an
+  // audit that expected to find "no locale support" instead found
+  // CheckoutReceipt.kt already fully localized (47 LocaleStrings hits) for
+  // both SERVER and RECAP modes under one shared cor_* key set. This data
+  // was extracted using Read/view only, not grep — a prior session found
+  // grep visually reverses RTL text, Read does not; this Arabic set should
+  // be the most reliable of the batch. amount_due below uses the
+  // pre-existing key values (shared with KitchenTicket.kt) — CC caught
+  // that my draft values for tl/vi/hi differed from what was already live
+  // and correctly reused the original rather than overwrite it. Compiled
+  // clean. Still unverified by a native speaker per CC's own deviation
+  // report — and the non-cor_* Arabic values below (transcribed from
+  // earlier terminal grep output) remain flagged for a native-speaker
+  // check against the source file directly, not this page.
+  var STRINGS = {
+    en: { check: "Check:", table: "Table:", server: "Server:", date: "Date:", seat: "Seat", subtotal: "SUBTOTAL:", sales_tax: "Sales Tax", total: "TOTAL:", original: "Original", tip: "TIP:", customer_copy: "** CUSTOMER COPY **", delivery_fee: "DELIVERY FEE:", cash_on_delivery: "CASH ON DELIVERY", delivery_tag: "DELIVERY", tax: "TAX:", amount_due: "AMOUNT DUE", signature: "SIGNATURE:", cor_server_checkout: "SERVER CHECKOUT", cor_daily_recap: "DAILY SALES RECAP", cor_terminal: "Terminal:", cor_sales_summary: "SALES SUMMARY", cor_gross_sales: "Gross Sales", cor_voids_comps: "Voids / Comps", cor_net_sales: "Net Sales", cor_tax: "Tax", cor_total_collected: "Total Collected", cor_check_stats: "CHECK STATS", cor_checks: "Checks", cor_avg_check: "Avg Check", cor_covers: "Covers", cor_payment_breakdown: "PAYMENT BREAKDOWN", cor_cash: "Cash", cor_card: "Card", cor_total_card: "Total Card", cor_total: "TOTAL", cor_tips: "TIPS", cor_card_tips: "Card Tips", cor_total_tips: "Total Tips", cor_tip_out: "TIP-OUT", cor_of: "of", cor_total_tip_out: "Total Tip-Out", cor_revenue_centers: "REVENUE CENTERS", cor_col_center: "CENTER", cor_col_checks: "CHECKS", cor_col_net_sales: "NET SALES", cor_server_summary: "SERVER SUMMARY", cor_col_server: "SERVER", cor_col_tips: "TIPS", cor_col_cash: "CASH", cor_cash_sales: "CASH SALES", cor_cc_tips: "CC TIPS:", cor_cash_expected: "CASH EXPECTED", gc_title: "GIFT CARD BALANCE", gc_card: "Card", gc_balance: "BALANCE", gc_printed: "Printed:", gc_terminal: "Terminal:" },
+    es: { check: "Cuenta:", table: "Mesa:", server: "Mesero:", date: "Fecha:", seat: "Lugar", subtotal: "SUBTOTAL:", sales_tax: "Impuesto", total: "TOTAL:", original: "Original", tip: "PROPINA:", customer_copy: "** COPIA DEL CLIENTE **", delivery_fee: "CARGO DE ENTREGA:", cash_on_delivery: "EFECTIVO CONTRA ENTREGA", delivery_tag: "ENTREGA", tax: "IMPUESTO:", amount_due: "MONTO ADEUDADO", signature: "FIRMA:", cor_server_checkout: "CIERRE DE MESERO", cor_daily_recap: "RESUMEN DIARIO DE VENTAS", cor_terminal: "Terminal:", cor_sales_summary: "RESUMEN DE VENTAS", cor_gross_sales: "Ventas Brutas", cor_voids_comps: "Anulaciones / Cortesías", cor_net_sales: "Ventas Netas", cor_tax: "Impuesto", cor_total_collected: "Total Cobrado", cor_check_stats: "ESTADÍSTICAS", cor_checks: "Cuentas", cor_avg_check: "Cuenta Prom.", cor_covers: "Comensales", cor_payment_breakdown: "DESGLOSE DE PAGOS", cor_cash: "Efectivo", cor_card: "Tarjeta", cor_total_card: "Total Tarjeta", cor_total: "TOTAL", cor_tips: "PROPINAS", cor_card_tips: "Propinas Tarjeta", cor_total_tips: "Total Propinas", cor_tip_out: "REPARTO PROPINAS", cor_of: "de", cor_total_tip_out: "Total Reparto", cor_revenue_centers: "CENTROS DE INGRESO", cor_col_center: "CENTRO", cor_col_checks: "CUENTAS", cor_col_net_sales: "VENTAS NETAS", cor_server_summary: "RESUMEN MESEROS", cor_col_server: "MESERO", cor_col_tips: "PROPINAS", cor_col_cash: "EFECTIVO", cor_cash_sales: "VENTAS EFECTIVO", cor_cc_tips: "PROP. TARJETA:", cor_cash_expected: "EFECTIVO ESPERADO", gc_title: "SALDO DE TARJETA REGALO", gc_card: "Tarjeta", gc_balance: "SALDO", gc_printed: "Impreso:", gc_terminal: "Terminal:" },
+    tl: { check: "Tseke:", table: "Mesa:", server: "Waiter:", date: "Petsa:", seat: "Upuan", subtotal: "SUBTOTAL:", sales_tax: "Buwis sa Benta", total: "KABUUAN:", original: "Orihinal", tip: "PROPINA:", customer_copy: "** KOPYA NG KOSTUMER **", delivery_fee: "BAYAD NG PAGHAHATID:", cash_on_delivery: "CASH KAPAG INIHATID", delivery_tag: "PAGHAHATID", tax: "BUWIS:", amount_due: "HALAGA NA DAPAT BAYARAN", signature: "PIRMA:", cor_server_checkout: "CHECKOUT NG SERBER", cor_daily_recap: "PANG-ARAW-ARAW NA BENTA", cor_terminal: "Terminal:", cor_sales_summary: "BUOD NG BENTA", cor_gross_sales: "Kabuuang Benta", cor_voids_comps: "Void / Komplimentaryo", cor_net_sales: "Netong Benta", cor_tax: "Buwis", cor_total_collected: "Kabuuang Nakolekta", cor_check_stats: "ESTADISTIKA", cor_checks: "Mga Tseke", cor_avg_check: "Karaniwang Tseke", cor_covers: "Mga Kostumer", cor_payment_breakdown: "BREAKDOWN NG BAYAD", cor_cash: "Cash", cor_card: "Card", cor_total_card: "Kabuuang Card", cor_total: "KABUUAN", cor_tips: "MGA TIP", cor_card_tips: "Tip sa Card", cor_total_tips: "Kabuuang Tip", cor_tip_out: "TIP-OUT", cor_of: "ng", cor_total_tip_out: "Kabuuang Tip-Out", cor_revenue_centers: "REVENUE CENTERS", cor_col_center: "SENTRO", cor_col_checks: "TSEKE", cor_col_net_sales: "NETONG BENTA", cor_server_summary: "BUOD NG SERBER", cor_col_server: "SERBER", cor_col_tips: "TIP", cor_col_cash: "CASH", cor_cash_sales: "BENTANG CASH", cor_cc_tips: "CC TIPS:", cor_cash_expected: "INAASAHANG CASH", gc_title: "BALANSE NG GIFT CARD", gc_card: "Card", gc_balance: "BALANSE", gc_printed: "Naprint:", gc_terminal: "Terminal:" },
+    zh: { check: "账单：", table: "桌位：", server: "服务员：", date: "日期：", seat: "座位", subtotal: "小计：", sales_tax: "销售税", total: "合计：", original: "原始", tip: "小费：", customer_copy: "** 顾客联 **", delivery_fee: "送货费：", cash_on_delivery: "货到付现", delivery_tag: "外送", tax: "税额：", amount_due: "应付金额", signature: "签名：", cor_server_checkout: "服务员结账", cor_daily_recap: "每日销售汇总", cor_terminal: "终端：", cor_sales_summary: "销售汇总", cor_gross_sales: "总销售", cor_voids_comps: "作废/赠送", cor_net_sales: "净销售", cor_tax: "税额", cor_total_collected: "总收款", cor_check_stats: "账单统计", cor_checks: "账单数", cor_avg_check: "平均账单", cor_covers: "客数", cor_payment_breakdown: "付款明细", cor_cash: "现金", cor_card: "刷卡", cor_total_card: "刷卡合计", cor_total: "总计", cor_tips: "小费", cor_card_tips: "刷卡小费", cor_total_tips: "小费合计", cor_tip_out: "小费分成", cor_of: "的", cor_total_tip_out: "分成合计", cor_revenue_centers: "收入中心", cor_col_center: "中心", cor_col_checks: "账单", cor_col_net_sales: "净销售", cor_server_summary: "服务员汇总", cor_col_server: "服务员", cor_col_tips: "小费", cor_col_cash: "现金", cor_cash_sales: "现金销售", cor_cc_tips: "刷卡小费：", cor_cash_expected: "应留现金", gc_title: "礼品卡余额", gc_card: "卡", gc_balance: "余额", gc_printed: "打印时间：", gc_terminal: "终端：" },
+    it: { check: "Conto:", table: "Tavolo:", server: "Cameriere:", date: "Data:", seat: "Posto", subtotal: "SUBTOTALE:", sales_tax: "Imposta", total: "TOTALE:", original: "Originale", tip: "MANCIA:", customer_copy: "** COPIA CLIENTE **", delivery_fee: "SPESE CONSEGNA:", cash_on_delivery: "CONTANTI ALLA CONSEGNA", delivery_tag: "CONSEGNA", tax: "IMPOSTA:", amount_due: "IMPORTO DOVUTO", signature: "FIRMA:", cor_server_checkout: "CHIUSURA CAMERIERE", cor_daily_recap: "RIEPILOGO GIORNALIERO", cor_terminal: "Terminale:", cor_sales_summary: "RIEPILOGO VENDITE", cor_gross_sales: "Vendite Lorde", cor_voids_comps: "Storni / Omaggi", cor_net_sales: "Vendite Nette", cor_tax: "Imposta", cor_total_collected: "Totale Incassato", cor_check_stats: "STATISTICHE", cor_checks: "Conti", cor_avg_check: "Conto Medio", cor_covers: "Coperti", cor_payment_breakdown: "DETTAGLIO PAGAMENTI", cor_cash: "Contanti", cor_card: "Carta", cor_total_card: "Totale Carta", cor_total: "TOTALE", cor_tips: "MANCE", cor_card_tips: "Mance Carta", cor_total_tips: "Totale Mance", cor_tip_out: "RIPARTO MANCE", cor_of: "di", cor_total_tip_out: "Totale Riparto", cor_revenue_centers: "CENTRI DI RICAVO", cor_col_center: "CENTRO", cor_col_checks: "CONTI", cor_col_net_sales: "VENDITE NETTE", cor_server_summary: "RIEPILOGO CAMERIERI", cor_col_server: "CAMERIERE", cor_col_tips: "MANCE", cor_col_cash: "CONTANTI", cor_cash_sales: "VENDITE CONTANTI", cor_cc_tips: "MANCE CARTA:", cor_cash_expected: "CONTANTI ATTESI", gc_title: "SALDO CARTA REGALO", gc_card: "Carta", gc_balance: "SALDO", gc_printed: "Stampato:", gc_terminal: "Terminale:" },
+    pt: { check: "Conta:", table: "Mesa:", server: "Garçom:", date: "Data:", seat: "Lugar", subtotal: "SUBTOTAL:", sales_tax: "Imposto Sobre Vendas", total: "TOTAL:", original: "Original", tip: "GORJETA:", customer_copy: "** VIA DO CLIENTE **", delivery_fee: "TAXA DE ENTREGA:", cash_on_delivery: "DINHEIRO NA ENTREGA", delivery_tag: "ENTREGA", tax: "IMPOSTO:", amount_due: "VALOR DEVIDO", signature: "ASSINATURA:", cor_server_checkout: "FECHAMENTO GARÇOM", cor_daily_recap: "RESUMO DIÁRIO", cor_terminal: "Terminal:", cor_sales_summary: "RESUMO DE VENDAS", cor_gross_sales: "Vendas Brutas", cor_voids_comps: "Cancel. / Cortesias", cor_net_sales: "Vendas Líquidas", cor_tax: "Imposto", cor_total_collected: "Total Recebido", cor_check_stats: "ESTATÍSTICAS", cor_checks: "Contas", cor_avg_check: "Conta Média", cor_covers: "Pessoas", cor_payment_breakdown: "DETALHE PAGAMENTOS", cor_cash: "Dinheiro", cor_card: "Cartão", cor_total_card: "Total Cartão", cor_total: "TOTAL", cor_tips: "GORJETAS", cor_card_tips: "Gorjetas Cartão", cor_total_tips: "Total Gorjetas", cor_tip_out: "REPASSE GORJETA", cor_of: "de", cor_total_tip_out: "Total Repasse", cor_revenue_centers: "CENTROS DE RECEITA", cor_col_center: "CENTRO", cor_col_checks: "CONTAS", cor_col_net_sales: "VENDAS LÍQ.", cor_server_summary: "RESUMO GARÇONS", cor_col_server: "GARÇOM", cor_col_tips: "GORJETAS", cor_col_cash: "DINHEIRO", cor_cash_sales: "VENDAS DINHEIRO", cor_cc_tips: "GORJ. CARTÃO:", cor_cash_expected: "DINHEIRO ESPERADO", gc_title: "SALDO CARTÃO PRESENTE", gc_card: "Cartão", gc_balance: "SALDO", gc_printed: "Impresso:", gc_terminal: "Terminal:" },
+    fr: { check: "Facture:", table: "Table:", server: "Serveur:", date: "Date:", seat: "Place", subtotal: "SOUS-TOTAL:", sales_tax: "Taxe de Vente", total: "TOTAL:", original: "Original", tip: "POURBOIRE:", customer_copy: "** COPIE CLIENT **", delivery_fee: "FRAIS DE LIVRAISON:", cash_on_delivery: "ESPÈCES À LA LIVRAISON", delivery_tag: "LIVRAISON", tax: "TAXE:", amount_due: "MONTANT DÛ", signature: "SIGNATURE:", cor_server_checkout: "CLÔTURE SERVEUR", cor_daily_recap: "RÉCAP. VENTES", cor_terminal: "Terminal :", cor_sales_summary: "RÉSUMÉ DES VENTES", cor_gross_sales: "Ventes Brutes", cor_voids_comps: "Annul. / Offerts", cor_net_sales: "Ventes Nettes", cor_tax: "Taxe", cor_total_collected: "Total Encaissé", cor_check_stats: "STATISTIQUES", cor_checks: "Additions", cor_avg_check: "Addition Moy.", cor_covers: "Couverts", cor_payment_breakdown: "DÉTAIL PAIEMENTS", cor_cash: "Espèces", cor_card: "Carte", cor_total_card: "Total Carte", cor_total: "TOTAL", cor_tips: "POURBOIRES", cor_card_tips: "Pourb. Carte", cor_total_tips: "Total Pourb.", cor_tip_out: "PARTAGE POURB.", cor_of: "de", cor_total_tip_out: "Total Partage", cor_revenue_centers: "CENTRES DE REVENU", cor_col_center: "CENTRE", cor_col_checks: "ADDITIONS", cor_col_net_sales: "VENTES NETTES", cor_server_summary: "RÉSUMÉ SERVEURS", cor_col_server: "SERVEUR", cor_col_tips: "POURB.", cor_col_cash: "ESPÈCES", cor_cash_sales: "VENTES ESPÈCES", cor_cc_tips: "POURB. CARTE :", cor_cash_expected: "ESPÈCES ATTENDUES", gc_title: "SOLDE CARTE CADEAU", gc_card: "Carte", gc_balance: "SOLDE", gc_printed: "Imprimé :", gc_terminal: "Terminal :" },
+    vi: { check: "Hoá đơn:", table: "Bàn:", server: "Người Phục Vụ:", date: "Ngày:", seat: "Chỗ Ngồi", subtotal: "TỔNG PHỤ:", sales_tax: "Thuế Bán Hàng", total: "TỔNG CỘNG:", original: "Gốc", tip: "TIỀN TIP:", customer_copy: "** BẢN KHÁCH HÀNG **", delivery_fee: "PHÍ GIAO HÀNG:", cash_on_delivery: "TIỀN MẶT KHI GIAO HÀNG", delivery_tag: "GIAO HÀNG", tax: "THUẾ:", amount_due: "SỐ TIỀN CÒN NỢ", signature: "CHỮ KÝ:", cor_server_checkout: "KẾT CA PHỤC VỤ", cor_daily_recap: "TỔNG KẾT NGÀY", cor_terminal: "Máy:", cor_sales_summary: "TỔNG KẾT BÁN HÀNG", cor_gross_sales: "Doanh Thu Gộp", cor_voids_comps: "Hủy / Tặng", cor_net_sales: "Doanh Thu Ròng", cor_tax: "Thuế", cor_total_collected: "Tổng Thu", cor_check_stats: "THỐNG KÊ", cor_checks: "Hóa Đơn", cor_avg_check: "TB Hóa Đơn", cor_covers: "Khách", cor_payment_breakdown: "CHI TIẾT THANH TOÁN", cor_cash: "Tiền Mặt", cor_card: "Thẻ", cor_total_card: "Tổng Thẻ", cor_total: "TỔNG", cor_tips: "TIỀN TIP", cor_card_tips: "Tip Thẻ", cor_total_tips: "Tổng Tip", cor_tip_out: "CHIA TIP", cor_of: "của", cor_total_tip_out: "Tổng Chia Tip", cor_revenue_centers: "TRUNG TÂM DOANH THU", cor_col_center: "TRUNG TÂM", cor_col_checks: "HĐ", cor_col_net_sales: "DOANH THU RÒNG", cor_server_summary: "TỔNG KẾT PHỤC VỤ", cor_col_server: "PHỤC VỤ", cor_col_tips: "TIP", cor_col_cash: "TIỀN MẶT", cor_cash_sales: "BÁN TIỀN MẶT", cor_cc_tips: "TIP THẺ:", cor_cash_expected: "TIỀN MẶT DỰ KIẾN", gc_title: "SỐ DƯ THẺ QUÀ TẶNG", gc_card: "Thẻ", gc_balance: "SỐ DƯ", gc_printed: "In lúc:", gc_terminal: "Máy:" },
+    ar: { check: "ةروتافلا:", table: "ةلواطلا:", server: "لدانلا:", date: "خيراتلا:", seat: "دعقملا", subtotal: "يعرفلا عومجملا:", sales_tax: "تاعيبملا ةبيرض", total: "يلامجإلا:", original: "لصألا", tip: "شيشقبلا:", customer_copy: "** نسخة العميل **", delivery_fee: "ليصوتلا موسر:", cash_on_delivery: "ميلستلا دنع اًدقن عفدلا", delivery_tag: "ليصوت", tax: "ةبيرضلا:", amount_due: "قحتسملا غلبملا", signature: "عيقوتلا:", cor_server_checkout: "إغلاق النادل", cor_daily_recap: "ملخص المبيعات اليومي", cor_terminal: "الجهاز:", cor_sales_summary: "ملخص المبيعات", cor_gross_sales: "المبيعات الإجمالية", cor_voids_comps: "إلغاءات / مجاملات", cor_net_sales: "صافي المبيعات", cor_tax: "الضريبة", cor_total_collected: "إجمالي المحصّل", cor_check_stats: "إحصائيات", cor_checks: "الفواتير", cor_avg_check: "متوسط الفاتورة", cor_covers: "الضيوف", cor_payment_breakdown: "تفصيل المدفوعات", cor_cash: "نقد", cor_card: "بطاقة", cor_total_card: "إجمالي البطاقة", cor_total: "الإجمالي", cor_tips: "البقشيش", cor_card_tips: "بقشيش البطاقة", cor_total_tips: "إجمالي البقشيش", cor_tip_out: "توزيع البقشيش", cor_of: "من", cor_total_tip_out: "إجمالي التوزيع", cor_revenue_centers: "مراكز الإيراد", cor_col_center: "المركز", cor_col_checks: "الفواتير", cor_col_net_sales: "صافي المبيعات", cor_server_summary: "ملخص النوادل", cor_col_server: "النادل", cor_col_tips: "البقشيش", cor_col_cash: "نقد", cor_cash_sales: "مبيعات نقدية", cor_cc_tips: "بقشيش البطاقة:", cor_cash_expected: "النقد المتوقع", gc_title: "ايادهلا ةقاطب ديصر", gc_card: "ةقاطب", gc_balance: "ديصرلا", gc_printed: "عبطُ:", gc_terminal: "زاهجلا:" },
+    hi: { check: "चेक:", table: "टेबल:", server: "सर्वर:", date: "तारीख:", seat: "सीट", subtotal: "उप-योग:", sales_tax: "बिक्री कर", total: "कुल:", original: "मूल", tip: "टिप:", customer_copy: "** ग्राहक प्रति **", delivery_fee: "डिलीवरी शुल्क:", cash_on_delivery: "डिलीवरी पर नकद", delivery_tag: "डिलीवरी", tax: "कर:", amount_due: "बकाया राशि", signature: "हस्ताक्षर:", cor_server_checkout: "सर्वर चेकआउट", cor_daily_recap: "दैनिक बिक्री सारांश", cor_terminal: "टर्मिनल:", cor_sales_summary: "बिक्री सारांश", cor_gross_sales: "सकल बिक्री", cor_voids_comps: "रद्द / नि:शुल्क", cor_net_sales: "शुद्ध बिक्री", cor_tax: "कर", cor_total_collected: "कुल वसूली", cor_check_stats: "चेक आँकड़े", cor_checks: "चेक", cor_avg_check: "औसत चेक", cor_covers: "ग्राहक", cor_payment_breakdown: "भुगतान विवरण", cor_cash: "नकद", cor_card: "कार्ड", cor_total_card: "कुल कार्ड", cor_total: "कुल", cor_tips: "टिप", cor_card_tips: "कार्ड टिप", cor_total_tips: "कुल टिप", cor_tip_out: "टिप-आउट", cor_of: "का", cor_total_tip_out: "कुल टिप-आउट", cor_revenue_centers: "राजस्व केंद्र", cor_col_center: "केंद्र", cor_col_checks: "चेक", cor_col_net_sales: "शुद्ध बिक्री", cor_server_summary: "सर्वर सारांश", cor_col_server: "सर्वर", cor_col_tips: "टिप", cor_col_cash: "नकद", cor_cash_sales: "नकद बिक्री", cor_cc_tips: "कार्ड टिप:", cor_cash_expected: "अपेक्षित नकद", gc_title: "गिफ्ट कार्ड शेष", gc_card: "कार्ड", gc_balance: "शेष", gc_printed: "मुद्रित:", gc_terminal: "टर्मिनल:" }
+  };
+
+  function setMoneyLine(id, label, amount) {
+    var el = document.getElementById(id);
+    el.querySelector(".lm-label").textContent = label;
+    el.querySelector(".lm-value").textContent = amount;
+  }
+
+  function setLabel(id, label) {
+    document.getElementById(id).querySelector(".lm-label").textContent = label;
+  }
+
+  function setText(id, text) {
+    document.getElementById(id).textContent = text;
+  }
+
+  function applyLocale(code) {
+    var S = STRINGS[code] || STRINGS.en;
+
+    document.getElementById("gr-check").textContent = S.check + " 42";
+    document.getElementById("gr-tableserver").textContent = S.table + " 12 | " + S.server + " Dorothy";
+    document.getElementById("gr-date").textContent = S.date + " 08/09/2026 6:52 PM";
+    document.getElementById("gr-seat1").textContent = "--- " + S.seat + " 1 ---";
+    document.getElementById("gr-seat2").textContent = "--- " + S.seat + " 2 ---";
+
+    setMoneyLine("gr-subtotal", S.subtotal, "$44.49");
+    setMoneyLine("gr-tax", S.sales_tax + ":", "$3.11");
+    setMoneyLine("gr-total", S.total, "$47.60");
+
+    setMoneyLine("gr-tip-blank", S.tip, "$____________");
+    setMoneyLine("gr-total-blank", S.total, "$____________");
+    setMoneyLine("gr-signature", S.signature, "________________________");
+
+    var orig = S.original.toUpperCase();
+    document.getElementById("kt-original-1").textContent = orig;
+    document.getElementById("kt-original-2").textContent = orig;
+
+    document.getElementById("gr-copytype").textContent = S.customer_copy;
+
+    document.getElementById("dr-status").textContent = S.cash_on_delivery;
+    document.getElementById("dr-tag").textContent = "DL-42 | " + S.delivery_tag;
+    document.getElementById("dr-date").textContent = S.date + " 8/9/2026 6:52 PM";
+    setMoneyLine("dr-subtotal", S.subtotal, "$30.00");
+    setMoneyLine("dr-fee", S.delivery_fee, "$4.99");
+    setMoneyLine("dr-tax", S.tax, "$2.10");
+    setMoneyLine("dr-total", S.total, "$37.09");
+    document.getElementById("dr-amountdue").textContent = S.amount_due;
+
+    setText("co-title", S.cor_server_checkout);
+    setText("co-terminal-label", S.cor_terminal);
+    setText("co-sales-summary", S.cor_sales_summary);
+    setLabel("co-gross", S.cor_gross_sales);
+    setLabel("co-voids", S.cor_voids_comps);
+    setLabel("co-net", S.cor_net_sales);
+    setLabel("co-tax", S.cor_tax);
+    setLabel("co-collected", S.cor_total_collected);
+    setText("co-check-stats", S.cor_check_stats);
+    setLabel("co-checks", S.cor_checks);
+    setLabel("co-avgcheck", S.cor_avg_check);
+    setLabel("co-covers", S.cor_covers);
+    setText("co-payment-breakdown", S.cor_payment_breakdown);
+    setLabel("co-cash", S.cor_cash);
+    setLabel("co-card", S.cor_card);
+    setLabel("co-paytotal", S.cor_total);
+    setText("co-tips", S.cor_tips);
+    setLabel("co-cardtips", S.cor_card_tips);
+    setLabel("co-totaltips", S.cor_total_tips);
+    setText("co-tipout", S.cor_tip_out);
+    setText("co-of1", S.cor_of);
+    setText("co-of2", S.cor_of);
+    setLabel("co-totaltipout", S.cor_total_tip_out);
+    setLabel("co-cashsales", S.cor_cash_sales);
+    setLabel("co-cctips", S.cor_cc_tips);
+    setText("co-cashexpected", S.cor_cash_expected);
+
+    setText("cr-title", S.cor_daily_recap);
+    setText("cr-sales-summary", S.cor_sales_summary);
+    setLabel("cr-gross", S.cor_gross_sales);
+    setLabel("cr-voids", S.cor_voids_comps);
+    setLabel("cr-net", S.cor_net_sales);
+    setLabel("cr-tax", S.cor_tax);
+    setLabel("cr-collected", S.cor_total_collected);
+    setText("cr-check-stats", S.cor_check_stats);
+    setLabel("cr-checks", S.cor_checks);
+    setLabel("cr-avgcheck", S.cor_avg_check);
+    setLabel("cr-covers", S.cor_covers);
+    setText("cr-payment-breakdown", S.cor_payment_breakdown);
+    setLabel("cr-cash", S.cor_cash);
+    setLabel("cr-totalcard", S.cor_total_card);
+    setLabel("cr-paytotal", S.cor_total);
+    setText("cr-revenue-centers", S.cor_revenue_centers);
+    setText("cr-col-center", S.cor_col_center);
+    setText("cr-col-checks", S.cor_col_checks);
+    setText("cr-col-netsales-1", S.cor_col_net_sales);
+    setText("cr-server-summary", S.cor_server_summary);
+    setText("cr-col-server", S.cor_col_server);
+    setText("cr-col-netsales-2", S.cor_col_net_sales);
+    setText("cr-col-tips", S.cor_col_tips);
+    setText("cr-col-cash", S.cor_col_cash);
+
+    setText("gc-title", S.gc_title);
+    setLabel("gc-card", S.gc_card);
+    setText("gc-balance", S.gc_balance);
+    setLabel("gc-printed", S.gc_printed);
+    setLabel("gc-terminal", S.gc_terminal);
+
+    var pills = document.querySelectorAll(".lang-pill");
+    for (var i = 0; i < pills.length; i++) {
+      pills[i].classList.toggle("active", pills[i].getAttribute("data-code") === code);
+    }
+
+    var caveat = document.getElementById("lang-caveat");
+    caveat.textContent = "Item names, store info, and customer details print exactly as entered — they're your content, not ours. The itemized \"TIP SUGGESTIONS\" breakdown on the guest receipt is currently English-only; every other label shown here is fully localized.";
+  }
+
+  function positionLangBar() {
+    var jumpnav = document.querySelector(".jumpnav");
+    var langBar = document.querySelector(".lang-bar");
+    if (jumpnav && langBar) {
+      var jumpnavHeight = jumpnav.offsetHeight;
+      langBar.style.top = jumpnavHeight + "px";
+      var totalSticky = jumpnavHeight + langBar.offsetHeight + 20;
+      document.documentElement.style.setProperty("--sticky-offset", totalSticky + "px");
+    }
+  }
+
+  function init() {
+    var pillHost = document.getElementById("lang-pills");
+    LANGS.forEach(function (lang) {
+      var btn = document.createElement("button");
+      btn.type = "button";
+      btn.className = "lang-pill";
+      btn.setAttribute("data-code", lang.code);
+      btn.textContent = lang.name;
+      btn.addEventListener("click", function () { applyLocale(lang.code); });
+      pillHost.appendChild(btn);
+    });
+    applyLocale("en");
+    positionLangBar();
+    window.addEventListener("resize", positionLangBar);
+  }
+
+  if (document.readyState === "loading") {
+    document.addEventListener("DOMContentLoaded", init);
+  } else {
+    init();
+  }
+})();
+</script>
+</body>
+</html>
