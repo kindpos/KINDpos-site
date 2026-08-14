@@ -96,6 +96,49 @@
         .nav-link:hover { color: var(--text); }
         .nav-link.active { color: var(--green); border-bottom-color: var(--green); }
 
+        .nav-dropdown { position: relative; display: flex; }
+        .nav-dropdown-caret {
+            display: inline-flex;
+            align-items: center;
+            padding: 0 14px 0 4px;
+            height: 52px;
+            color: var(--textMuted);
+            cursor: pointer;
+            border-bottom: 3px solid transparent;
+            user-select: none;
+        }
+        .nav-dropdown-caret svg { transition: transform 0.15s; }
+        .nav-dropdown.open .nav-dropdown-caret svg { transform: rotate(180deg); }
+        .nav-dropdown-menu {
+            position: absolute;
+            top: 100%;
+            left: 0;
+            min-width: 200px;
+            background: var(--shell);
+            border: 1px solid rgba(90,95,102,0.3);
+            border-top: 2px solid var(--green);
+            box-shadow: 0 12px 24px rgba(0,0,0,0.4);
+            display: none;
+            flex-direction: column;
+            z-index: 1001;
+        }
+        .nav-dropdown-menu a {
+            font-family: var(--fb);
+            font-size: 14px;
+            letter-spacing: 0.5px;
+            text-transform: uppercase;
+            color: var(--textMuted);
+            text-decoration: none;
+            padding: 14px 18px;
+            border-bottom: 1px solid rgba(90,95,102,0.15);
+            white-space: nowrap;
+            transition: color 0.15s, background 0.15s;
+        }
+        .nav-dropdown-menu a:last-child { border-bottom: none; }
+        .nav-dropdown-menu a:hover { color: var(--text); background: rgba(134,239,172,0.06); }
+        .nav-dropdown:hover .nav-dropdown-menu,
+        .nav-dropdown.open .nav-dropdown-menu { display: flex; }
+
         /* ── LAYOUT ── */
         .page-container {
             display: flex;
@@ -420,8 +463,16 @@
             </div>
             <a class="nav-link active" onclick="showTab('home')">Home</a>
             <a class="nav-link" onclick="showTab('story')">Story</a>
-            <a class="nav-link" href="/solution">Solution</a>
-            <a class="nav-link" href="/print-templates">Print Templates</a>
+            <div class="nav-dropdown" id="solution-dropdown">
+                <a class="nav-link" href="/solution">Solution</a>
+                <span class="nav-dropdown-caret" id="solution-dropdown-caret">
+                    <svg width="10" height="6" viewBox="0 0 10 6" fill="none"><path d="M1 1l4 4 4-4" stroke="currentColor" stroke-width="1.5" fill="none" stroke-linecap="round"/></svg>
+                </span>
+                <div class="nav-dropdown-menu">
+                    <a href="/solution">Solution Tour</a>
+                    <a href="/print-templates">Print Templates</a>
+                </div>
+            </div>
             <a class="nav-link" onclick="showTab('feedback')">Feedback</a>
             <a class="nav-link" onclick="showTab('joinus')">Join Us</a>
             <a class="nav-link" onclick="showTab('pilot')">Pilot</a>
@@ -489,6 +540,43 @@
                 <!-- Updates -->
                 <section style="padding: 70px 20px; max-width: 740px; margin: 0 auto;">
                     <h2 style="color: var(--gold);">Build Progress</h2>
+
+                    <div class="update-item">
+                        <span class="update-date">Aug 2026</span>
+                        <span>EventSchema required-key registry complete — 274 event types registered across 17 chunks, backed by 582 automated tests</span>
+                    </div>
+                    <div class="update-item">
+                        <span class="update-date">Aug 2026</span>
+                        <span>Web terminal reaches full parity with the Android terminal — check overview, gift cards, cash drawer management, visual floor plan, and a quick-pay tender bar</span>
+                    </div>
+                    <div class="update-item">
+                        <span class="update-date">Aug 2026</span>
+                        <span>Localization coverage extended across the full order-to-checkout flow, including Arabic and Hindi</span>
+                    </div>
+                    <div class="update-item">
+                        <span class="update-date">Jul 2026</span>
+                        <span>Full inventory, vendor, and recipe (BOM) subsystem shipped — auto-depletion at send, restore-on-void, recipe-based costing</span>
+                    </div>
+                    <div class="update-item">
+                        <span class="update-date">Jul 2026</span>
+                        <span>Combos & Specials shipped across dine-in, QSR, and web — auto-detected meal deals plus configurable specials with grace-period windows</span>
+                    </div>
+                    <div class="update-item">
+                        <span class="update-date">Jul 2026</span>
+                        <span>Metrc compliance integration certified — sandbox evaluation passed end-to-end across sales, packages, lab results, and transfers</span>
+                    </div>
+                    <div class="update-item">
+                        <span class="update-date">Jun 2026</span>
+                        <span>Delivery Phase 1 complete — delivery zones, radius/geocode assignment, and address autocomplete on order entry</span>
+                    </div>
+                    <div class="update-item">
+                        <span class="update-date">Jun 2026</span>
+                        <span>Browser-based web terminal shipped — server and manager landings, order entry, checkout, and card payments, ported 1:1 from the Android terminal</span>
+                    </div>
+                    <div class="update-item">
+                        <span class="update-date">Jun 2026</span>
+                        <span>Per-employee display language and text size now wired end-to-end, from Overseer setting to terminal</span>
+                    </div>
 
                     <div class="update-item">
                         <span class="update-date">May 2026</span>
@@ -957,6 +1045,22 @@
             }
             fromHash();
             window.addEventListener('hashchange', fromHash);
+        })();
+
+        // Solution/Print Templates dropdown — click toggle for touch devices,
+        // hover already handled by CSS for pointer devices.
+        (function () {
+            var dropdown = document.getElementById('solution-dropdown');
+            var caret = document.getElementById('solution-dropdown-caret');
+            if (!dropdown || !caret) return;
+            caret.addEventListener('click', function (e) {
+                e.preventDefault();
+                e.stopPropagation();
+                dropdown.classList.toggle('open');
+            });
+            document.addEventListener('click', function (e) {
+                if (!dropdown.contains(e.target)) dropdown.classList.remove('open');
+            });
         })();
     </script>
 
