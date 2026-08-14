@@ -55,7 +55,7 @@
 
   .jumpnav {
     position: sticky;
-    top: 0;
+    top: 54px;
     z-index: 20;
     display: flex;
     align-items: center;
@@ -70,16 +70,96 @@
     border-bottom: 1px solid var(--line);
   }
 
-  .jumpnav .brand {
-    font-family: "JetBrains Mono", "Consolas", monospace;
-    font-size: 12px;
-    font-weight: 700;
-    letter-spacing: 0.1em;
-    text-transform: uppercase;
-    color: var(--green);
-    margin-right: 8px;
-    white-space: nowrap;
+  /* ── SITE NAV (matches kindpos.com index.html nav exactly) ── */
+  .site-nav {
+    position: sticky;
+    top: 0;
+    z-index: 30;
+    background: var(--surface-2);
+    border-bottom: 2px solid var(--green);
+    margin: 0 -24px;
   }
+  .site-nav-container {
+    display: flex;
+    justify-content: center;
+    align-items: stretch;
+    overflow-x: auto;
+    white-space: nowrap;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none;
+  }
+  .site-nav-container::-webkit-scrollbar { display: none; }
+  .site-nav-logo-wrap {
+    display: flex;
+    align-items: center;
+    padding: 6px 16px 6px 0;
+    border-right: 1px solid rgba(90, 95, 102, 0.3);
+    margin-right: 8px;
+  }
+  .site-nav-logo-wrap img { height: 36px; width: auto; display: block; }
+  .site-nav-link {
+    font-family: "JetBrains Mono", "Consolas", monospace;
+    font-weight: 500;
+    color: var(--text-muted);
+    text-decoration: none;
+    text-transform: uppercase;
+    padding: 0 16px;
+    font-size: 16px;
+    letter-spacing: 1px;
+    cursor: pointer;
+    border-bottom: 3px solid transparent;
+    transition: color 0.15s, border-color 0.15s;
+    display: inline-flex;
+    align-items: center;
+    height: 52px;
+  }
+  .site-nav-link:hover { color: var(--text); }
+  .site-nav-link.active { color: var(--green); border-bottom-color: var(--green); }
+
+  .site-nav-dropdown { position: relative; display: flex; }
+  .site-nav-dropdown-caret {
+    display: inline-flex;
+    align-items: center;
+    padding: 0 14px 0 4px;
+    height: 52px;
+    color: var(--text-muted);
+    cursor: pointer;
+    border-bottom: 3px solid transparent;
+    user-select: none;
+  }
+  .site-nav-dropdown-caret svg { transition: transform 0.15s; }
+  .site-nav-dropdown.open .site-nav-dropdown-caret svg { transform: rotate(180deg); }
+  .site-nav-dropdown-menu {
+    position: absolute;
+    top: 100%;
+    left: 0;
+    min-width: 200px;
+    background: var(--surface-2);
+    border: 1px solid rgba(90, 95, 102, 0.3);
+    border-top: 2px solid var(--green);
+    box-shadow: 0 12px 24px rgba(0, 0, 0, 0.4);
+    display: none;
+    flex-direction: column;
+    z-index: 31;
+  }
+  .site-nav-dropdown-menu a {
+    font-family: "JetBrains Mono", "Consolas", monospace;
+    font-size: 14px;
+    letter-spacing: 0.5px;
+    text-transform: uppercase;
+    color: var(--text-muted);
+    text-decoration: none;
+    padding: 14px 18px;
+    border-bottom: 1px solid rgba(90, 95, 102, 0.15);
+    white-space: nowrap;
+    transition: color 0.15s, background 0.15s;
+  }
+  .site-nav-dropdown-menu a:last-child { border-bottom: none; }
+  .site-nav-dropdown-menu a:hover { color: var(--text); background: rgba(134, 239, 172, 0.06); }
+  .site-nav-dropdown-menu a.current { color: var(--green); }
+  .site-nav-dropdown:hover .site-nav-dropdown-menu,
+  .site-nav-dropdown.open .site-nav-dropdown-menu { display: flex; }
+
 
   .navchip {
     display: inline-flex;
@@ -392,10 +472,32 @@
 </style>
 </head>
 <body>
+<nav class="site-nav">
+  <div class="site-nav-container">
+    <div class="site-nav-logo-wrap">
+      <a href="/"><img src="logo.png" alt="KINDpos"></a>
+    </div>
+    <a class="site-nav-link" href="/">Home</a>
+    <a class="site-nav-link" href="/#story">Story</a>
+    <div class="site-nav-dropdown" id="solution-dropdown">
+      <a class="site-nav-link" href="/solution">Solution</a>
+      <span class="site-nav-dropdown-caret" id="solution-dropdown-caret">
+        <svg width="10" height="6" viewBox="0 0 10 6" fill="none"><path d="M1 1l4 4 4-4" stroke="currentColor" stroke-width="1.5" fill="none" stroke-linecap="round"/></svg>
+      </span>
+      <div class="site-nav-dropdown-menu">
+        <a href="/solution">Solution Tour</a>
+        <a href="/print-templates" class="current">Print Templates</a>
+      </div>
+    </div>
+    <a class="site-nav-link" href="/#feedback">Feedback</a>
+    <a class="site-nav-link" href="/#joinus">Join Us</a>
+    <a class="site-nav-link" href="/#pilot">Pilot</a>
+  </div>
+</nav>
+
 <div class="page">
 
   <nav class="jumpnav">
-    <span class="brand">KINDpos</span>
     <a class="navchip" href="#kitchen-ticket">Kitchen Ticket</a>
     <a class="navchip" href="#guest-receipt">Guest Receipt</a>
     <a class="navchip" href="#gift-card-balance">Gift Card Balance</a>
@@ -1361,15 +1463,31 @@
     caveat.textContent = "Item names, store info, and customer details print exactly as entered — they're your content, not ours. The itemized \"TIP SUGGESTIONS\" breakdown on the guest receipt is currently English-only; every other label shown here is fully localized.";
   }
 
-  function positionLangBar() {
+  function positionStickyBars() {
+    var siteNav = document.querySelector(".site-nav");
     var jumpnav = document.querySelector(".jumpnav");
     var langBar = document.querySelector(".lang-bar");
-    if (jumpnav && langBar) {
-      var jumpnavHeight = jumpnav.offsetHeight;
-      langBar.style.top = jumpnavHeight + "px";
-      var totalSticky = jumpnavHeight + langBar.offsetHeight + 20;
-      document.documentElement.style.setProperty("--sticky-offset", totalSticky + "px");
-    }
+    if (!siteNav || !jumpnav || !langBar) return;
+    var siteNavHeight = siteNav.offsetHeight;
+    jumpnav.style.top = siteNavHeight + "px";
+    var jumpnavHeight = jumpnav.offsetHeight;
+    langBar.style.top = (siteNavHeight + jumpnavHeight) + "px";
+    var totalSticky = siteNavHeight + jumpnavHeight + langBar.offsetHeight + 20;
+    document.documentElement.style.setProperty("--sticky-offset", totalSticky + "px");
+  }
+
+  function initDropdown() {
+    var dropdown = document.getElementById("solution-dropdown");
+    var caret = document.getElementById("solution-dropdown-caret");
+    if (!dropdown || !caret) return;
+    caret.addEventListener("click", function (e) {
+      e.preventDefault();
+      e.stopPropagation();
+      dropdown.classList.toggle("open");
+    });
+    document.addEventListener("click", function (e) {
+      if (!dropdown.contains(e.target)) dropdown.classList.remove("open");
+    });
   }
 
   function init() {
@@ -1384,8 +1502,9 @@
       pillHost.appendChild(btn);
     });
     applyLocale("en");
-    positionLangBar();
-    window.addEventListener("resize", positionLangBar);
+    initDropdown();
+    positionStickyBars();
+    window.addEventListener("resize", positionStickyBars);
   }
 
   if (document.readyState === "loading") {
